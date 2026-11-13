@@ -5,7 +5,7 @@ Generado por `node scripts/tasks.mjs` desde `docs/tasks.json`. No editar a mano.
 
 Estados: ✅ completed · 🔄 in_progress · ⏳ pending · ⛔ blocked_external (en la herramienta queda `pending`).
 
-Resumen: 20 completadas · 40 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
+Resumen: 23 completadas · 37 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
 
 | ID | Tarea | Responsable | Depende de | Estado | Criterio de aceptación | Evidencia |
 |---|---|---|---|---|---|---|
@@ -57,12 +57,12 @@ Resumen: 20 completadas · 40 en curso · 6 pendientes · 0 bloqueadas extername
 | T46 | Implementar polling/webhook seguro e ingestión durable de updates | bot+backend | T44 | ✅ completed | Durabilidad y dedupe probados | Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9) |
 | T47 | Implementar scheduler/outbox, claims, leases, ack y recuperación | backend | T08 | ✅ completed | Dos workers, lease vencido, ack obsoleto, 429 | Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9) |
 | T48 | Implementar recordatorios, pausa, preferencias y estados de entrega | backend | T47 | ✅ completed | Horario local/DST, cancelación, pausa | Scheduler diario/semanal/mensual por fecha local+DST, pausa/reanudar, cancelación por check-in terminado, sin avalancha; GET /reminders con estados de entrega |
-| T49 | Implementar adaptador Calendar de lectura y pruebas | integrations | T09 | 🔄 in_progress | Pruebas con servidor HTTP simulado | — |
-| T50 | Implementar adaptador Gmail de lectura y pruebas | integrations | T49 | 🔄 in_progress | Filtra automáticos; propone interacciones | — |
-| T51 | Implementar adaptador ClickUp por vista y pruebas | integrations | T24 | 🔄 in_progress | Orden fáciles/resto/need info; solo lectura | — |
-| T52 | Implementar captura libre/LLM, propuestas tipadas y confirmación | integrations | T38, T24 | 🔄 in_progress | Validación de esquema, preview, confirmación, modo manual | — |
-| T53 | Implementar importación del vault, dry-run, conflictos y trazabilidad | integrations | T38, T27 | 🔄 in_progress | Dry-run, idempotente, ZIP peligroso rechazado | — |
-| T54 | Implementar exportación JSON/CSV/Markdown y round-trip representativo | integrations | T53 | 🔄 in_progress | Round-trip conserva vínculos; sin secretos | — |
+| T49 | Implementar adaptador Calendar de lectura y pruebas | integrations | T09 | ✅ completed | Pruebas con servidor HTTP simulado | Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes |
+| T50 | Implementar adaptador Gmail de lectura y pruebas | integrations | T49 | ✅ completed | Filtra automáticos; propone interacciones | Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes |
+| T51 | Implementar adaptador ClickUp por vista y pruebas | integrations | T24 | ✅ completed | Orden fáciles/resto/need info; solo lectura | Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes |
+| T52 | Implementar captura libre/LLM, propuestas tipadas y confirmación | integrations | T38, T24 | 🔄 in_progress | Validación de esquema, preview, confirmación, modo manual | Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes; UI en fase 2 |
+| T53 | Implementar importación del vault, dry-run, conflictos y trazabilidad | integrations | T38, T27 | 🔄 in_progress | Dry-run, idempotente, ZIP peligroso rechazado | Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes; UI en fase 2 |
+| T54 | Implementar exportación JSON/CSV/Markdown y round-trip representativo | integrations | T53 | 🔄 in_progress | Round-trip conserva vínculos; sin secretos | Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes; UI en fase 2 |
 | T55 | Implementar manifest, iconos, service worker e instalación PWA | frontend | T14 | ✅ completed | Manifest válido, SW, instrucciones | manifest+iconos maskable, SW Workbox sin /api /internal ni runtime cache (verificado en sw.js), aviso de actualización, /instalar por plataforma; build OK |
 | T56 | Implementar borradores offline, cola, sincronización y conflictos | frontend | T20, T21 | 🔄 in_progress | Borrador offline sincroniza; conflicto explícito | — |
 | T57 | Verificar caché, logout, actualizaciones y aislamiento de datos locales | frontend | T56 | 🔄 in_progress | SW sin /api; logout limpia; update preserva borradores | — |

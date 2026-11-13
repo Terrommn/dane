@@ -540,9 +540,9 @@
       "deps": [
         "T09"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Pruebas con servidor HTTP simulado",
-      "evidence": ""
+      "evidence": "Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes"
     },
     {
       "id": "T50",
@@ -551,9 +551,9 @@
       "deps": [
         "T49"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Filtra automáticos; propone interacciones",
-      "evidence": ""
+      "evidence": "Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes"
     },
     {
       "id": "T51",
@@ -562,9 +562,9 @@
       "deps": [
         "T24"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Orden fáciles/resto/need info; solo lectura",
-      "evidence": ""
+      "evidence": "Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes"
     },
     {
       "id": "T52",
@@ -576,7 +576,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Validación de esquema, preview, confirmación, modo manual",
-      "evidence": ""
+      "evidence": "Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes; UI en fase 2"
     },
     {
       "id": "T53",
@@ -588,7 +588,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Dry-run, idempotente, ZIP peligroso rechazado",
-      "evidence": ""
+      "evidence": "Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes; UI en fase 2"
     },
     {
       "id": "T54",
@@ -599,7 +599,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Round-trip conserva vínculos; sin secretos",
-      "evidence": ""
+      "evidence": "Agente E (backend): integrations_google(4), integrations_clickup(3), integrations_captures(5), integrations_import(3), domain::vault; cuentas reales pendientes; UI en fase 2"
     },
     {
       "id": "T55",

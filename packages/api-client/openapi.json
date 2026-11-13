@@ -826,6 +826,286 @@
         }
       }
     },
+    "/captures": {
+      "get": {
+        "tags": [
+          "captures"
+        ],
+        "operationId": "list_captures",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CaptureView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "captures"
+        ],
+        "summary": "Crea una captura desde la app y, si hay IA, propone su interpretación.",
+        "operationId": "create_capture",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCapture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/captures/suggest": {
+      "post": {
+        "tags": [
+          "captures"
+        ],
+        "summary": "Sugerencia asistida por IA sobre datos propios (resumen semanal, clasificación de Inbox, hábitos para un objetivo).\nSe crea como propuesta que requiere confirmación; los datos se envían como texto delimitado y mínimo.",
+        "operationId": "suggest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuggestBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureView"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/captures/{id}": {
+      "get": {
+        "tags": [
+          "captures"
+        ],
+        "summary": "Obtiene la captura; si viene del bot y aún no tiene propuesta, la extrae (o explica el modo manual).",
+        "operationId": "get_capture",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureView"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "captures"
+        ],
+        "summary": "Edita la propuesta (vista previa). Se valida formato y catálogos; el autor es el usuario.",
+        "operationId": "update_capture",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCapture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureView"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/captures/{id}/apply": {
+      "post": {
+        "tags": [
+          "captures"
+        ],
+        "summary": "Confirma y aplica la propuesta en una sola transacción. Repetir no duplica (claves de idempotencia por elemento).",
+        "operationId": "apply_capture",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureView"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/captures/{id}/reject": {
+      "post": {
+        "tags": [
+          "captures"
+        ],
+        "summary": "Descarta la captura sin aplicar nada.",
+        "operationId": "reject_capture",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/checkins": {
       "get": {
         "tags": [
@@ -2101,6 +2381,51 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exports/json": {
+      "get": {
+        "tags": [
+          "exports"
+        ],
+        "summary": "Todos los datos propios en JSON (excluye sesiones, identidades, credenciales y claves de idempotencia).",
+        "operationId": "export_json",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exports/zip": {
+      "get": {
+        "tags": [
+          "exports"
+        ],
+        "summary": "ZIP con `vida-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault).",
+        "operationId": "export_zip",
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0
+                  }
                 }
               }
             }
@@ -4487,6 +4812,193 @@
         }
       }
     },
+    "/imports": {
+      "get": {
+        "tags": [
+          "imports"
+        ],
+        "operationId": "list_runs",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportRun"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Sube un ZIP del vault (`Content-Type: application/zip`, cuerpo binario) y genera el dry-run. No escribe datos.",
+        "operationId": "upload_zip",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Nombre del archivo para mostrar.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/zip": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportRunView"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/imports/folder": {
+      "post": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Sube una carpeta del vault (selección de carpeta en el navegador) y genera el dry-run.",
+        "operationId": "upload_folder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FolderUpload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportRunView"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/imports/{id}": {
+      "get": {
+        "tags": [
+          "imports"
+        ],
+        "operationId": "get_run",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportRunView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/imports/{id}/apply": {
+      "post": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Confirma y aplica un dry-run en una sola transacción. Las acciones se recalculan contra el estado actual\n(si algo cambió desde el dry-run, se respeta lo que hay en la app).",
+        "operationId": "apply_run",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportRunView"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/inbox": {
       "get": {
         "tags": [
@@ -4718,6 +5230,430 @@
               }
             }
           }
+        }
+      }
+    },
+    "/integrations": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Estado de todas las integraciones: conexión, última sincronización y errores.",
+        "operationId": "overview",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationsOverview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/clickup": {
+      "put": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "clickup_connect",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClickupBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionStatus"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "clickup_disconnect",
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/integrations/clickup/sync": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Lee la vista configurada de ClickUp ahora (no modifica nada en ClickUp).",
+        "operationId": "clickup_sync",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncReport"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/clickup/tasks": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Tareas abiertas de ClickUp en el orden de la daily: fáciles (con razón), resto, need info.",
+        "operationId": "clickup_tasks",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderedTask"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/google": {
+      "delete": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Revoca el acceso en Google y borra las credenciales.",
+        "operationId": "google_disconnect",
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/integrations/google/calendars": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Calendarios disponibles; los de festivos/observancias se marcan como excluidos siempre.",
+        "operationId": "google_calendars",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CalendarInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/google/callback": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Callback de Google. El `state` (un solo uso) identifica al usuario; no requiere sesión.",
+        "operationId": "google_callback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "302": {}
+        }
+      }
+    },
+    "/integrations/google/config": {
+      "put": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "google_config",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleConfigBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionStatus"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/google/connect": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Inicia la conexión con Google (OAuth + PKCE, scopes de solo lectura).",
+        "operationId": "google_connect",
+        "parameters": [
+          {
+            "name": "redirect_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizeUrl"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/google/sync": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Sincroniza ahora (agenda y correos enviados). Ventana máxima de 62 días.",
+        "operationId": "google_sync",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SyncReport"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/suggestions": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Interacciones y personas propuestas desde Calendar/Gmail/dictado (nada se registra sin aceptar).",
+        "operationId": "suggestions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Suggestions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/suggestions/interactions/{id}/accept": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "accept_interaction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInteraction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InteractionSuggestion"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/suggestions/interactions/{id}/dismiss": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "dismiss_interaction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/integrations/suggestions/people/{id}/accept": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Crea la persona sugerida (decisión explícita del usuario).",
+        "operationId": "accept_person",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptPerson"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/integrations/suggestions/people/{id}/dismiss": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "dismiss_person",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
         }
       }
     },
@@ -7237,6 +8173,36 @@
   },
   "components": {
     "schemas": {
+      "AcceptInteraction": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Tema editado (opcional)."
+          }
+        }
+      },
+      "AcceptPerson": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
       "AcceptResult": {
         "type": "object",
         "required": [
@@ -7978,6 +8944,18 @@
           }
         }
       },
+      "AuthorizeUrl": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Abre esta URL (en el navegador, no dentro de un WebView) para autorizar."
+          }
+        }
+      },
       "BalanceSnapshot": {
         "type": "object",
         "required": [
@@ -8350,6 +9328,34 @@
           }
         }
       },
+      "CalendarInfo": {
+        "type": "object",
+        "required": [
+          "id",
+          "summary",
+          "primary",
+          "excluded_by_rule",
+          "selected"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "primary": {
+            "type": "boolean"
+          },
+          "excluded_by_rule": {
+            "type": "boolean",
+            "description": "Calendarios de festivos/observancias/contactos/semana: siempre excluidos."
+          },
+          "selected": {
+            "type": "boolean"
+          }
+        }
+      },
       "CaptureBody": {
         "type": "object",
         "required": [
@@ -8372,6 +9378,93 @@
               "null"
             ],
             "description": "`app` (por defecto) o `telegram`."
+          }
+        }
+      },
+      "CaptureView": {
+        "type": "object",
+        "required": [
+          "id",
+          "intent",
+          "input_text",
+          "source",
+          "reference_date",
+          "status",
+          "mode",
+          "proposal",
+          "questions",
+          "errors",
+          "llm_configured",
+          "allowed_fields",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "intent": {
+            "type": "string",
+            "description": "`daily | dump | gasto | ingreso | objetivos | weekly_review | log_session | inbox | free`"
+          },
+          "input_text": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "reference_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "description": "`pending | needs_input | applied | rejected | failed`"
+          },
+          "mode": {
+            "type": "string",
+            "description": "`llm` (propuesta extraída) o `manual` (sin IA; el usuario llena la propuesta)."
+          },
+          "proposal": {
+            "type": "object",
+            "description": "Propuesta tipada: expenses, incomes, tasks, inbox, log, reflections_good/bad, interactions, checkin, goals, devlog, summary."
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applied": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "llm_configured": {
+            "type": "boolean"
+          },
+          "llm_model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "allowed_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -8995,6 +10088,58 @@
           }
         }
       },
+      "ClickupBody": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Token personal (pk_…). Si se omite, solo se actualiza la configuración."
+          },
+          "view_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status_map": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Estado de ClickUp → `open | need_info | closed`.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "endpoints_override": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Solo desarrollo/pruebas: URL base simulada."
+          }
+        }
+      },
       "CloseBody": {
         "type": "object",
         "required": [
@@ -9100,6 +10245,65 @@
               "null"
             ],
             "format": "uuid"
+          }
+        }
+      },
+      "ConnectionStatus": {
+        "type": "object",
+        "description": "Estado visible de una conexión (sin credenciales).",
+        "required": [
+          "provider",
+          "status",
+          "scopes",
+          "config",
+          "version"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "`connected | error | disconnected | revoked`"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "account_label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "config": {
+            "type": "object"
+          },
+          "last_sync_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "last_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_error_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -10786,6 +11990,22 @@
           }
         }
       },
+      "EditCapture": {
+        "type": "object",
+        "required": [
+          "version",
+          "proposal"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "proposal": {
+            "type": "object"
+          }
+        }
+      },
       "EnergyPoint": {
         "type": "object",
         "required": [
@@ -11001,6 +12221,21 @@
           "route": {
             "type": "string",
             "description": "Ruta de la web para abrir la fuente."
+          }
+        }
+      },
+      "FileRefView": {
+        "type": "object",
+        "required": [
+          "path",
+          "reason"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
           }
         }
       },
@@ -11376,6 +12611,45 @@
             "type": "integer",
             "format": "int64",
             "description": "Movimientos en otra moneda sin conversión, excluidos de los totales."
+          }
+        }
+      },
+      "FolderFile": {
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Ruta relativa dentro del vault (ej. `Daily/2026-11-02.md`)."
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Contenido de texto (Markdown). Archivos binarios: omite `content` para registrarlos como referencia."
+          }
+        }
+      },
+      "FolderUpload": {
+        "type": "object",
+        "required": [
+          "files"
+        ],
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FolderFile"
+            }
           }
         }
       },
@@ -11823,6 +13097,40 @@
           "habit_adherence": {
             "type": "object",
             "description": "Adherencia cerrada de los hábitos del objetivo en su periodo."
+          }
+        }
+      },
+      "GoogleConfigBody": {
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "calendars": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs de calendarios a leer (los de festivos se ignoran aunque se incluyan)."
+          },
+          "calendar_enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "gmail_enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
           }
         }
       },
@@ -12588,6 +13896,89 @@
           }
         }
       },
+      "ImportRun": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "source_name",
+          "summary",
+          "warnings",
+          "conflicts",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "source_name": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "object"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "conflicts": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "applied_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "ImportRunView": {
+        "type": "object",
+        "required": [
+          "run",
+          "items",
+          "references",
+          "ignored"
+        ],
+        "properties": {
+          "run": {
+            "$ref": "#/components/schemas/ImportRun"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanItemView"
+            }
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileRefView"
+            },
+            "description": "Archivos no soportados conservados como referencia (adjuntos, dibujos)."
+          },
+          "ignored": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileRefView"
+            }
+          }
+        }
+      },
       "InboxAction": {
         "oneOf": [
           {
@@ -12863,6 +14254,41 @@
           }
         }
       },
+      "IntegrationsOverview": {
+        "type": "object",
+        "required": [
+          "google",
+          "clickup",
+          "google_available",
+          "llm",
+          "recent_runs",
+          "google_redirect_uri"
+        ],
+        "properties": {
+          "google": {
+            "$ref": "#/components/schemas/ConnectionStatus"
+          },
+          "clickup": {
+            "$ref": "#/components/schemas/ConnectionStatus"
+          },
+          "google_available": {
+            "type": "boolean",
+            "description": "El servidor tiene credenciales OAuth de Google (GOOGLE_CLIENT_ID)."
+          },
+          "llm": {
+            "$ref": "#/components/schemas/LlmStatus"
+          },
+          "recent_runs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncRun"
+            }
+          },
+          "google_redirect_uri": {
+            "type": "string"
+          }
+        }
+      },
       "Interaction": {
         "type": "object",
         "required": [
@@ -12972,6 +14398,44 @@
           }
         }
       },
+      "InteractionSuggestion": {
+        "type": "object",
+        "required": [
+          "id",
+          "person_id",
+          "person_name",
+          "on_date",
+          "topic",
+          "source",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "person_name": {
+            "type": "string"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
       "LinkBody": {
         "type": "object",
         "required": [
@@ -13027,6 +14491,28 @@
           "created_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "LlmStatus": {
+        "type": "object",
+        "required": [
+          "configured",
+          "mode"
+        ],
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "description": "`llm` si hay credencial; `manual` si no (formularios completos sin IA)."
           }
         }
       },
@@ -13203,6 +14689,29 @@
           "consumption_net_cents": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "NewCapture": {
+        "type": "object",
+        "required": [
+          "intent",
+          "text"
+        ],
+        "properties": {
+          "intent": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "reference_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Fecha de referencia (\"hoy\" para el usuario si se omite)."
           }
         }
       },
@@ -13407,6 +14916,53 @@
               "null"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "OrderedTask": {
+        "type": "object",
+        "required": [
+          "task_id",
+          "external_id",
+          "title",
+          "group",
+          "status"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "external_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priority": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "group": {
+            "type": "string",
+            "description": "`easy | assigned | need_info`"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
           }
         }
       },
@@ -14207,6 +15763,40 @@
           },
           "forbid_cards_with_debt": {
             "type": "boolean"
+          }
+        }
+      },
+      "PlanItemView": {
+        "type": "object",
+        "required": [
+          "source_key",
+          "path",
+          "title",
+          "entity_type",
+          "action"
+        ],
+        "properties": {
+          "source_key": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "entity_type": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "description": "`create | link | unchanged | conflict`"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -15769,6 +17359,31 @@
           }
         }
       },
+      "SuggestBody": {
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "`weekly_summary | inbox_classification | goal_habits`"
+          },
+          "iso_week": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "goal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
       "SuggestionBody": {
         "type": "object",
         "required": [
@@ -15802,6 +17417,27 @@
           },
           "context": {
             "type": "string"
+          }
+        }
+      },
+      "Suggestions": {
+        "type": "object",
+        "required": [
+          "interactions",
+          "people"
+        ],
+        "properties": {
+          "interactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InteractionSuggestion"
+            }
+          },
+          "people": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonSuggestion"
+            }
           }
         }
       },
@@ -15933,6 +17569,111 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "SyncBody": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          }
+        }
+      },
+      "SyncReport": {
+        "type": "object",
+        "description": "Resultado común de una sincronización.",
+        "required": [
+          "provider",
+          "kind",
+          "upserted",
+          "removed",
+          "suggestions",
+          "skipped"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "upserted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "removed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "suggestions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "skipped": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SyncRun": {
+        "type": "object",
+        "required": [
+          "provider",
+          "kind",
+          "started_at",
+          "items"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ok": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
