@@ -826,6 +826,167 @@
         }
       }
     },
+    "/checkins": {
+      "get": {
+        "tags": [
+          "checkins"
+        ],
+        "summary": "Check-ins de un rango (historial; no incluye días sin registro).",
+        "operationId": "list_checkins",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Checkin"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/checkins/{date}": {
+      "get": {
+        "tags": [
+          "checkins"
+        ],
+        "operationId": "get_checkin",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckinFull"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "checkins"
+        ],
+        "summary": "Aplica el check-in (mañana o noche) sobre el registro único del día.",
+        "operationId": "put_checkin",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckinPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckinFull"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/checkins/{date}/view": {
+      "get": {
+        "tags": [
+          "checkins"
+        ],
+        "summary": "Todo lo necesario para la pantalla Hoy de una fecha (también días anteriores).",
+        "operationId": "day_view",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DayView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/class-notes": {
       "get": {
         "tags": [
@@ -1275,6 +1436,53 @@
         }
       }
     },
+    "/dashboard": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Dashboard general.",
+        "operationId": "dashboard",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Fecha de referencia (por defecto hoy).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "compare",
+            "in": "query",
+            "description": "`same_span` (por defecto: mismo tramo del periodo anterior) o `full` (periodos completos).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/devlog-sessions/{id}": {
       "put": {
         "tags": [
@@ -1549,6 +1757,203 @@
               }
             }
           }
+        }
+      }
+    },
+    "/devotionals": {
+      "get": {
+        "tags": [
+          "devotionals"
+        ],
+        "summary": "Historial (Devocionales.base: fecha desc con pasaje) con búsqueda sin acentos.",
+        "operationId": "list_devotionals",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Búsqueda de texto (tolerante a acentos donde aplique).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "Incluir archivados.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevotionalPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devotionals/template": {
+      "get": {
+        "tags": [
+          "devotionals"
+        ],
+        "summary": "Plantilla vigente: la personalizada en ajustes (`devotional_template`) o la del vault según el modo.",
+        "operationId": "get_template",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevotionalTemplate"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devotionals/{date}": {
+      "get": {
+        "tags": [
+          "devotionals"
+        ],
+        "operationId": "get_devotional",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Devotional"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "devotionals"
+        ],
+        "summary": "Crea/actualiza el devocional del día. Con contenido real marca el hábito vinculado (`devotional_content`) de esa\nfecha; si queda vacío, retira la marca automática.",
+        "operationId": "put_devotional",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevotionalBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Devotional"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "devotionals"
+        ],
+        "operationId": "delete_devotional",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
         }
       }
     },
@@ -3108,6 +3513,980 @@
         }
       }
     },
+    "/goals": {
+      "get": {
+        "tags": [
+          "goals"
+        ],
+        "summary": "Objetivos (vista Objetivos.base: agrupables por tipo, con periodo, inicio, fin y estado).",
+        "operationId": "list_goals",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "`month | week`",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "period_key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GoalView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "goals"
+        ],
+        "summary": "Crea un objetivo. No se crean objetivos sin decisión explícita del usuario (esta llamada es esa decisión).",
+        "operationId": "create_goal",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoalBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goals/planning": {
+      "get": {
+        "tags": [
+          "goals"
+        ],
+        "summary": "Contexto para planear la semana (y el mes primero cuando toca), con avisos de carga de hábitos.",
+        "operationId": "planning",
+        "parameters": [
+          {
+            "name": "week",
+            "in": "query",
+            "description": "Semana `GGGG-Www`. Por defecto la actual; sábado y domingo, la siguiente.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Planning"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goals/{id}": {
+      "get": {
+        "tags": [
+          "goals"
+        ],
+        "operationId": "get_goal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "goals"
+        ],
+        "summary": "Edita el objetivo (no cambia tipo ni periodo). Logros subjetivos se confirman con el cierre explícito.",
+        "operationId": "update_goal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoalBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalView"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goals/{id}/close": {
+      "post": {
+        "tags": [
+          "goals"
+        ],
+        "summary": "Cierre del objetivo (acción diferenciada de editar o archivar): estado final + logro, aprendizaje, dificultades y ajustes.",
+        "operationId": "close_goal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloseBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalView"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goals/{id}/links": {
+      "post": {
+        "tags": [
+          "goals"
+        ],
+        "summary": "Enlaza una entidad para que aporte al objetivo (una vez por objetivo; enlazarla a la semana y al mes aporta una vez a cada uno).",
+        "operationId": "add_link",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goals/{id}/links/{src_type}/{src_id}": {
+      "delete": {
+        "tags": [
+          "goals"
+        ],
+        "operationId": "delete_link",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "src_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "src_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/goals/{id}/progress": {
+      "post": {
+        "tags": [
+          "goals"
+        ],
+        "summary": "Evento manual de progreso (debe coincidir con el tipo de progreso del objetivo).",
+        "operationId": "add_progress",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goals/{id}/progress/{event_id}": {
+      "delete": {
+        "tags": [
+          "goals"
+        ],
+        "operationId": "delete_progress",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/habit-links": {
+      "get": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Vínculos configurados (registrar peso → \"Pesarme\", gasto → \"Registrar gastos\", etc.).",
+        "operationId": "list_links",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HabitLink"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/habit-links/{trigger}": {
+      "put": {
+        "tags": [
+          "habits"
+        ],
+        "operationId": "set_link",
+        "parameters": [
+          {
+            "name": "trigger",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HabitLink"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "habits"
+        ],
+        "operationId": "delete_link",
+        "parameters": [
+          {
+            "name": "trigger",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/habits": {
+      "get": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Hábitos con estado de hoy, rachas y cumplimiento de 30 días.",
+        "operationId": "list_habits",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Fecha de referencia (por defecto hoy en la zona del usuario).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HabitSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Crea un hábito con su primera versión. Un hábito de objetivo rige solo dentro del periodo del objetivo.",
+        "operationId": "create_habit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHabit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HabitDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/habits/fixed": {
+      "post": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Confirma los hábitos fijos propuestos en onboarding (devocional, ejercicio, lectura). Nada se crea sin esta\nconfirmación. Idempotente: si ya existe, actualiza su frecuencia desde `starts_on` o lo archiva si `enabled=false`.",
+        "operationId": "setup_fixed_habits",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FixedHabitsBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Habit"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/habits/history": {
+      "get": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Historial por día (por defecto últimos 30 días) con energía, peso y estado de cada hábito.",
+        "operationId": "habit_history",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HabitHistory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/habits/{id}": {
+      "get": {
+        "tags": [
+          "habits"
+        ],
+        "operationId": "get_habit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HabitDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Edita la identidad (nombre, área, unidad, archivo). La frecuencia se cambia con una versión nueva.",
+        "operationId": "update_habit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateHabit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Habit"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/habits/{id}/entries/{date}": {
+      "put": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Registra el estado de un día (una sola ocurrencia por hábito y fecha).",
+        "operationId": "put_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HabitEntry"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Vuelve el día a \"sin registrar\".",
+        "operationId": "delete_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/habits/{id}/pauses": {
+      "post": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Pausa: los días cubiertos salen del denominador.",
+        "operationId": "add_pause",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PauseBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HabitPause"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/habits/{id}/pauses/{pause_id}": {
+      "delete": {
+        "tags": [
+          "habits"
+        ],
+        "operationId": "delete_pause",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pause_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/habits/{id}/versions": {
+      "post": {
+        "tags": [
+          "habits"
+        ],
+        "summary": "Cambia la frecuencia/meta desde una fecha sin alterar el historial.",
+        "operationId": "add_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewVersionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HabitVersionRow"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/inbox": {
       "get": {
         "tags": [
@@ -4428,6 +5807,190 @@
         }
       }
     },
+    "/readings": {
+      "get": {
+        "tags": [
+          "readings"
+        ],
+        "summary": "Lecturas (tabla y tarjetas por estado).",
+        "operationId": "list_readings",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "`want | reading | finished | abandoned`",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reading"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "readings"
+        ],
+        "operationId": "create_reading",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readings/{id}": {
+      "get": {
+        "tags": [
+          "readings"
+        ],
+        "operationId": "get_reading",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "readings"
+        ],
+        "operationId": "update_reading",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingView"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "readings"
+        ],
+        "summary": "Borra la lectura y retira sus aportes a objetivos.",
+        "operationId": "delete_reading",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      }
+    },
     "/reminders": {
       "get": {
         "tags": [
@@ -5542,6 +7105,134 @@
           }
         }
       }
+    },
+    "/weekly-reviews": {
+      "get": {
+        "tags": [
+          "weekly"
+        ],
+        "operationId": "list_reviews",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeeklyReview"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/weekly-reviews/{iso_week}": {
+      "get": {
+        "tags": [
+          "weekly"
+        ],
+        "operationId": "get_review",
+        "parameters": [
+          {
+            "name": "iso_week",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyReviewView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "weekly"
+        ],
+        "summary": "Guarda la revisión (con snapshot del resumen calculado y sus evidencias).",
+        "operationId": "put_review",
+        "parameters": [
+          {
+            "name": "iso_week",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeeklyBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyReview"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/weekly-reviews/{iso_week}/summary": {
+      "get": {
+        "tags": [
+          "weekly"
+        ],
+        "summary": "Resumen automático (editable en el formulario; no se guarda hasta `PUT`).",
+        "operationId": "summary",
+        "parameters": [
+          {
+            "name": "iso_week",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklySummary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6012,6 +7703,57 @@
           }
         }
       },
+      "AgendaItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "title",
+          "all_day",
+          "attendees"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "starts_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ends_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "all_day": {
+            "type": "boolean"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attendees": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
       "AiContentContext": {
         "type": "object",
         "required": [
@@ -6121,6 +7863,29 @@
           }
         }
       },
+      "AreaActivity": {
+        "type": "object",
+        "required": [
+          "area_name",
+          "done",
+          "open"
+        ],
+        "properties": {
+          "area_name": {
+            "type": "string"
+          },
+          "done": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "open": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "AreaBody": {
         "type": "object",
         "required": [
@@ -6183,7 +7948,7 @@
           "tasks": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Task"
+              "$ref": "#/components/schemas/TaskBrief"
             }
           }
         }
@@ -6894,6 +8659,239 @@
           }
         }
       },
+      "Checkin": {
+        "type": "object",
+        "required": [
+          "id",
+          "on_date",
+          "planned_spend_none",
+          "notes_md",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "weight_kg": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "energy": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "planned_spend_text": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "planned_spend_cents": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "planned_spend_none": {
+            "type": "boolean"
+          },
+          "notes_md": {
+            "type": "string"
+          },
+          "morning_done_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "evening_done_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CheckinFull": {
+        "type": "object",
+        "required": [
+          "version",
+          "log",
+          "went_well",
+          "went_badly",
+          "habit_entries"
+        ],
+        "properties": {
+          "checkin": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Checkin",
+                "description": "`null` si aún no hay registro ese día (todo \"sin registrar\")."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Versión a enviar en el siguiente guardado (0 si no existe)."
+          },
+          "log": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LogEntry"
+            }
+          },
+          "went_well": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reflection"
+            }
+          },
+          "went_badly": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reflection"
+            }
+          },
+          "habit_entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitEntry"
+            }
+          }
+        }
+      },
+      "CheckinPatch": {
+        "type": "object",
+        "description": "Guardado parcial: los campos ausentes no cambian; `null` explícito borra (vuelve a \"sin dato\", que no es cero).",
+        "properties": {
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Versión conocida por el cliente (0 o ausente si el día no tenía registro). Si no coincide → 409 con el actual."
+          },
+          "weight_kg": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "energy": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "planned_spend_text": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "planned_spend_cents": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "planned_spend_none": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "\"No planeo gastar nada\" (distinto de no haber respondido)."
+          },
+          "notes_md": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "morning_done": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "evening_done": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Marca el cierre nocturno (cancela el recordatorio del día)."
+          },
+          "log": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista completa del log del día (reemplaza)."
+          },
+          "went_well": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "\"Lo que hice bien hoy\" (reemplaza). Solo lo que el usuario escribió."
+          },
+          "went_badly": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "\"Lo que hice mal hoy\" (reemplaza)."
+          },
+          "habits": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/HabitEntryPatch"
+            },
+            "description": "Entradas de hábitos del día (fijos y de objetivos)."
+          }
+        }
+      },
       "ClassNote": {
         "type": "object",
         "required": [
@@ -6994,6 +8992,79 @@
               "$ref": "#/components/schemas/Task"
             },
             "description": "Entregas/tareas relacionadas."
+          }
+        }
+      },
+      "CloseBody": {
+        "type": "object",
+        "required": [
+          "status",
+          "version"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "`achieved | not_achieved` — decisión del usuario."
+          },
+          "achievement": {
+            "type": "string"
+          },
+          "learning": {
+            "type": "string"
+          },
+          "difficulties": {
+            "type": "string"
+          },
+          "adjustments": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Comparison": {
+        "type": "object",
+        "required": [
+          "mode",
+          "label",
+          "current_start",
+          "current_end",
+          "previous_start",
+          "previous_end",
+          "metrics"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "`same_span | full`"
+          },
+          "label": {
+            "type": "string",
+            "description": "Texto para la UI (ej. \"del 1 al 12 vs mismo tramo de octubre\")."
+          },
+          "current_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "current_end": {
+            "type": "string",
+            "format": "date"
+          },
+          "previous_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "previous_end": {
+            "type": "string",
+            "format": "date"
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricDelta"
+            }
           }
         }
       },
@@ -7163,6 +9234,53 @@
               "null"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "ContentBrief": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "status",
+          "platforms"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "published_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "views": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "retention_pct": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -7351,6 +9469,64 @@
           }
         ]
       },
+      "CreateHabit": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FrequencyBody"
+          },
+          {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string",
+                "description": "`goal` (requiere `goal_id`) o `custom`. Los fijos se crean con `POST /habits/fixed`."
+              },
+              "goal_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "area_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "unit": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Unidad de la cantidad registrada (ej. `min`). Independiente de la unidad de cualquier objetivo."
+              },
+              "description": {
+                "type": "string"
+              },
+              "position": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "starts_on": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date",
+                "description": "Desde cuándo se exige (por defecto hoy o el inicio del objetivo si es posterior)."
+              }
+            }
+          }
+        ]
+      },
       "CreatedTransaction": {
         "type": "object",
         "required": [
@@ -7430,6 +9606,96 @@
           }
         }
       },
+      "Dashboard": {
+        "type": "object",
+        "required": [
+          "date",
+          "today",
+          "iso_week",
+          "month",
+          "month_goals",
+          "week_goals",
+          "habits",
+          "last_30_days",
+          "weight",
+          "energy",
+          "peace",
+          "finance",
+          "week_comparison",
+          "month_comparison"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "today": {
+            "type": "string",
+            "format": "date"
+          },
+          "iso_week": {
+            "type": "string"
+          },
+          "month": {
+            "type": "string"
+          },
+          "month_goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalView"
+            }
+          },
+          "week_goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalView"
+            }
+          },
+          "habits": {
+            "$ref": "#/components/schemas/HabitBlock"
+          },
+          "devotional": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DevotionalFailures"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_30_days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HeatDay"
+            }
+          },
+          "weight": {
+            "$ref": "#/components/schemas/WeightBlock"
+          },
+          "energy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnergyPoint"
+            }
+          },
+          "peace": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PeacePoint"
+            }
+          },
+          "finance": {
+            "$ref": "#/components/schemas/FinanceBlock"
+          },
+          "week_comparison": {
+            "$ref": "#/components/schemas/Comparison"
+          },
+          "month_comparison": {
+            "$ref": "#/components/schemas/Comparison"
+          }
+        }
+      },
       "DayPoint": {
         "type": "object",
         "required": [
@@ -7487,6 +9753,123 @@
             "minimum": 0
           }
         }
+      },
+      "DayView": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CheckinFull"
+          },
+          {
+            "type": "object",
+            "required": [
+              "date",
+              "today",
+              "timezone",
+              "iso_week",
+              "month",
+              "is_open",
+              "habits",
+              "month_goals",
+              "week_goals",
+              "devotional_enabled",
+              "devotional_mode",
+              "agenda",
+              "tasks_by_area",
+              "people",
+              "derived",
+              "reminder_done",
+              "currency",
+              "generated_at"
+            ],
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "today": {
+                "type": "string",
+                "format": "date"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "iso_week": {
+                "type": "string"
+              },
+              "month": {
+                "type": "string"
+              },
+              "is_open": {
+                "type": "boolean",
+                "description": "El día sigue abierto (es hoy): sus faltantes no penalizan todavía."
+              },
+              "habits": {
+                "$ref": "#/components/schemas/HabitGroups"
+              },
+              "month_goals": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GoalBrief"
+                }
+              },
+              "week_goals": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GoalBrief"
+                }
+              },
+              "devotional_enabled": {
+                "type": "boolean",
+                "description": "Módulo devocional activo y modo (`devotional | meditation`)."
+              },
+              "devotional_mode": {
+                "type": "string"
+              },
+              "devotional": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Devotional"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "agenda": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AgendaItem"
+                },
+                "description": "Agenda del día (propuesta: un evento no prueba asistencia)."
+              },
+              "tasks_by_area": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AreaTasks"
+                }
+              },
+              "people": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/InteractionBrief"
+                }
+              },
+              "derived": {
+                "$ref": "#/components/schemas/DerivedLog"
+              },
+              "reminder_done": {
+                "type": "boolean"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "generated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
       },
       "Debt": {
         "type": "object",
@@ -7750,6 +10133,47 @@
           }
         }
       },
+      "DerivedLog": {
+        "type": "object",
+        "required": [
+          "closed_tasks",
+          "past_events",
+          "devlog_sessions",
+          "expenses_total_cents",
+          "expenses_count"
+        ],
+        "properties": {
+          "closed_tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskBrief"
+            },
+            "description": "Pendientes cerrados ese día (derivado, no se guarda en el log)."
+          },
+          "past_events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AgendaItem"
+            },
+            "description": "Eventos de agenda ya terminados."
+          },
+          "devlog_sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DevlogBrief"
+            }
+          },
+          "expenses_total_cents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Gasto confirmado del día en moneda base (centavos)."
+          },
+          "expenses_count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "DevLogin": {
         "type": "object",
         "required": [
@@ -7912,6 +10336,35 @@
           }
         }
       },
+      "DevlogBrief": {
+        "type": "object",
+        "required": [
+          "id",
+          "on_date",
+          "repo",
+          "branch",
+          "changes_md"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "branch": {
+            "type": "string"
+          },
+          "changes_md": {
+            "type": "string"
+          }
+        }
+      },
       "DevlogDay": {
         "type": "object",
         "required": [
@@ -7937,6 +10390,256 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DevSession"
+            }
+          }
+        }
+      },
+      "Devotional": {
+        "type": "object",
+        "required": [
+          "id",
+          "on_date",
+          "mode",
+          "passage",
+          "verse_actions",
+          "learned",
+          "teaching",
+          "prayer",
+          "song",
+          "extra",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "mode": {
+            "type": "string",
+            "description": "`devotional | meditation`"
+          },
+          "passage": {
+            "type": "string"
+          },
+          "verse_actions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "`[{verse, action}]` — \"¿Cómo puedo agradar a Dios hoy?\""
+          },
+          "learned": {
+            "type": "string"
+          },
+          "teaching": {
+            "type": "string"
+          },
+          "prayer": {
+            "type": "string"
+          },
+          "song": {
+            "type": "string"
+          },
+          "extra": {
+            "type": "object",
+            "description": "Secciones personalizadas de la plantilla del usuario: `{clave: texto}`."
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DevotionalBody": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`devotional | meditation` (por defecto, el modo de ajustes)."
+          },
+          "passage": {
+            "type": "string"
+          },
+          "verse_actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerseActionBody"
+            }
+          },
+          "learned": {
+            "type": "string"
+          },
+          "teaching": {
+            "type": "string"
+          },
+          "prayer": {
+            "type": "string"
+          },
+          "song": {
+            "type": "string"
+          },
+          "extra": {
+            "type": "object",
+            "description": "Secciones personalizadas `{clave: texto}`."
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "0 o ausente al crear."
+          }
+        }
+      },
+      "DevotionalFailures": {
+        "type": "object",
+        "required": [
+          "habit_id",
+          "explicit_failures",
+          "unrecorded",
+          "failures_total",
+          "closed_days",
+          "note",
+          "route"
+        ],
+        "properties": {
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "explicit_failures": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Días cerrados del mes con `not_done` explícito.",
+            "minimum": 0
+          },
+          "unrecorded": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Días cerrados del mes sin registro (cuentan como falla, se muestran aparte).",
+            "minimum": 0
+          },
+          "failures_total": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "closed_days": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "max_allowed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Máximo configurado (ajustes). `None` si el usuario no lo definió."
+          },
+          "over_limit": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "description": "Aviso: el mes sigue abierto; hoy y los días futuros no cuentan."
+          },
+          "route": {
+            "type": "string"
+          }
+        }
+      },
+      "DevotionalNote": {
+        "type": "object",
+        "required": [
+          "date",
+          "passage",
+          "actions",
+          "learned"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "passage": {
+            "type": "string"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "learned": {
+            "type": "string"
+          }
+        }
+      },
+      "DevotionalPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Devotional"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "limit": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "DevotionalTemplate": {
+        "type": "object",
+        "required": [
+          "mode",
+          "enabled",
+          "sections"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "`devotional | meditation`"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateSection"
             }
           }
         }
@@ -8083,6 +10786,23 @@
           }
         }
       },
+      "EnergyPoint": {
+        "type": "object",
+        "required": [
+          "date",
+          "energy"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "energy": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "EntityLinks": {
         "type": "object",
         "required": [
@@ -8141,6 +10861,39 @@
           "at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "EntryBody": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "`done | not_done | not_applicable`"
+          },
+          "quantity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Obligatorio para `not_applicable`."
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Versión esperada si la entrada ya existe (control de conflictos)."
           }
         }
       },
@@ -8220,6 +10973,53 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "Evidence": {
+        "type": "object",
+        "required": [
+          "entity_type",
+          "label",
+          "route"
+        ],
+        "properties": {
+          "entity_type": {
+            "type": "string",
+            "description": "Tipo de entidad (ver docs/CONVENTIONS.md §6)."
+          },
+          "entity_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string"
+          },
+          "route": {
+            "type": "string",
+            "description": "Ruta de la web para abrir la fuente."
+          }
+        }
+      },
+      "FinanceBlock": {
+        "type": "object",
+        "required": [
+          "month",
+          "week",
+          "route"
+        ],
+        "properties": {
+          "month": {
+            "$ref": "#/components/schemas/FinanceSummary"
+          },
+          "week": {
+            "$ref": "#/components/schemas/FinanceSummary"
+          },
+          "route": {
+            "type": "string"
           }
         }
       },
@@ -8350,6 +11150,167 @@
           }
         }
       },
+      "FinanceSummary": {
+        "type": "object",
+        "description": "Resumen financiero confirmado de un periodo, en centavos de la moneda base del usuario.\nSolo movimientos `confirmed` en la moneda base; los de otra moneda sin conversión se cuentan aparte.",
+        "required": [
+          "consumption_cents",
+          "debt_payments_cents",
+          "earned_income_cents",
+          "financing_cents",
+          "investment_cents",
+          "cash_in_cents",
+          "cash_out_cents",
+          "excluded_foreign_count"
+        ],
+        "properties": {
+          "consumption_cents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Consumo (gastos con rol consumption/payroll), una sola vez aunque se pague con tarjeta."
+          },
+          "debt_payments_cents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Pagos de deuda (pagos de tarjeta + abonos a deudas)."
+          },
+          "earned_income_cents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Ingreso ganado (rol earned)."
+          },
+          "financing_cents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Financiamiento recibido (préstamos)."
+          },
+          "investment_cents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cash_in_cents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Entradas y salidas de cuentas de efectivo/débito (flujo de efectivo)."
+          },
+          "cash_out_cents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "excluded_foreign_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Movimientos en otra moneda excluidos de los totales."
+          }
+        }
+      },
+      "FixedHabitConfig": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FrequencyBody"
+          },
+          {
+            "type": "object",
+            "required": [
+              "enabled"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Nombre visible (ej. \"Meditación\" si sustituye al devocional)."
+              }
+            }
+          }
+        ]
+      },
+      "FixedHabitWeek": {
+        "type": "object",
+        "required": [
+          "habit_id",
+          "key",
+          "name",
+          "done",
+          "target",
+          "compliance"
+        ],
+        "properties": {
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "key": {
+            "type": "string",
+            "description": "`devotional | exercise | reading`"
+          },
+          "name": {
+            "type": "string"
+          },
+          "done": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Días con `done` en la semana (hasta hoy).",
+            "minimum": 0
+          },
+          "target": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Meta de la semana: días exigibles (diario) o N (N por semana).",
+            "minimum": 0
+          },
+          "compliance": {
+            "type": "object"
+          }
+        }
+      },
+      "FixedHabitsBody": {
+        "type": "object",
+        "properties": {
+          "devotional": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FixedHabitConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exercise": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FixedHabitConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reading": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FixedHabitConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "starts_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Desde cuándo rigen (por defecto hoy)."
+          }
+        }
+      },
       "FlowTotals": {
         "type": "object",
         "required": [
@@ -8418,6 +11379,41 @@
           }
         }
       },
+      "FrequencyBody": {
+        "type": "object",
+        "required": [
+          "frequency"
+        ],
+        "properties": {
+          "frequency": {
+            "type": "string",
+            "description": "`daily | weekdays | times_per_week`"
+          },
+          "weekdays": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Bitmask ISO (lunes = 1 … domingo = 64) para `weekdays`."
+          },
+          "times_per_week": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "1–7 para `times_per_week`."
+          },
+          "target_quantity": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Meta por ocurrencia (ej. 20 minutos), opcional."
+          }
+        }
+      },
       "FxBody": {
         "type": "object",
         "required": [
@@ -8455,6 +11451,1042 @@
           "fx_source": {
             "type": "string",
             "description": "Fuente de la tasa (banco, app, Banxico…)."
+          }
+        }
+      },
+      "Goal": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "period_key",
+          "starts_on",
+          "ends_on",
+          "title",
+          "motivation",
+          "success_criteria",
+          "status",
+          "progress_type",
+          "progress_source",
+          "position",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "`month | week`"
+          },
+          "period_key": {
+            "type": "string",
+            "description": "`YYYY-MM` o `GGGG-Www`"
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "title": {
+            "type": "string"
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "motivation": {
+            "type": "string"
+          },
+          "success_criteria": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "`active | achieved | not_achieved`"
+          },
+          "parent_goal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "progress_type": {
+            "type": "string",
+            "description": "`none | cumulative | current_value | milestone`"
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "baseline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "direction": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "progress_source": {
+            "type": "string",
+            "description": "`manual | readings | habit | weight | debt | finance`"
+          },
+          "source_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "closing": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Cierre: `{achievement, learning, difficulties, adjustments}`."
+          },
+          "closed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GoalBody": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`month | week` (solo al crear)."
+          },
+          "period_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`YYYY-MM` o `GGGG-Www` (solo al crear)."
+          },
+          "title": {
+            "type": "string"
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "motivation": {
+            "type": "string"
+          },
+          "success_criteria": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "`active | achieved | not_achieved` (para cerrar usa `POST /goals/{id}/close`)."
+          },
+          "parent_goal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Objetivo mensual al que apoya (solo semanales)."
+          },
+          "progress_type": {
+            "type": "string"
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "baseline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "direction": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`increase | decrease`"
+          },
+          "progress_source": {
+            "type": "string",
+            "description": "`manual | readings | habit | weight | debt | finance`"
+          },
+          "source_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Hábito (fuente `habit`) o deuda (fuente `debt`)."
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "GoalBrief": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "period_key",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "period_key": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "GoalDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GoalView"
+          },
+          {
+            "type": "object",
+            "required": [
+              "events",
+              "links",
+              "children"
+            ],
+            "properties": {
+              "events": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ProgressEventRow"
+                }
+              },
+              "links": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GoalLink"
+                }
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Goal"
+                },
+                "description": "Objetivos semanales que apoyan a este (si es mensual)."
+              },
+              "parent": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Goal"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "GoalLink": {
+        "type": "object",
+        "required": [
+          "src_type",
+          "src_id",
+          "created_at"
+        ],
+        "properties": {
+          "src_type": {
+            "type": "string"
+          },
+          "src_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GoalView": {
+        "type": "object",
+        "required": [
+          "goal",
+          "progress",
+          "closure_pending",
+          "habits",
+          "habit_adherence"
+        ],
+        "properties": {
+          "goal": {
+            "$ref": "#/components/schemas/Goal"
+          },
+          "progress": {
+            "type": "object",
+            "description": "Progreso del resultado (independiente de la adherencia a hábitos)."
+          },
+          "closure_pending": {
+            "type": "boolean",
+            "description": "Periodo terminado y estado aún activo: falta cerrarlo (distinto de archivar)."
+          },
+          "habits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitBrief"
+            }
+          },
+          "habit_adherence": {
+            "type": "object",
+            "description": "Adherencia cerrada de los hábitos del objetivo en su periodo."
+          }
+        }
+      },
+      "Habit": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "description",
+          "position",
+          "created_on",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "description": "`fixed | goal | custom`"
+          },
+          "fixed_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`devotional | exercise | reading` para hábitos fijos."
+          },
+          "goal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "created_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HabitBlock": {
+        "type": "object",
+        "required": [
+          "fixed",
+          "month",
+          "week",
+          "other"
+        ],
+        "properties": {
+          "fixed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitStat"
+            }
+          },
+          "month": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitStat"
+            }
+          },
+          "week": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitStat"
+            }
+          },
+          "other": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitStat"
+            }
+          }
+        }
+      },
+      "HabitBrief": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "HabitDay": {
+        "type": "object",
+        "required": [
+          "habit",
+          "progress"
+        ],
+        "properties": {
+          "habit": {
+            "$ref": "#/components/schemas/Habit"
+          },
+          "goal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "goal_title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "entry": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HabitEntry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "progress": {
+            "type": "object"
+          },
+          "target_quantity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "HabitDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HabitSummary"
+          },
+          {
+            "type": "object",
+            "required": [
+              "versions",
+              "pauses",
+              "this_month",
+              "entries"
+            ],
+            "properties": {
+              "versions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/HabitVersionRow"
+                }
+              },
+              "pauses": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/HabitPause"
+                }
+              },
+              "this_month": {
+                "type": "object"
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/HabitEntry"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "HabitEntry": {
+        "type": "object",
+        "required": [
+          "habit_id",
+          "on_date",
+          "status",
+          "source",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "description": "`done | not_done | not_applicable`"
+          },
+          "quantity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HabitEntryPatch": {
+        "type": "object",
+        "required": [
+          "habit_id"
+        ],
+        "properties": {
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`done | not_done | not_applicable`; `null` vuelve a \"sin registrar\"."
+          },
+          "quantity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "HabitGroups": {
+        "type": "object",
+        "required": [
+          "fixed",
+          "month",
+          "week",
+          "other"
+        ],
+        "properties": {
+          "fixed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitDay"
+            },
+            "description": "Devocional/meditación, ejercicio, lectura."
+          },
+          "month": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitDay"
+            }
+          },
+          "week": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitDay"
+            }
+          },
+          "other": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HabitDay"
+            }
+          }
+        }
+      },
+      "HabitHistory": {
+        "type": "object",
+        "required": [
+          "habits",
+          "days"
+        ],
+        "properties": {
+          "habits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Habit"
+            }
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryDay"
+            }
+          }
+        }
+      },
+      "HabitLink": {
+        "type": "object",
+        "required": [
+          "trigger",
+          "habit_id",
+          "habit_name"
+        ],
+        "properties": {
+          "trigger": {
+            "type": "string",
+            "description": "`weight_logged | expense_logged | positive_reflection | devotional_content`"
+          },
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "habit_name": {
+            "type": "string"
+          }
+        }
+      },
+      "HabitPause": {
+        "type": "object",
+        "required": [
+          "id",
+          "habit_id",
+          "starts_on",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "ends_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "HabitStat": {
+        "type": "object",
+        "required": [
+          "habit",
+          "today",
+          "streaks",
+          "week",
+          "month",
+          "last_30_days",
+          "route"
+        ],
+        "properties": {
+          "habit": {
+            "$ref": "#/components/schemas/Habit"
+          },
+          "goal_title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "today": {
+            "type": "object"
+          },
+          "streaks": {
+            "type": "object"
+          },
+          "week": {
+            "type": "object",
+            "description": "Adherencia cerrada (sin el día abierto) de la semana y el mes en curso y de los últimos 30 días."
+          },
+          "month": {
+            "type": "object"
+          },
+          "last_30_days": {
+            "type": "object"
+          },
+          "route": {
+            "type": "string"
+          }
+        }
+      },
+      "HabitSummary": {
+        "type": "object",
+        "required": [
+          "habit",
+          "today",
+          "streaks",
+          "last_30_days"
+        ],
+        "properties": {
+          "habit": {
+            "$ref": "#/components/schemas/Habit"
+          },
+          "current_version": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HabitVersionRow"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "goal_title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "goal_kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`month | week` si el hábito pertenece a un objetivo."
+          },
+          "today": {
+            "type": "object"
+          },
+          "streaks": {
+            "type": "object"
+          },
+          "last_30_days": {
+            "type": "object",
+            "description": "Cumplimiento cerrado de los últimos 30 días (sin hoy)."
+          }
+        }
+      },
+      "HabitVersionRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "habit_id",
+          "valid_from",
+          "frequency"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valid_from": {
+            "type": "string",
+            "format": "date"
+          },
+          "valid_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "frequency": {
+            "type": "string",
+            "description": "`daily | weekdays | times_per_week`"
+          },
+          "weekdays": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Bitmask ISO (lunes = 1 … domingo = 64)."
+          },
+          "times_per_week": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "target_quantity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "HeatDay": {
+        "type": "object",
+        "required": [
+          "date",
+          "done",
+          "required",
+          "unrecorded",
+          "route"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "done": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "required": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "ratio": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "`done/required`; `None` si nada era exigible o el día está abierto."
+          },
+          "unrecorded": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "energy": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "route": {
+            "type": "string"
+          }
+        }
+      },
+      "HistoryCell": {
+        "type": "object",
+        "required": [
+          "habit_id",
+          "state"
+        ],
+        "properties": {
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "description": "`done | not_done | not_applicable | unrecorded | not_required | paused | future | open`"
+          }
+        }
+      },
+      "HistoryDay": {
+        "type": "object",
+        "required": [
+          "date",
+          "cells",
+          "done",
+          "required"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "energy": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "weight_kg": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cells": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryCell"
+            }
+          },
+          "done": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Cumplidas / exigibles del día (para el heatmap). `None` si nada era exigible.",
+            "minimum": 0
+          },
+          "required": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -8906,35 +12938,54 @@
           }
         }
       },
+      "InteractionBrief": {
+        "type": "object",
+        "required": [
+          "id",
+          "person_id",
+          "person_name",
+          "on_date",
+          "topic",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "person_name": {
+            "type": "string"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      },
       "LinkBody": {
         "type": "object",
         "required": [
           "src_type",
-          "src_id",
-          "dst_type",
-          "dst_id"
+          "src_id"
         ],
         "properties": {
           "src_type": {
-            "type": "string"
+            "type": "string",
+            "description": "`reading | content | task | debt`"
           },
           "src_id": {
             "type": "string",
             "format": "uuid"
-          },
-          "dst_type": {
-            "type": "string"
-          },
-          "dst_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "relation": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "`related` (por defecto) o `contributes_to` (aporte explícito a un objetivo)."
           }
         }
       },
@@ -8979,6 +13030,36 @@
           }
         }
       },
+      "LogEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "on_date",
+          "text",
+          "position",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "text": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      },
       "MaterializeResult": {
         "type": "object",
         "required": [
@@ -9018,6 +13099,58 @@
             "$ref": "#/components/schemas/TelegramStatus"
           },
           "session_transport": {
+            "type": "string"
+          }
+        }
+      },
+      "MetricDelta": {
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "unit",
+          "route"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "current": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "previous": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "delta": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "better": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "`true` si el cambio es favorable; `None` si no aplica o falta dato."
+          },
+          "unit": {
+            "type": "string",
+            "description": "`count | pct | kg | cents | score`"
+          },
+          "route": {
             "type": "string"
           }
         }
@@ -9072,6 +13205,26 @@
             "format": "int64"
           }
         }
+      },
+      "NewVersionBody": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FrequencyBody"
+          },
+          {
+            "type": "object",
+            "required": [
+              "valid_from"
+            ],
+            "properties": {
+              "valid_from": {
+                "type": "string",
+                "format": "date",
+                "description": "Fecha desde la que rige la nueva frecuencia (el pasado conserva la anterior)."
+              }
+            }
+          }
+        ]
       },
       "Note": {
         "type": "object",
@@ -9602,14 +13755,43 @@
       },
       "PauseBody": {
         "type": "object",
+        "required": [
+          "starts_on"
+        ],
         "properties": {
-          "days": {
+          "starts_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "ends_on": {
             "type": [
-              "integer",
+              "string",
               "null"
             ],
-            "format": "int64",
-            "description": "Días de pausa (1–365). Sin valor: pausa indefinida hasta reanudar."
+            "format": "date"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "PeacePoint": {
+        "type": "object",
+        "required": [
+          "iso_week",
+          "peace",
+          "route"
+        ],
+        "properties": {
+          "iso_week": {
+            "type": "string"
+          },
+          "peace": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "route": {
+            "type": "string"
           }
         }
       },
@@ -10028,6 +14210,217 @@
           }
         }
       },
+      "Planning": {
+        "type": "object",
+        "required": [
+          "week",
+          "week_start",
+          "week_end",
+          "month",
+          "month_goals",
+          "next_month_goals",
+          "week_goals",
+          "define_month_first",
+          "previous_week",
+          "previous_week_goals",
+          "pending_closure",
+          "previous_week_reflections",
+          "month_habit_count",
+          "week_habit_count",
+          "warnings"
+        ],
+        "properties": {
+          "week": {
+            "type": "string"
+          },
+          "week_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "week_end": {
+            "type": "string",
+            "format": "date"
+          },
+          "month": {
+            "type": "string",
+            "description": "Mes de referencia de la semana (el de su lunes) y, si la semana cruza de mes, el siguiente."
+          },
+          "next_month": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "month_goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalView"
+            }
+          },
+          "next_month_goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalView"
+            }
+          },
+          "week_goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalView"
+            }
+          },
+          "define_month_first": {
+            "type": "boolean",
+            "description": "Hay que definir el mes antes que la semana (no hay objetivos mensuales activos con hábitos)."
+          },
+          "previous_week": {
+            "type": "string"
+          },
+          "previous_week_goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalView"
+            }
+          },
+          "pending_closure": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalView"
+            },
+            "description": "Objetivos con periodo terminado aún sin cerrar (revisar periodo anterior antes de planear)."
+          },
+          "previous_week_reflections": {
+            "$ref": "#/components/schemas/ReflectionDigest"
+          },
+          "month_habit_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "week_habit_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Avisos editables de carga (~6 mensuales, ~8 combinados, 1–3 por objetivo). No bloquean."
+          }
+        }
+      },
+      "Priority": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "ProgressBody": {
+        "type": "object",
+        "required": [
+          "occurred_on"
+        ],
+        "properties": {
+          "occurred_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "amount": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Incremento (acumulativos)."
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Medición (valor actual)."
+          },
+          "completed": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Hito completado."
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "ProgressEventRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "goal_id",
+          "occurred_on",
+          "source_type",
+          "note",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "goal_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "occurred_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "amount": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "completed": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "source_type": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "Project": {
         "type": "object",
         "required": [
@@ -10343,6 +14736,193 @@
           }
         }
       },
+      "Reading": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "author",
+          "status",
+          "ideas_md",
+          "quotes_md",
+          "application_md",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "`book | article`"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "`want | reading | finished | abandoned`"
+          },
+          "rating": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "started_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "finished_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "ideas_md": {
+            "type": "string"
+          },
+          "quotes_md": {
+            "type": "string"
+          },
+          "application_md": {
+            "type": "string"
+          },
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReadingBody": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "`book | article`"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "rating": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "started_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "finished_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "ideas_md": {
+            "type": "string"
+          },
+          "quotes_md": {
+            "type": "string"
+          },
+          "application_md": {
+            "type": "string"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "goal_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Objetivos a los que aporta al terminarse (reemplaza los enlaces actuales si se envía)."
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "ReadingView": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Reading"
+          },
+          {
+            "type": "object",
+            "required": [
+              "goal_ids"
+            ],
+            "properties": {
+              "goal_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "description": "Objetivos a los que aporta (enlace explícito)."
+              }
+            }
+          }
+        ]
+      },
       "RecurrenceRule": {
         "type": "object",
         "required": [
@@ -10497,6 +15077,79 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "Reflection": {
+        "type": "object",
+        "required": [
+          "id",
+          "on_date",
+          "polarity",
+          "text",
+          "position"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "on_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "polarity": {
+            "type": "string",
+            "description": "`good | bad`"
+          },
+          "text": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ReflectionDigest": {
+        "type": "object",
+        "required": [
+          "good",
+          "bad"
+        ],
+        "properties": {
+          "good": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bad": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReflectionItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "text": {
+            "type": "string"
           }
         }
       },
@@ -11535,6 +16188,92 @@
           }
         }
       },
+      "TaskBrief": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "area_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "project_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "planned_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "due_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "done_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "external_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "external_status_category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ease_hint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "TaskDetail": {
         "type": "object",
         "required": [
@@ -11618,6 +16357,26 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "TemplateSection": {
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "kind"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "description": "`text | verse_actions`"
           }
         }
       },
@@ -12077,6 +16836,45 @@
           }
         }
       },
+      "UpdateHabit": {
+        "type": "object",
+        "required": [
+          "name",
+          "version"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "User": {
         "type": "object",
         "required": [
@@ -12232,6 +17030,17 @@
           }
         }
       },
+      "VerseActionBody": {
+        "type": "object",
+        "properties": {
+          "verse": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          }
+        }
+      },
       "VersionBody": {
         "type": "object",
         "properties": {
@@ -12242,6 +17051,413 @@
             ],
             "format": "int32",
             "description": "Opcional: si se envía, se valida contra la versión actual."
+          }
+        }
+      },
+      "WeeklyBody": {
+        "type": "object",
+        "properties": {
+          "peace": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Paz 1–5 aportada por el usuario."
+          },
+          "what_happened": {
+            "type": "string"
+          },
+          "what_didnt": {
+            "type": "string"
+          },
+          "content_md": {
+            "type": "string"
+          },
+          "habits_md": {
+            "type": "string"
+          },
+          "goals_md": {
+            "type": "string"
+          },
+          "went_well": {
+            "type": "string"
+          },
+          "went_badly": {
+            "type": "string"
+          },
+          "areas_md": {
+            "type": "string"
+          },
+          "people_md": {
+            "type": "string"
+          },
+          "priorities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Priority"
+            },
+            "description": "Hasta tres prioridades de la semana siguiente."
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Marca la revisión como terminada."
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "0 o ausente al crear."
+          }
+        }
+      },
+      "WeeklyReview": {
+        "type": "object",
+        "required": [
+          "id",
+          "iso_week",
+          "week_start",
+          "what_happened",
+          "what_didnt",
+          "content_md",
+          "habits_md",
+          "goals_md",
+          "went_well",
+          "went_badly",
+          "areas_md",
+          "people_md",
+          "priorities",
+          "evidence",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "iso_week": {
+            "type": "string"
+          },
+          "week_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "peace": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Paz de la semana 1–5 (la aporta el usuario)."
+          },
+          "what_happened": {
+            "type": "string"
+          },
+          "what_didnt": {
+            "type": "string"
+          },
+          "content_md": {
+            "type": "string"
+          },
+          "habits_md": {
+            "type": "string"
+          },
+          "goals_md": {
+            "type": "string"
+          },
+          "went_well": {
+            "type": "string"
+          },
+          "went_badly": {
+            "type": "string"
+          },
+          "areas_md": {
+            "type": "string"
+          },
+          "people_md": {
+            "type": "string"
+          },
+          "priorities": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Hasta 3: `[{text, reason}]`."
+          },
+          "summary": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Snapshot del resumen calculado al guardar."
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WeeklyReviewView": {
+        "type": "object",
+        "required": [
+          "version",
+          "next_week",
+          "planning_route"
+        ],
+        "properties": {
+          "review": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WeeklyReview",
+                "description": "`null` si aún no se ha guardado la revisión de esa semana."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "next_week": {
+            "type": "string",
+            "description": "Enlace para planear la semana siguiente."
+          },
+          "planning_route": {
+            "type": "string"
+          }
+        }
+      },
+      "WeeklySummary": {
+        "type": "object",
+        "required": [
+          "iso_week",
+          "week_start",
+          "week_end",
+          "is_open",
+          "fixed_habits",
+          "goals",
+          "went_well",
+          "went_badly",
+          "tasks_done",
+          "tasks_not_done",
+          "areas",
+          "people",
+          "content_published",
+          "devlog",
+          "devotionals",
+          "expenses_total_cents",
+          "expenses_count",
+          "inbox_pending",
+          "evidence"
+        ],
+        "properties": {
+          "iso_week": {
+            "type": "string"
+          },
+          "week_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "week_end": {
+            "type": "string",
+            "format": "date"
+          },
+          "is_open": {
+            "type": "boolean",
+            "description": "La semana sigue en curso (los faltantes de días abiertos/futuros no cuentan)."
+          },
+          "fixed_habits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FixedHabitWeek"
+            }
+          },
+          "goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalView"
+            },
+            "description": "Objetivos de la semana con adherencia de hábitos y progreso; cerrar es aparte."
+          },
+          "went_well": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReflectionItem"
+            }
+          },
+          "went_badly": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReflectionItem"
+            }
+          },
+          "tasks_done": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskBrief"
+            }
+          },
+          "tasks_not_done": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskBrief"
+            },
+            "description": "Planeado para la semana y aún abierto (\"qué no pasó\")."
+          },
+          "areas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AreaActivity"
+            }
+          },
+          "people": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InteractionBrief"
+            }
+          },
+          "content_published": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContentBrief"
+            }
+          },
+          "devlog": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DevlogBrief"
+            }
+          },
+          "devotionals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DevotionalNote"
+            }
+          },
+          "expenses_total_cents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "expenses_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "inbox_pending": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "energy_avg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            }
+          }
+        }
+      },
+      "WeightBlock": {
+        "type": "object",
+        "required": [
+          "points"
+        ],
+        "properties": {
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeightPoint"
+            },
+            "description": "Mediciones reales (sin interpolar días sin dato)."
+          },
+          "last": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WeightPoint"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "change_week": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Cambio primero→último dentro de la semana/mes en curso (solo con ≥ 2 mediciones reales)."
+          },
+          "change_month": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "goal_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "direction": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`decrease | increase | maintain`"
+          },
+          "remaining_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "WeightPoint": {
+        "type": "object",
+        "required": [
+          "date",
+          "kg"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "kg": {
+            "type": "number",
+            "format": "double"
           }
         }
       }

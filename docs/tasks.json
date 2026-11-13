@@ -185,7 +185,7 @@
       ],
       "status": "in_progress",
       "acceptance": "CRUD, relación semana→mes, avisos de carga, cierre",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T18",
@@ -196,7 +196,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Acumulativo/valor actual/hito; sin doble conteo",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T19",
@@ -208,7 +208,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Versiones, frecuencias, estados y pausas probados",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T20",
@@ -219,7 +219,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Check-in único por fecha; todas las secciones; vínculos explícitos",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T21",
@@ -241,7 +241,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Funciones de dominio documentadas y probadas",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T23",
@@ -253,7 +253,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Dashboard con todas las métricas y enlaces a fuentes",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T24",
@@ -287,7 +287,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Resumen automático editable, paz 1–5, cierre separado",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T27",
@@ -309,7 +309,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Contenido real completa hábito; módulo desactivable",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T29",
@@ -320,7 +320,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Terminar lectura aporta una vez a meta de libros",
-      "evidence": ""
+      "evidence": "Agente A (backend): domain 40 tests; core_goals_habits(9), core_checkins(6), core_dashboard_weekly(3); UI en fase 2 web"
     },
     {
       "id": "T30",

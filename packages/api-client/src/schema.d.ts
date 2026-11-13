@@ -305,6 +305,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/checkins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check-ins de un rango (historial; no incluye días sin registro). */
+        get: operations["list_checkins"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/checkins/{date}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_checkin"];
+        /** Aplica el check-in (mañana o noche) sobre el registro único del día. */
+        put: operations["put_checkin"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/checkins/{date}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Todo lo necesario para la pantalla Hoy de una fecha (también días anteriores). */
+        get: operations["day_view"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/class-notes": {
         parameters: {
             query?: never;
@@ -437,6 +488,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dashboard general. */
+        get: operations["dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/devlog-sessions/{id}": {
         parameters: {
             query?: never;
@@ -531,6 +599,60 @@ export interface paths {
         /** Agrega una sesión al devlog del día (varias por día). */
         post: operations["add_session"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devotionals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historial (Devocionales.base: fecha desc con pasaje) con búsqueda sin acentos. */
+        get: operations["list_devotionals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devotionals/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plantilla vigente: la personalizada en ajustes (`devotional_template`) o la del vault según el modo. */
+        get: operations["get_template"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devotionals/{date}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_devotional"];
+        /**
+         * Crea/actualiza el devocional del día. Con contenido real marca el hábito vinculado (`devotional_content`) de esa
+         *     fecha; si queda vacío, retira la marca automática.
+         */
+        put: operations["put_devotional"];
+        post?: never;
+        delete: operations["delete_devotional"];
         options?: never;
         head?: never;
         patch?: never;
@@ -966,6 +1088,314 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Objetivos (vista Objetivos.base: agrupables por tipo, con periodo, inicio, fin y estado). */
+        get: operations["list_goals"];
+        put?: never;
+        /** Crea un objetivo. No se crean objetivos sin decisión explícita del usuario (esta llamada es esa decisión). */
+        post: operations["create_goal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals/planning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contexto para planear la semana (y el mes primero cuando toca), con avisos de carga de hábitos. */
+        get: operations["planning"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_goal"];
+        /** Edita el objetivo (no cambia tipo ni periodo). Logros subjetivos se confirman con el cierre explícito. */
+        put: operations["update_goal"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cierre del objetivo (acción diferenciada de editar o archivar): estado final + logro, aprendizaje, dificultades y ajustes. */
+        post: operations["close_goal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals/{id}/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enlaza una entidad para que aporte al objetivo (una vez por objetivo; enlazarla a la semana y al mes aporta una vez a cada uno). */
+        post: operations["add_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals/{id}/links/{src_type}/{src_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_link"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals/{id}/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Evento manual de progreso (debe coincidir con el tipo de progreso del objetivo). */
+        post: operations["add_progress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/goals/{id}/progress/{event_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_progress"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habit-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vínculos configurados (registrar peso → "Pesarme", gasto → "Registrar gastos", etc.). */
+        get: operations["list_links"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habit-links/{trigger}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["set_link"];
+        post?: never;
+        delete: operations["delete_link"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hábitos con estado de hoy, rachas y cumplimiento de 30 días. */
+        get: operations["list_habits"];
+        put?: never;
+        /** Crea un hábito con su primera versión. Un hábito de objetivo rige solo dentro del periodo del objetivo. */
+        post: operations["create_habit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habits/fixed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirma los hábitos fijos propuestos en onboarding (devocional, ejercicio, lectura). Nada se crea sin esta
+         *     confirmación. Idempotente: si ya existe, actualiza su frecuencia desde `starts_on` o lo archiva si `enabled=false`.
+         */
+        post: operations["setup_fixed_habits"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habits/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historial por día (por defecto últimos 30 días) con energía, peso y estado de cada hábito. */
+        get: operations["habit_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habits/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_habit"];
+        /** Edita la identidad (nombre, área, unidad, archivo). La frecuencia se cambia con una versión nueva. */
+        put: operations["update_habit"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habits/{id}/entries/{date}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Registra el estado de un día (una sola ocurrencia por hábito y fecha). */
+        put: operations["put_entry"];
+        post?: never;
+        /** Vuelve el día a "sin registrar". */
+        delete: operations["delete_entry"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habits/{id}/pauses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pausa: los días cubiertos salen del denominador. */
+        post: operations["add_pause"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habits/{id}/pauses/{pause_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_pause"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/habits/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cambia la frecuencia/meta desde una fecha sin alterar el historial. */
+        post: operations["add_version"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/inbox": {
         parameters: {
             query?: never;
@@ -1379,6 +1809,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/readings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lecturas (tabla y tarjetas por estado). */
+        get: operations["list_readings"];
+        put?: never;
+        post: operations["create_reading"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/readings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_reading"];
+        put: operations["update_reading"];
+        post?: never;
+        /** Borra la lectura y retira sus aportes a objetivos. */
+        delete: operations["delete_reading"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reminders": {
         parameters: {
             query?: never;
@@ -1726,6 +2190,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/weekly-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_reviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/weekly-reviews/{iso_week}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_review"];
+        /** Guarda la revisión (con snapshot del resumen calculado y sus evidencias). */
+        put: operations["put_review"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/weekly-reviews/{iso_week}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resumen automático (editable en el formulario; no se guarda hasta `PUT`). */
+        get: operations["summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1895,6 +2409,19 @@ export interface components {
             /** Format: int32 */
             version?: number | null;
         };
+        AgendaItem: {
+            /** Format: uuid */
+            id: string;
+            source: string;
+            title: string;
+            /** Format: date-time */
+            starts_at?: string | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            all_day: boolean;
+            location?: string | null;
+            attendees: Record<string, never>[];
+        };
         AiContentContext: {
             /** @description Las 5 piezas publicadas más recientes (views, retención y "Resultado") a considerar antes de proponer un guion. */
             recent_published: components["schemas"]["ContentPiece"][];
@@ -1930,6 +2457,13 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
+        AreaActivity: {
+            area_name: string;
+            /** Format: int32 */
+            done: number;
+            /** Format: int32 */
+            open: number;
+        };
         AreaBody: {
             name: string;
             /** @description Opcional: se deriva del nombre si falta. */
@@ -1949,7 +2483,7 @@ export interface components {
             /** Format: uuid */
             area_id?: string | null;
             area_name: string;
-            tasks: components["schemas"]["Task"][];
+            tasks: components["schemas"]["TaskBrief"][];
         };
         AuthConfig: {
             miniapp_enabled: boolean;
@@ -2183,6 +2717,68 @@ export interface components {
              */
             remaining_cents?: number | null;
         };
+        Checkin: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            on_date: string;
+            weight_kg?: string | null;
+            /** Format: int32 */
+            energy?: number | null;
+            planned_spend_text?: string | null;
+            /** Format: int64 */
+            planned_spend_cents?: number | null;
+            planned_spend_none: boolean;
+            notes_md: string;
+            /** Format: date-time */
+            morning_done_at?: string | null;
+            /** Format: date-time */
+            evening_done_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        CheckinFull: {
+            checkin?: components["schemas"]["Checkin"] | null;
+            /**
+             * Format: int32
+             * @description Versión a enviar en el siguiente guardado (0 si no existe).
+             */
+            version: number;
+            log: components["schemas"]["LogEntry"][];
+            went_well: components["schemas"]["Reflection"][];
+            went_badly: components["schemas"]["Reflection"][];
+            habit_entries: components["schemas"]["HabitEntry"][];
+        };
+        /** @description Guardado parcial: los campos ausentes no cambian; `null` explícito borra (vuelve a "sin dato", que no es cero). */
+        CheckinPatch: {
+            /**
+             * Format: int32
+             * @description Versión conocida por el cliente (0 o ausente si el día no tenía registro). Si no coincide → 409 con el actual.
+             */
+            version?: number | null;
+            weight_kg?: string | null;
+            /** Format: int32 */
+            energy?: number | null;
+            planned_spend_text?: string | null;
+            /** Format: int64 */
+            planned_spend_cents?: number | null;
+            /** @description "No planeo gastar nada" (distinto de no haber respondido). */
+            planned_spend_none?: boolean | null;
+            notes_md?: string | null;
+            morning_done?: boolean | null;
+            /** @description Marca el cierre nocturno (cancela el recordatorio del día). */
+            evening_done?: boolean | null;
+            /** @description Lista completa del log del día (reemplaza). */
+            log?: string[] | null;
+            /** @description "Lo que hice bien hoy" (reemplaza). Solo lo que el usuario escribió. */
+            went_well?: string[] | null;
+            /** @description "Lo que hice mal hoy" (reemplaza). */
+            went_badly?: string[] | null;
+            /** @description Entradas de hábitos del día (fijos y de objetivos). */
+            habits?: components["schemas"]["HabitEntryPatch"][] | null;
+        };
         ClassNote: {
             /** Format: uuid */
             id: string;
@@ -2214,6 +2810,31 @@ export interface components {
             note: components["schemas"]["ClassNote"];
             /** @description Entregas/tareas relacionadas. */
             deliverables: components["schemas"]["Task"][];
+        };
+        CloseBody: {
+            /** @description `achieved | not_achieved` — decisión del usuario. */
+            status: string;
+            achievement?: string;
+            learning?: string;
+            difficulties?: string;
+            adjustments?: string;
+            /** Format: int32 */
+            version: number;
+        };
+        Comparison: {
+            /** @description `same_span | full` */
+            mode: string;
+            /** @description Texto para la UI (ej. "del 1 al 12 vs mismo tramo de octubre"). */
+            label: string;
+            /** Format: date */
+            current_start: string;
+            /** Format: date */
+            current_end: string;
+            /** Format: date */
+            previous_start: string;
+            /** Format: date */
+            previous_end: string;
+            metrics: components["schemas"]["MetricDelta"][];
         };
         ConfirmBody: {
             /** Format: int32 */
@@ -2267,6 +2888,18 @@ export interface components {
             /** Format: int32 */
             version?: number | null;
         };
+        ContentBrief: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            status: string;
+            /** Format: date */
+            published_on?: string | null;
+            platforms: string[];
+            /** Format: int64 */
+            views?: number | null;
+            retention_pct?: string | null;
+        };
         ContentPiece: {
             /** Format: uuid */
             id: string;
@@ -2317,6 +2950,25 @@ export interface components {
             days_to_publish?: number | null;
             chosen_hook_text?: string | null;
         };
+        CreateHabit: components["schemas"]["FrequencyBody"] & {
+            name: string;
+            /** @description `goal` (requiere `goal_id`) o `custom`. Los fijos se crean con `POST /habits/fixed`. */
+            kind?: string;
+            /** Format: uuid */
+            goal_id?: string | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** @description Unidad de la cantidad registrada (ej. `min`). Independiente de la unidad de cualquier objetivo. */
+            unit?: string | null;
+            description?: string;
+            /** Format: int32 */
+            position?: number;
+            /**
+             * Format: date
+             * @description Desde cuándo se exige (por defecto hoy o el inicio del objetivo si es posterior).
+             */
+            starts_on?: string | null;
+        };
         CreatedTransaction: {
             transaction: components["schemas"]["Transaction"];
             /** @description `false` si era un reintento con la misma `client_key` (no se duplicó). */
@@ -2339,6 +2991,25 @@ export interface components {
             /** Format: int32 */
             version: number;
         };
+        Dashboard: {
+            /** Format: date */
+            date: string;
+            /** Format: date */
+            today: string;
+            iso_week: string;
+            month: string;
+            month_goals: components["schemas"]["GoalView"][];
+            week_goals: components["schemas"]["GoalView"][];
+            habits: components["schemas"]["HabitBlock"];
+            devotional?: components["schemas"]["DevotionalFailures"] | null;
+            last_30_days: components["schemas"]["HeatDay"][];
+            weight: components["schemas"]["WeightBlock"];
+            energy: components["schemas"]["EnergyPoint"][];
+            peace: components["schemas"]["PeacePoint"][];
+            finance: components["schemas"]["FinanceBlock"];
+            week_comparison: components["schemas"]["Comparison"];
+            month_comparison: components["schemas"]["Comparison"];
+        };
         DayPoint: {
             /** Format: int32 */
             day: number;
@@ -2359,6 +3030,33 @@ export interface components {
             groups: components["schemas"]["AreaTasks"][];
             open_count: number;
             done_count: number;
+        };
+        DayView: components["schemas"]["CheckinFull"] & {
+            /** Format: date */
+            date: string;
+            /** Format: date */
+            today: string;
+            timezone: string;
+            iso_week: string;
+            month: string;
+            /** @description El día sigue abierto (es hoy): sus faltantes no penalizan todavía. */
+            is_open: boolean;
+            habits: components["schemas"]["HabitGroups"];
+            month_goals: components["schemas"]["GoalBrief"][];
+            week_goals: components["schemas"]["GoalBrief"][];
+            /** @description Módulo devocional activo y modo (`devotional | meditation`). */
+            devotional_enabled: boolean;
+            devotional_mode: string;
+            devotional?: components["schemas"]["Devotional"] | null;
+            /** @description Agenda del día (propuesta: un evento no prueba asistencia). */
+            agenda: components["schemas"]["AgendaItem"][];
+            tasks_by_area: components["schemas"]["AreaTasks"][];
+            people: components["schemas"]["InteractionBrief"][];
+            derived: components["schemas"]["DerivedLog"];
+            reminder_done: boolean;
+            currency: string;
+            /** Format: date-time */
+            generated_at: string;
         };
         Debt: {
             /** Format: uuid */
@@ -2457,6 +3155,20 @@ export interface components {
             sent_at?: string | null;
             last_error?: string | null;
         };
+        DerivedLog: {
+            /** @description Pendientes cerrados ese día (derivado, no se guarda en el log). */
+            closed_tasks: components["schemas"]["TaskBrief"][];
+            /** @description Eventos de agenda ya terminados. */
+            past_events: components["schemas"]["AgendaItem"][];
+            devlog_sessions: components["schemas"]["DevlogBrief"][];
+            /**
+             * Format: int64
+             * @description Gasto confirmado del día en moneda base (centavos).
+             */
+            expenses_total_cents: number;
+            /** Format: int64 */
+            expenses_count: number;
+        };
         DevLogin: {
             /** Format: int64 */
             telegram_id: number;
@@ -2505,11 +3217,107 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
+        DevlogBrief: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            on_date: string;
+            repo: string;
+            branch: string;
+            changes_md: string;
+        };
         DevlogDay: {
             /** Format: date */
             date: string;
             devlog?: components["schemas"]["Devlog"] | null;
             sessions: components["schemas"]["DevSession"][];
+        };
+        Devotional: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            on_date: string;
+            /** @description `devotional | meditation` */
+            mode: string;
+            passage: string;
+            /** @description `[{verse, action}]` — "¿Cómo puedo agradar a Dios hoy?" */
+            verse_actions: Record<string, never>[];
+            learned: string;
+            teaching: string;
+            prayer: string;
+            song: string;
+            /** @description Secciones personalizadas de la plantilla del usuario: `{clave: texto}`. */
+            extra: Record<string, never>;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        DevotionalBody: {
+            /** @description `devotional | meditation` (por defecto, el modo de ajustes). */
+            mode?: string | null;
+            passage?: string;
+            verse_actions?: components["schemas"]["VerseActionBody"][];
+            learned?: string;
+            teaching?: string;
+            prayer?: string;
+            song?: string;
+            /** @description Secciones personalizadas `{clave: texto}`. */
+            extra?: Record<string, never>;
+            /**
+             * Format: int32
+             * @description 0 o ausente al crear.
+             */
+            version?: number | null;
+        };
+        DevotionalFailures: {
+            /** Format: uuid */
+            habit_id: string;
+            /**
+             * Format: int32
+             * @description Días cerrados del mes con `not_done` explícito.
+             */
+            explicit_failures: number;
+            /**
+             * Format: int32
+             * @description Días cerrados del mes sin registro (cuentan como falla, se muestran aparte).
+             */
+            unrecorded: number;
+            /** Format: int32 */
+            failures_total: number;
+            /** Format: int32 */
+            closed_days: number;
+            /**
+             * Format: int32
+             * @description Máximo configurado (ajustes). `None` si el usuario no lo definió.
+             */
+            max_allowed?: number | null;
+            over_limit?: boolean | null;
+            /** @description Aviso: el mes sigue abierto; hoy y los días futuros no cuentan. */
+            note: string;
+            route: string;
+        };
+        DevotionalNote: {
+            /** Format: date */
+            date: string;
+            passage: string;
+            actions: string[];
+            learned: string;
+        };
+        DevotionalPage: {
+            items: components["schemas"]["Devotional"][];
+            /** Format: int64 */
+            total: number;
+            /** Format: int64 */
+            limit: number;
+            /** Format: int64 */
+            offset: number;
+        };
+        DevotionalTemplate: {
+            /** @description `devotional | meditation` */
+            mode: string;
+            enabled: boolean;
+            sections: components["schemas"]["TemplateSection"][];
         };
         Drawing: {
             /** Format: uuid */
@@ -2556,6 +3364,12 @@ export interface components {
             /** Format: int32 */
             version: number;
         };
+        EnergyPoint: {
+            /** Format: date */
+            date: string;
+            /** Format: int32 */
+            energy: number;
+        };
         EntityLinks: {
             links: components["schemas"]["LinkView"][];
             backlinks: components["schemas"]["LinkView"][];
@@ -2570,6 +3384,18 @@ export interface components {
             status?: string | null;
             /** Format: date-time */
             at: string;
+        };
+        EntryBody: {
+            /** @description `done | not_done | not_applicable` */
+            status: string;
+            quantity?: string | null;
+            /** @description Obligatorio para `not_applicable`. */
+            reason?: string | null;
+            /**
+             * Format: int32
+             * @description Versión esperada si la entrada ya existe (control de conflictos).
+             */
+            version?: number | null;
         };
         ErrorBody: {
             error: components["schemas"]["ErrorDetail"];
@@ -2595,6 +3421,20 @@ export interface components {
             end_time?: string | null;
             all_day?: boolean;
             location?: string | null;
+        };
+        Evidence: {
+            /** @description Tipo de entidad (ver docs/CONVENTIONS.md §6). */
+            entity_type: string;
+            /** Format: uuid */
+            entity_id?: string | null;
+            label: string;
+            /** @description Ruta de la web para abrir la fuente. */
+            route: string;
+        };
+        FinanceBlock: {
+            month: components["schemas"]["FinanceSummary"];
+            week: components["schemas"]["FinanceSummary"];
+            route: string;
         };
         FinanceDashboard: {
             month: string;
@@ -2638,6 +3478,79 @@ export interface components {
             by_project: components["schemas"]["ProjectSpend"][];
             accounts: components["schemas"]["AccountsSummary"];
         };
+        /**
+         * @description Resumen financiero confirmado de un periodo, en centavos de la moneda base del usuario.
+         *     Solo movimientos `confirmed` en la moneda base; los de otra moneda sin conversión se cuentan aparte.
+         */
+        FinanceSummary: {
+            /**
+             * Format: int64
+             * @description Consumo (gastos con rol consumption/payroll), una sola vez aunque se pague con tarjeta.
+             */
+            consumption_cents: number;
+            /**
+             * Format: int64
+             * @description Pagos de deuda (pagos de tarjeta + abonos a deudas).
+             */
+            debt_payments_cents: number;
+            /**
+             * Format: int64
+             * @description Ingreso ganado (rol earned).
+             */
+            earned_income_cents: number;
+            /**
+             * Format: int64
+             * @description Financiamiento recibido (préstamos).
+             */
+            financing_cents: number;
+            /** Format: int64 */
+            investment_cents: number;
+            /**
+             * Format: int64
+             * @description Entradas y salidas de cuentas de efectivo/débito (flujo de efectivo).
+             */
+            cash_in_cents: number;
+            /** Format: int64 */
+            cash_out_cents: number;
+            /**
+             * Format: int64
+             * @description Movimientos en otra moneda excluidos de los totales.
+             */
+            excluded_foreign_count: number;
+        };
+        FixedHabitConfig: components["schemas"]["FrequencyBody"] & {
+            enabled: boolean;
+            /** @description Nombre visible (ej. "Meditación" si sustituye al devocional). */
+            name?: string | null;
+        };
+        FixedHabitWeek: {
+            /** Format: uuid */
+            habit_id: string;
+            /** @description `devotional | exercise | reading` */
+            key: string;
+            name: string;
+            /**
+             * Format: int32
+             * @description Días con `done` en la semana (hasta hoy).
+             */
+            done: number;
+            /**
+             * Format: int32
+             * @description Meta de la semana: días exigibles (diario) o N (N por semana).
+             */
+            target: number;
+            compliance: Record<string, never>;
+        };
+        FixedHabitsBody: {
+            devotional?: components["schemas"]["FixedHabitConfig"] | null;
+            exercise?: components["schemas"]["FixedHabitConfig"] | null;
+            reading?: components["schemas"]["FixedHabitConfig"] | null;
+            /**
+             * Format: date
+             * @description Desde cuándo rigen (por defecto hoy).
+             */
+            starts_on?: string | null;
+        };
         FlowTotals: {
             /**
              * Format: int64
@@ -2680,6 +3593,22 @@ export interface components {
              */
             excluded_foreign_count: number;
         };
+        FrequencyBody: {
+            /** @description `daily | weekdays | times_per_week` */
+            frequency: string;
+            /**
+             * Format: int32
+             * @description Bitmask ISO (lunes = 1 … domingo = 64) para `weekdays`.
+             */
+            weekdays?: number | null;
+            /**
+             * Format: int32
+             * @description 1–7 para `times_per_week`.
+             */
+            times_per_week?: number | null;
+            /** @description Meta por ocurrencia (ej. 20 minutos), opcional. */
+            target_quantity?: string | null;
+        };
         FxBody: {
             /**
              * Format: int64
@@ -2694,6 +3623,302 @@ export interface components {
             fx_date: string;
             /** @description Fuente de la tasa (banco, app, Banxico…). */
             fx_source: string;
+        };
+        Goal: {
+            /** Format: uuid */
+            id: string;
+            /** @description `month | week` */
+            kind: string;
+            /** @description `YYYY-MM` o `GGGG-Www` */
+            period_key: string;
+            /** Format: date */
+            starts_on: string;
+            /** Format: date */
+            ends_on: string;
+            title: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            motivation: string;
+            success_criteria: string;
+            /** @description `active | achieved | not_achieved` */
+            status: string;
+            /** Format: uuid */
+            parent_goal_id?: string | null;
+            /** @description `none | cumulative | current_value | milestone` */
+            progress_type: string;
+            unit?: string | null;
+            baseline?: string | null;
+            target?: string | null;
+            direction?: string | null;
+            /** @description `manual | readings | habit | weight | debt | finance` */
+            progress_source: string;
+            /** Format: uuid */
+            source_ref?: string | null;
+            /** @description Cierre: `{achievement, learning, difficulties, adjustments}`. */
+            closing?: Record<string, never> | null;
+            /** Format: date-time */
+            closed_at?: string | null;
+            /** Format: int32 */
+            position: number;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        GoalBody: {
+            /** @description `month | week` (solo al crear). */
+            kind?: string | null;
+            /** @description `YYYY-MM` o `GGGG-Www` (solo al crear). */
+            period_key?: string | null;
+            title: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            motivation?: string;
+            success_criteria?: string;
+            /** @description `active | achieved | not_achieved` (para cerrar usa `POST /goals/{id}/close`). */
+            status?: string;
+            /**
+             * Format: uuid
+             * @description Objetivo mensual al que apoya (solo semanales).
+             */
+            parent_goal_id?: string | null;
+            progress_type?: string;
+            unit?: string | null;
+            baseline?: string | null;
+            target?: string | null;
+            /** @description `increase | decrease` */
+            direction?: string | null;
+            /** @description `manual | readings | habit | weight | debt | finance` */
+            progress_source?: string;
+            /**
+             * Format: uuid
+             * @description Hábito (fuente `habit`) o deuda (fuente `debt`).
+             */
+            source_ref?: string | null;
+            /** Format: int32 */
+            position?: number;
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        GoalBrief: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            kind: string;
+            period_key: string;
+            status: string;
+        };
+        GoalDetail: components["schemas"]["GoalView"] & {
+            events: components["schemas"]["ProgressEventRow"][];
+            links: components["schemas"]["GoalLink"][];
+            /** @description Objetivos semanales que apoyan a este (si es mensual). */
+            children: components["schemas"]["Goal"][];
+            parent?: components["schemas"]["Goal"] | null;
+        };
+        GoalLink: {
+            src_type: string;
+            /** Format: uuid */
+            src_id: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        GoalView: {
+            goal: components["schemas"]["Goal"];
+            /** @description Progreso del resultado (independiente de la adherencia a hábitos). */
+            progress: Record<string, never>;
+            /** @description Periodo terminado y estado aún activo: falta cerrarlo (distinto de archivar). */
+            closure_pending: boolean;
+            habits: components["schemas"]["HabitBrief"][];
+            /** @description Adherencia cerrada de los hábitos del objetivo en su periodo. */
+            habit_adherence: Record<string, never>;
+        };
+        Habit: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @description `fixed | goal | custom` */
+            kind: string;
+            /** @description `devotional | exercise | reading` para hábitos fijos. */
+            fixed_key?: string | null;
+            /** Format: uuid */
+            goal_id?: string | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            unit?: string | null;
+            description: string;
+            /** Format: int32 */
+            position: number;
+            /** Format: date */
+            created_on: string;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        HabitBlock: {
+            fixed: components["schemas"]["HabitStat"][];
+            month: components["schemas"]["HabitStat"][];
+            week: components["schemas"]["HabitStat"][];
+            other: components["schemas"]["HabitStat"][];
+        };
+        HabitBrief: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            unit?: string | null;
+        };
+        HabitDay: {
+            habit: components["schemas"]["Habit"];
+            /** Format: uuid */
+            goal_id?: string | null;
+            goal_title?: string | null;
+            entry?: components["schemas"]["HabitEntry"] | null;
+            progress: Record<string, never>;
+            target_quantity?: string | null;
+        };
+        HabitDetail: components["schemas"]["HabitSummary"] & {
+            versions: components["schemas"]["HabitVersionRow"][];
+            pauses: components["schemas"]["HabitPause"][];
+            this_month: Record<string, never>;
+            entries: components["schemas"]["HabitEntry"][];
+        };
+        HabitEntry: {
+            /** Format: uuid */
+            habit_id: string;
+            /** Format: date */
+            on_date: string;
+            /** @description `done | not_done | not_applicable` */
+            status: string;
+            quantity?: string | null;
+            reason?: string | null;
+            source: string;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        HabitEntryPatch: {
+            /** Format: uuid */
+            habit_id: string;
+            /** @description `done | not_done | not_applicable`; `null` vuelve a "sin registrar". */
+            status?: string | null;
+            quantity?: string | null;
+            reason?: string | null;
+        };
+        HabitGroups: {
+            /** @description Devocional/meditación, ejercicio, lectura. */
+            fixed: components["schemas"]["HabitDay"][];
+            month: components["schemas"]["HabitDay"][];
+            week: components["schemas"]["HabitDay"][];
+            other: components["schemas"]["HabitDay"][];
+        };
+        HabitHistory: {
+            habits: components["schemas"]["Habit"][];
+            days: components["schemas"]["HistoryDay"][];
+        };
+        HabitLink: {
+            /** @description `weight_logged | expense_logged | positive_reflection | devotional_content` */
+            trigger: string;
+            /** Format: uuid */
+            habit_id: string;
+            habit_name: string;
+        };
+        HabitPause: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            habit_id: string;
+            /** Format: date */
+            starts_on: string;
+            /** Format: date */
+            ends_on?: string | null;
+            reason: string;
+        };
+        HabitStat: {
+            habit: components["schemas"]["Habit"];
+            goal_title?: string | null;
+            today: Record<string, never>;
+            streaks: Record<string, never>;
+            /** @description Adherencia cerrada (sin el día abierto) de la semana y el mes en curso y de los últimos 30 días. */
+            week: Record<string, never>;
+            month: Record<string, never>;
+            last_30_days: Record<string, never>;
+            route: string;
+        };
+        HabitSummary: {
+            habit: components["schemas"]["Habit"];
+            current_version?: components["schemas"]["HabitVersionRow"] | null;
+            goal_title?: string | null;
+            /** @description `month | week` si el hábito pertenece a un objetivo. */
+            goal_kind?: string | null;
+            today: Record<string, never>;
+            streaks: Record<string, never>;
+            /** @description Cumplimiento cerrado de los últimos 30 días (sin hoy). */
+            last_30_days: Record<string, never>;
+        };
+        HabitVersionRow: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            habit_id: string;
+            /** Format: date */
+            valid_from: string;
+            /** Format: date */
+            valid_to?: string | null;
+            /** @description `daily | weekdays | times_per_week` */
+            frequency: string;
+            /**
+             * Format: int32
+             * @description Bitmask ISO (lunes = 1 … domingo = 64).
+             */
+            weekdays?: number | null;
+            /** Format: int32 */
+            times_per_week?: number | null;
+            target_quantity?: string | null;
+        };
+        HeatDay: {
+            /** Format: date */
+            date: string;
+            /** Format: int32 */
+            done: number;
+            /** Format: int32 */
+            required: number;
+            /**
+             * Format: double
+             * @description `done/required`; `None` si nada era exigible o el día está abierto.
+             */
+            ratio?: number | null;
+            /** Format: int32 */
+            unrecorded: number;
+            /** Format: int32 */
+            energy?: number | null;
+            route: string;
+        };
+        HistoryCell: {
+            /** Format: uuid */
+            habit_id: string;
+            /** @description `done | not_done | not_applicable | unrecorded | not_required | paused | future | open` */
+            state: string;
+        };
+        HistoryDay: {
+            /** Format: date */
+            date: string;
+            /** Format: int32 */
+            energy?: number | null;
+            weight_kg?: string | null;
+            cells: components["schemas"]["HistoryCell"][];
+            /**
+             * Format: int32
+             * @description Cumplidas / exigibles del día (para el heatmap). `None` si nada era exigible.
+             */
+            done: number;
+            /** Format: int32 */
+            required: number;
         };
         Identity: {
             /** Format: uuid */
@@ -2837,15 +4062,22 @@ export interface components {
             /** @description Referencia externa (id de evento/correo) para no duplicar. */
             source_ref?: string | null;
         };
+        InteractionBrief: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            person_id: string;
+            person_name: string;
+            /** Format: date */
+            on_date: string;
+            topic: string;
+            source: string;
+        };
         LinkBody: {
+            /** @description `reading | content | task | debt` */
             src_type: string;
             /** Format: uuid */
             src_id: string;
-            dst_type: string;
-            /** Format: uuid */
-            dst_id: string;
-            /** @description `related` (por defecto) o `contributes_to` (aporte explícito a un objetivo). */
-            relation?: string | null;
         };
         LinkView: {
             src_type: string;
@@ -2860,6 +4092,16 @@ export interface components {
             /** Format: date-time */
             created_at: string;
         };
+        LogEntry: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            on_date: string;
+            text: string;
+            /** Format: int32 */
+            position: number;
+            source: string;
+        };
         MaterializeResult: {
             /** Format: int32 */
             created: number;
@@ -2870,6 +4112,21 @@ export interface components {
             settings: components["schemas"]["UserSettings"];
             telegram: components["schemas"]["TelegramStatus"];
             session_transport: string;
+        };
+        MetricDelta: {
+            key: string;
+            label: string;
+            /** Format: double */
+            current?: number | null;
+            /** Format: double */
+            previous?: number | null;
+            /** Format: double */
+            delta?: number | null;
+            /** @description `true` si el cambio es favorable; `None` si no aplica o falta dato. */
+            better?: boolean | null;
+            /** @description `count | pct | kg | cents | score` */
+            unit: string;
+            route: string;
         };
         MiniAppLogin: {
             /** @description `Telegram.WebApp.initData` sin modificar. */
@@ -2890,6 +4147,13 @@ export interface components {
             earned_income_cents: number;
             /** Format: int64 */
             consumption_net_cents: number;
+        };
+        NewVersionBody: components["schemas"]["FrequencyBody"] & {
+            /**
+             * Format: date
+             * @description Fecha desde la que rige la nueva frecuencia (el pasado conserva la anterior).
+             */
+            valid_from: string;
         };
         Note: {
             /** Format: uuid */
@@ -3042,11 +4306,17 @@ export interface components {
             project_slugs: string[];
         };
         PauseBody: {
-            /**
-             * Format: int64
-             * @description Días de pausa (1–365). Sin valor: pausa indefinida hasta reanudar.
-             */
-            days?: number | null;
+            /** Format: date */
+            starts_on: string;
+            /** Format: date */
+            ends_on?: string | null;
+            reason?: string;
+        };
+        PeacePoint: {
+            iso_week: string;
+            /** Format: int32 */
+            peace: number;
+            route: string;
         };
         PeopleGroup: {
             /** Format: uuid */
@@ -3163,6 +4433,64 @@ export interface components {
             excluded_account_ids?: string[];
             forbid_cards_with_debt?: boolean;
         };
+        Planning: {
+            week: string;
+            /** Format: date */
+            week_start: string;
+            /** Format: date */
+            week_end: string;
+            /** @description Mes de referencia de la semana (el de su lunes) y, si la semana cruza de mes, el siguiente. */
+            month: string;
+            next_month?: string | null;
+            month_goals: components["schemas"]["GoalView"][];
+            next_month_goals: components["schemas"]["GoalView"][];
+            week_goals: components["schemas"]["GoalView"][];
+            /** @description Hay que definir el mes antes que la semana (no hay objetivos mensuales activos con hábitos). */
+            define_month_first: boolean;
+            previous_week: string;
+            previous_week_goals: components["schemas"]["GoalView"][];
+            /** @description Objetivos con periodo terminado aún sin cerrar (revisar periodo anterior antes de planear). */
+            pending_closure: components["schemas"]["GoalView"][];
+            previous_week_reflections: components["schemas"]["ReflectionDigest"];
+            /** Format: int32 */
+            month_habit_count: number;
+            /** Format: int32 */
+            week_habit_count: number;
+            /** @description Avisos editables de carga (~6 mensuales, ~8 combinados, 1–3 por objetivo). No bloquean. */
+            warnings: string[];
+        };
+        Priority: {
+            text: string;
+            reason?: string;
+        };
+        ProgressBody: {
+            /** Format: date */
+            occurred_on: string;
+            /** @description Incremento (acumulativos). */
+            amount?: string | null;
+            /** @description Medición (valor actual). */
+            value?: string | null;
+            /** @description Hito completado. */
+            completed?: boolean | null;
+            note?: string;
+        };
+        ProgressEventRow: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            goal_id: string;
+            /** Format: date */
+            occurred_on: string;
+            amount?: string | null;
+            value?: string | null;
+            completed?: boolean | null;
+            source_type: string;
+            /** Format: uuid */
+            source_id?: string | null;
+            note: string;
+            /** Format: date-time */
+            created_at: string;
+        };
         Project: {
             /** Format: uuid */
             id: string;
@@ -3252,6 +4580,58 @@ export interface components {
             recent: components["schemas"]["ActivityItem"][];
             adrs: components["schemas"]["Adr"][];
         };
+        Reading: {
+            /** Format: uuid */
+            id: string;
+            /** @description `book | article` */
+            kind: string;
+            title: string;
+            author: string;
+            url?: string | null;
+            /** @description `want | reading | finished | abandoned` */
+            status: string;
+            /** Format: int32 */
+            rating?: number | null;
+            /** Format: date */
+            started_on?: string | null;
+            /** Format: date */
+            finished_on?: string | null;
+            ideas_md: string;
+            quotes_md: string;
+            application_md: string;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ReadingBody: {
+            /** @description `book | article` */
+            kind?: string;
+            title: string;
+            author?: string;
+            url?: string | null;
+            status?: string;
+            /** Format: int32 */
+            rating?: number | null;
+            /** Format: date */
+            started_on?: string | null;
+            /** Format: date */
+            finished_on?: string | null;
+            ideas_md?: string;
+            quotes_md?: string;
+            application_md?: string;
+            archived?: boolean;
+            /** @description Objetivos a los que aporta al terminarse (reemplaza los enlaces actuales si se envía). */
+            goal_ids?: string[] | null;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        ReadingView: components["schemas"]["Reading"] & {
+            /** @description Objetivos a los que aporta (enlace explícito). */
+            goal_ids: string[];
+        };
         RecurrenceRule: {
             /** Format: uuid */
             id: string;
@@ -3302,6 +4682,28 @@ export interface components {
             version: number;
             /** Format: date-time */
             updated_at: string;
+        };
+        Reflection: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            on_date: string;
+            /** @description `good | bad` */
+            polarity: string;
+            text: string;
+            /** Format: int32 */
+            position: number;
+        };
+        ReflectionDigest: {
+            good: string[];
+            bad: string[];
+        };
+        ReflectionItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            date: string;
+            text: string;
         };
         ReminderStatus: {
             paused: boolean;
@@ -3605,6 +5007,28 @@ export interface components {
             /** Format: int32 */
             version?: number | null;
         };
+        TaskBrief: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            status: string;
+            /** Format: int32 */
+            priority?: number | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            area_name?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** Format: date */
+            planned_on?: string | null;
+            /** Format: date */
+            due_on?: string | null;
+            /** Format: date */
+            done_on?: string | null;
+            external_url?: string | null;
+            external_status_category?: string | null;
+            ease_hint?: string | null;
+        };
         TaskDetail: {
             task: components["schemas"]["Task"];
             events: components["schemas"]["TaskEvent"][];
@@ -3628,6 +5052,12 @@ export interface components {
             can_message: boolean;
             bot_username?: string | null;
             last_error?: string | null;
+        };
+        TemplateSection: {
+            key: string;
+            label: string;
+            /** @description `text | verse_actions` */
+            kind: string;
         };
         Transaction: {
             /** Format: uuid */
@@ -3785,6 +5215,18 @@ export interface components {
             /** Format: date-time */
             run_at: string;
         };
+        UpdateHabit: {
+            name: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            unit?: string | null;
+            description?: string;
+            /** Format: int32 */
+            position?: number;
+            archived?: boolean;
+            /** Format: int32 */
+            version: number;
+        };
         User: {
             /** Format: uuid */
             id: string;
@@ -3830,12 +5272,136 @@ export interface components {
             /** Format: int32 */
             version: number;
         };
+        VerseActionBody: {
+            verse?: string;
+            action?: string;
+        };
         VersionBody: {
             /**
              * Format: int32
              * @description Opcional: si se envía, se valida contra la versión actual.
              */
             version?: number | null;
+        };
+        WeeklyBody: {
+            /**
+             * Format: int32
+             * @description Paz 1–5 aportada por el usuario.
+             */
+            peace?: number | null;
+            what_happened?: string;
+            what_didnt?: string;
+            content_md?: string;
+            habits_md?: string;
+            goals_md?: string;
+            went_well?: string;
+            went_badly?: string;
+            areas_md?: string;
+            people_md?: string;
+            /** @description Hasta tres prioridades de la semana siguiente. */
+            priorities?: components["schemas"]["Priority"][];
+            /** @description Marca la revisión como terminada. */
+            completed?: boolean;
+            /**
+             * Format: int32
+             * @description 0 o ausente al crear.
+             */
+            version?: number | null;
+        };
+        WeeklyReview: {
+            /** Format: uuid */
+            id: string;
+            iso_week: string;
+            /** Format: date */
+            week_start: string;
+            /**
+             * Format: int32
+             * @description Paz de la semana 1–5 (la aporta el usuario).
+             */
+            peace?: number | null;
+            what_happened: string;
+            what_didnt: string;
+            content_md: string;
+            habits_md: string;
+            goals_md: string;
+            went_well: string;
+            went_badly: string;
+            areas_md: string;
+            people_md: string;
+            /** @description Hasta 3: `[{text, reason}]`. */
+            priorities: Record<string, never>[];
+            /** @description Snapshot del resumen calculado al guardar. */
+            summary?: Record<string, never> | null;
+            evidence: Record<string, never>[];
+            /** Format: date-time */
+            completed_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        WeeklyReviewView: {
+            review?: components["schemas"]["WeeklyReview"] | null;
+            /** Format: int32 */
+            version: number;
+            /** @description Enlace para planear la semana siguiente. */
+            next_week: string;
+            planning_route: string;
+        };
+        WeeklySummary: {
+            iso_week: string;
+            /** Format: date */
+            week_start: string;
+            /** Format: date */
+            week_end: string;
+            /** @description La semana sigue en curso (los faltantes de días abiertos/futuros no cuentan). */
+            is_open: boolean;
+            fixed_habits: components["schemas"]["FixedHabitWeek"][];
+            /** @description Objetivos de la semana con adherencia de hábitos y progreso; cerrar es aparte. */
+            goals: components["schemas"]["GoalView"][];
+            went_well: components["schemas"]["ReflectionItem"][];
+            went_badly: components["schemas"]["ReflectionItem"][];
+            tasks_done: components["schemas"]["TaskBrief"][];
+            /** @description Planeado para la semana y aún abierto ("qué no pasó"). */
+            tasks_not_done: components["schemas"]["TaskBrief"][];
+            areas: components["schemas"]["AreaActivity"][];
+            people: components["schemas"]["InteractionBrief"][];
+            content_published: components["schemas"]["ContentBrief"][];
+            devlog: components["schemas"]["DevlogBrief"][];
+            devotionals: components["schemas"]["DevotionalNote"][];
+            /** Format: int64 */
+            expenses_total_cents: number;
+            /** Format: int64 */
+            expenses_count: number;
+            /** Format: int64 */
+            inbox_pending: number;
+            /** Format: double */
+            energy_avg?: number | null;
+            evidence: components["schemas"]["Evidence"][];
+        };
+        WeightBlock: {
+            /** @description Mediciones reales (sin interpolar días sin dato). */
+            points: components["schemas"]["WeightPoint"][];
+            last?: components["schemas"]["WeightPoint"] | null;
+            /**
+             * Format: double
+             * @description Cambio primero→último dentro de la semana/mes en curso (solo con ≥ 2 mediciones reales).
+             */
+            change_week?: number | null;
+            /** Format: double */
+            change_month?: number | null;
+            /** Format: double */
+            goal_kg?: number | null;
+            /** @description `decrease | increase | maintain` */
+            direction?: string | null;
+            /** Format: double */
+            remaining_kg?: number | null;
+        };
+        WeightPoint: {
+            /** Format: date */
+            date: string;
+            /** Format: double */
+            kg: number;
         };
     };
     responses: never;
@@ -4408,6 +5974,111 @@ export interface operations {
             };
         };
     };
+    list_checkins: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkin"][];
+                };
+            };
+        };
+    };
+    get_checkin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckinFull"];
+                };
+            };
+        };
+    };
+    put_checkin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckinPatch"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckinFull"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    day_view: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DayView"];
+                };
+            };
+        };
+    };
     list_class_notes: {
         parameters: {
             query?: {
@@ -4686,6 +6357,30 @@ export interface operations {
             };
         };
     };
+    dashboard: {
+        parameters: {
+            query?: {
+                /** @description Fecha de referencia (por defecto hoy). */
+                date?: string | null;
+                /** @description `same_span` (por defecto: mismo tramo del periodo anterior) o `full` (periodos completos). */
+                compare?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dashboard"];
+                };
+            };
+        };
+    };
     update_session: {
         parameters: {
             query?: never;
@@ -4866,6 +6561,132 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["DevSession"];
                 };
+            };
+        };
+    };
+    list_devotionals: {
+        parameters: {
+            query?: {
+                limit?: number | null;
+                offset?: number | null;
+                /** @description Búsqueda de texto (tolerante a acentos donde aplique). */
+                q?: string | null;
+                /** @description Incluir archivados. */
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevotionalPage"];
+                };
+            };
+        };
+    };
+    get_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevotionalTemplate"];
+                };
+            };
+        };
+    };
+    get_devotional: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Devotional"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    put_devotional: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DevotionalBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Devotional"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    delete_devotional: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -5875,6 +7696,604 @@ export interface operations {
             };
         };
     };
+    list_goals: {
+        parameters: {
+            query?: {
+                /** @description `month | week` */
+                kind?: string | null;
+                period_key?: string | null;
+                status?: string | null;
+                from?: string | null;
+                to?: string | null;
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalView"][];
+                };
+            };
+        };
+    };
+    create_goal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoalBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalView"];
+                };
+            };
+        };
+    };
+    planning: {
+        parameters: {
+            query?: {
+                /** @description Semana `GGGG-Www`. Por defecto la actual; sábado y domingo, la siguiente. */
+                week?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Planning"];
+                };
+            };
+        };
+    };
+    get_goal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalDetail"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update_goal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoalBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalView"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    close_goal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalView"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    add_link: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalDetail"];
+                };
+            };
+        };
+    };
+    delete_link: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                src_type: string;
+                src_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    add_progress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProgressBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalDetail"];
+                };
+            };
+        };
+    };
+    delete_progress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_links: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitLink"][];
+                };
+            };
+        };
+    };
+    set_link: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trigger: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitLink"][];
+                };
+            };
+        };
+    };
+    delete_link: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trigger: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_habits: {
+        parameters: {
+            query?: {
+                /** @description Fecha de referencia (por defecto hoy en la zona del usuario). */
+                date?: string | null;
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitSummary"][];
+                };
+            };
+        };
+    };
+    create_habit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateHabit"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitDetail"];
+                };
+            };
+        };
+    };
+    setup_fixed_habits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FixedHabitsBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Habit"][];
+                };
+            };
+        };
+    };
+    habit_history: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitHistory"];
+                };
+            };
+        };
+    };
+    get_habit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitDetail"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update_habit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateHabit"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Habit"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    put_entry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntryBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitEntry"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    delete_entry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    add_pause: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PauseBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitPause"];
+                };
+            };
+        };
+    };
+    delete_pause: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                pause_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    add_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewVersionBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitVersionRow"];
+                };
+            };
+        };
+    };
     list_inbox: {
         parameters: {
             query?: {
@@ -6726,6 +9145,126 @@ export interface operations {
             };
         };
     };
+    list_readings: {
+        parameters: {
+            query?: {
+                /** @description `want | reading | finished | abandoned` */
+                status?: string | null;
+                q?: string | null;
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reading"][];
+                };
+            };
+        };
+    };
+    create_reading: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReadingBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadingView"];
+                };
+            };
+        };
+    };
+    get_reading: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadingView"];
+                };
+            };
+        };
+    };
+    update_reading: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReadingBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadingView"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    delete_reading: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     status: {
         parameters: {
             query?: never;
@@ -7405,6 +9944,100 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectsView"];
+                };
+            };
+        };
+    };
+    list_reviews: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyReview"][];
+                };
+            };
+        };
+    };
+    get_review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                iso_week: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyReviewView"];
+                };
+            };
+        };
+    };
+    put_review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                iso_week: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WeeklyBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyReview"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                iso_week: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklySummary"];
                 };
             };
         };
