@@ -239,6 +239,21 @@ function CaptureReview({ capture }: { capture: CaptureView }) {
         <p className="rounded-lg border border-line bg-surface p-3 text-sm">Descartada: no se aplicó nada.</p>
       )}
 
+      {suggestedHabits(capture.meta).length > 0 && (
+        <Card title="Hábitos sugeridos para el objetivo">
+          <ul className="list-disc space-y-1 pl-5 text-sm">
+            {suggestedHabits(capture.meta).map((h) => (
+              <li key={h}>{h}</li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-muted">
+            {final
+              ? "Estos hábitos se aplicaron al objetivo."
+              : "Al aplicar se crean como hábitos diarios del objetivo. Si no te convencen, descarta la propuesta."}
+          </p>
+        </Card>
+      )}
+
       <Card title={final ? "Propuesta" : "Revisa y edita la propuesta"}>
         {!final && isProposalEmpty(cleaned) && (
           <p className="mb-3 text-sm text-muted">
@@ -368,4 +383,10 @@ function CaptureReview({ capture }: { capture: CaptureView }) {
       </Dialog>
     </div>
   );
+}
+
+/** Hábitos que la IA propuso para un objetivo existente (van en `meta`, no en la propuesta). */
+function suggestedHabits(meta: unknown): string[] {
+  const h = (meta as { habits?: unknown } | null)?.habits;
+  return Array.isArray(h) ? h.filter((x): x is string => typeof x === "string" && x.trim() !== "") : [];
 }
