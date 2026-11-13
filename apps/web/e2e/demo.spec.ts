@@ -22,7 +22,7 @@ test("explorar con datos demo muestra un espacio aislado y poblado", async ({ pa
   await expect(page.getByText(/Modo demo/).first()).toBeVisible();
   for (const [route, text] of MODULES) {
     await page.goto(route);
-    await expect(page.getByText(text).first(), route).toBeVisible();
+    await expect(page.locator("main").getByText(text).filter({ visible: true }).first(), route).toBeVisible();
   }
   const me = await (await page.request.get("/api/v1/me")).json();
   expect(me.user.is_demo).toBe(true);
