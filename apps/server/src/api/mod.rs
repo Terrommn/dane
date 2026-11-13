@@ -3,8 +3,31 @@
 //! Para agregar un módulo: crear `api/<modulo>.rs` con `pub fn router() -> OpenApiRouter<AppState>` y añadir una línea
 //! `.merge(<modulo>::router())` en `v1()`. Cada handler declara `#[utoipa::path]` con `tag` del módulo.
 
+pub mod agenda;
 pub mod areas;
+pub mod captures;
+pub mod checkins;
+pub mod content;
+pub mod dashboard;
+pub mod dev;
+pub mod devotionals;
+pub mod drawings;
+pub mod exports;
+pub mod finance;
+pub mod goals;
+pub mod habits;
+pub mod imports;
+pub mod inbox;
+pub mod integrations;
+pub mod notes;
+pub mod people;
+pub mod readings;
+pub mod reminders;
+pub mod school;
+pub mod search;
 pub mod settings;
+pub mod tasks;
+pub mod weekly;
 
 use std::time::Duration;
 
@@ -54,7 +77,29 @@ fn v1() -> OpenApiRouter<AppState> {
         .merge(auth::routes::router())
         .merge(settings::router())
         .merge(areas::router())
-    // MODULES: los agentes agregan aquí sus routers.
+        .merge(goals::router())
+        .merge(habits::router())
+        .merge(checkins::router())
+        .merge(dashboard::router())
+        .merge(weekly::router())
+        .merge(devotionals::router())
+        .merge(readings::router())
+        .merge(tasks::router())
+        .merge(inbox::router())
+        .merge(people::router())
+        .merge(content::router())
+        .merge(school::router())
+        .merge(dev::router())
+        .merge(notes::router())
+        .merge(drawings::router())
+        .merge(agenda::router())
+        .merge(search::router())
+        .merge(finance::router())
+        .merge(reminders::router())
+        .merge(integrations::router())
+        .merge(captures::router())
+        .merge(imports::router())
+        .merge(exports::router())
 }
 
 /// OpenAPI completo (para `vida-server openapi` y `/api/v1/openapi.json`).

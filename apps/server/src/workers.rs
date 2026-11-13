@@ -42,8 +42,14 @@ impl Shutdown {
 }
 
 pub fn spawn_all(state: AppState, shutdown: Shutdown) -> Vec<tokio::task::JoinHandle<()>> {
-    let handles = Vec::new();
-    let _ = (&state, &shutdown);
-    // WORKERS: los módulos registran aquí sus tareas periódicas.
+    let mut handles = Vec::new();
+    if !state.config.scheduler_enabled {
+        tracing::info!("SCHEDULER_ENABLED=false: sin tareas de fondo");
+        return handles;
+    }
+    handles.extend(crate::api::tasks::workers(&state, &shutdown));
+    handles.extend(crate::api::finance::workers(&state, &shutdown));
+    handles.extend(crate::telegram::workers(&state, &shutdown));
+    handles.extend(crate::integrations::workers(&state, &shutdown));
     handles
 }

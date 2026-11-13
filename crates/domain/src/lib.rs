@@ -1,8 +1,17 @@
 //! Reglas de negocio puras: sin IO, sin Telegram, sin UI. Todo lo dependiente del tiempo recibe fechas o un `Clock`.
 
+pub mod capture;
+pub mod checkin;
+pub mod finance;
+pub mod goals;
+pub mod habits;
+pub mod metrics;
 pub mod money;
+pub mod reminders;
+pub mod tasks;
 pub mod text;
 pub mod time;
+pub mod vault;
 
 use serde::Serialize;
 

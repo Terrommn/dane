@@ -6,8 +6,10 @@ pub mod config;
 pub mod crypto;
 pub mod error;
 pub mod http;
+pub mod integrations;
 pub mod internal;
 pub mod state;
+pub mod telegram;
 pub mod workers;
 
 pub use api::app;

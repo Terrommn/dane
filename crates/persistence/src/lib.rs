@@ -1,5 +1,6 @@
 //! Acceso a PostgreSQL: pool, migraciones embebidas y repositorios. Toda consulta filtra por `user_id`.
 
+pub mod hooks;
 pub mod repos;
 
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
