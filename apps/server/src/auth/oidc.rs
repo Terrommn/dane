@@ -32,12 +32,11 @@ impl MetadataCache {
     /// Metadatos de descubrimiento + JWKS, cacheados una hora. `force` los recarga (rotación de llaves).
     pub async fn get(&self, cfg: &OidcConfig, force: bool) -> anyhow::Result<CoreProviderMetadata> {
         let mut g = self.0.lock().await;
-        if !force {
-            if let Some((at, m)) = g.as_ref() {
-                if at.elapsed() < METADATA_TTL {
-                    return Ok(m.clone());
-                }
-            }
+        if !force
+            && let Some((at, m)) = g.as_ref()
+            && at.elapsed() < METADATA_TTL
+        {
+            return Ok(m.clone());
         }
         let m = CoreProviderMetadata::discover_async(IssuerUrl::new(cfg.issuer.clone())?, &http_client()?)
             .await?;
