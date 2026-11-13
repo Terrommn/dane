@@ -112,7 +112,7 @@ impl Config {
             .context("BIND_ADDR inválido")?;
         let database_url = var("DATABASE_URL").context("DATABASE_URL es obligatorio")?;
         let public_base_url: url::Url = var("PUBLIC_BASE_URL")
-            .unwrap_or_else(|| "http://localhost:5173".into())
+            .unwrap_or_else(|| "http://localhost:5180".into())
             .parse()
             .context("PUBLIC_BASE_URL inválido")?;
         let allowed_telegram_ids = var("ALLOWED_TELEGRAM_IDS")

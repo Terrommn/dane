@@ -23,9 +23,9 @@ y la misma web funciona en el navegador y como PWA instalable.
 ```bash
 cp .env.example .env          # ya trae valores de desarrollo (dev-login con el ID 111)
 pnpm install
-pnpm dev                      # BD local (puerto 5433) + server :8080 + bot (si hay token) + web :5173
+pnpm dev                      # BD local (puerto 5433) + server :8080 + bot (si hay token) + web :5180
 ```
-Abre http://localhost:5173 → "Entrar en modo desarrollo" con el ID `111` (está en `ALLOWED_TELEGRAM_IDS`).
+Abre http://localhost:5180 → "Entrar en modo desarrollo" con el ID `111` (está en `ALLOWED_TELEGRAM_IDS`).
 Para probar el bot y la Mini App reales sigue [`docs/USER_SETUP.md`](docs/USER_SETUP.md).
 
 Comandos útiles:

@@ -9,7 +9,7 @@ fake-indexeddb + Testing Library.
 ```bash
 scripts/dev-db.sh start                         # PostgreSQL local (raíz del repo)
 set -a; source .env; set +a; cargo run -p server  # API en 127.0.0.1:8080
-pnpm -C apps/web dev                             # http://localhost:5173 (proxy /api → 8080)
+pnpm -C apps/web dev                             # http://localhost:5180 (proxy /api → 8080)
 ```
 `VIDA_API_URL=http://127.0.0.1:8099 pnpm -C apps/web dev -- --port 5174` para usar otro puerto de API/web.
 `PUBLIC_BASE_URL` del server debe ser el origen de la web (dev-login exige origen local).
