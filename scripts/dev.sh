@@ -24,7 +24,7 @@ for _ in $(seq 1 60); do curl -fsS "http://${BIND_ADDR}/readyz" >/dev/null 2>&1 
 echo "✓ API en http://${BIND_ADDR} (OpenAPI: /api/v1/openapi.json)"
 
 if [ -n "${TELEGRAM_BOT_TOKEN:-}" ]; then
-  ./target/debug/vida-bot & pids+=($!)
+  env -u DATABASE_URL -u TEST_DATABASE_URL ./target/debug/vida-bot & pids+=($!)
   echo "✓ Bot en modo ${TELEGRAM_MODE:-polling}"
 else
   echo "• Bot omitido: define TELEGRAM_BOT_TOKEN en .env para probarlo"
