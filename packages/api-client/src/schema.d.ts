@@ -594,6 +594,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/demo/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Entra a un espacio demo aislado (solo desarrollo). */
+        post: operations["demo_session"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/devlog-sessions/{id}": {
         parameters: {
             query?: never;
@@ -3673,6 +3690,19 @@ export interface components {
             /** Format: date-time */
             sent_at?: string | null;
             last_error?: string | null;
+        };
+        DemoRequest: {
+            /** @description Borra el usuario demo y lo vuelve a crear con datos frescos. */
+            reset?: boolean;
+            /** @description `cookie` (por defecto) o `bearer` (Mini App). */
+            transport?: string | null;
+        };
+        DemoSession: {
+            /** Format: uuid */
+            user_id: string;
+            is_demo: boolean;
+            token?: string | null;
+            csrf?: string | null;
         };
         DerivedLog: {
             /** @description Pendientes cerrados ese día (derivado, no se guarda en el log). */
@@ -7242,6 +7272,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Dashboard"];
+                };
+            };
+        };
+    };
+    demo_session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DemoRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoSession"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
                 };
             };
         };

@@ -1763,6 +1763,45 @@
         }
       }
     },
+    "/demo/session": {
+      "post": {
+        "tags": [
+          "demo"
+        ],
+        "summary": "Entra a un espacio demo aislado (solo desarrollo).",
+        "operationId": "demo_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoSession"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/devlog-sessions/{id}": {
       "put": {
         "tags": [
@@ -11330,6 +11369,50 @@
             "format": "date-time"
           },
           "last_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "DemoRequest": {
+        "type": "object",
+        "properties": {
+          "reset": {
+            "type": "boolean",
+            "description": "Borra el usuario demo y lo vuelve a crear con datos frescos."
+          },
+          "transport": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`cookie` (por defecto) o `bearer` (Mini App)."
+          }
+        }
+      },
+      "DemoSession": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "is_demo"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "is_demo": {
+            "type": "boolean"
+          },
+          "token": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "csrf": {
             "type": [
               "string",
               "null"

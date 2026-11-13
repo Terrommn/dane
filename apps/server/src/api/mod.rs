@@ -9,6 +9,7 @@ pub mod captures;
 pub mod checkins;
 pub mod content;
 pub mod dashboard;
+pub mod demo;
 pub mod dev;
 pub mod devotionals;
 pub mod drawings;
@@ -77,6 +78,7 @@ fn v1() -> OpenApiRouter<AppState> {
         .merge(auth::routes::router())
         .merge(settings::router())
         .merge(areas::router())
+        .merge(demo::router())
         .merge(goals::router())
         .merge(habits::router())
         .merge(checkins::router())
