@@ -39,7 +39,7 @@ if [ -f apps/web/package.json ]; then
   step "web unit tests"    pnpm -C apps/web test
   step "web build"         pnpm -C apps/web build
   if [ "${SKIP_E2E:-0}" != "1" ] && grep -q '"e2e"' apps/web/package.json; then
-    step "web e2e (playwright)" pnpm -C apps/web e2e
+    step "web e2e (playwright)" bash -c "cargo build -q -p server && pnpm -C apps/web e2e"
   fi
 fi
 step "backup/restore"      bash scripts/test-backup-restore.sh

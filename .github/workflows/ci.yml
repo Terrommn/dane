@@ -22,6 +22,7 @@ jobs:
       CI: "1"
       DATABASE_URL: postgres://vida:vida@127.0.0.1:5433/vida_test
       ADMIN_DATABASE_URL: postgres://vida:vida@127.0.0.1:5433/postgres
+      E2E_ADMIN_DATABASE_URL: postgres://vida:vida@127.0.0.1:5433/postgres
     steps:
       - uses: actions/checkout@v4
       - name: Extensiones y rol con CREATEDB
@@ -41,7 +42,6 @@ jobs:
         with: { node-version: 24, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C apps/web exec playwright install --with-deps chromium
-        continue-on-error: true
       - name: pnpm verify
         run: PGPASSWORD=vida pnpm verify
       - uses: actions/upload-artifact@v4
