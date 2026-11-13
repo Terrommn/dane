@@ -14,6 +14,9 @@ use tower::ServiceExt;
 use wiremock::matchers::{body_string_contains, header_exists, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
+/// Construye un ID token a partir del nonce del flujo.
+type TokenFactory<'a> = Box<dyn Fn(&str) -> String + 'a>;
+
 const CLIENT_ID: &str = "8000000001";
 const CLIENT_SECRET: &str = "test-secret";
 const KEY: &str = include_str!("fixtures/oidc_test_key.pem");
@@ -191,7 +194,7 @@ async fn invalid_tokens_are_rejected(pool: PgPool) {
     let idp = idp().await;
     let t = app(pool.clone(), &idp);
     let iss = idp.uri();
-    let cases: Vec<(&str, Box<dyn Fn(&str) -> String>)> = vec![
+    let cases: Vec<(&str, TokenFactory)> = vec![
         (
             "nonce",
             Box::new(|_n| id_token(&iss, json!({ "nonce": "otro" }), KEY)),

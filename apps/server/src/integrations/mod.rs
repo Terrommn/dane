@@ -198,6 +198,7 @@ pub async fn today(state: &AppState, user_id: Uuid) -> NaiveDate {
 
 /// Propone una interacción con una persona conocida o una persona nueva (nunca la crea).
 /// Devuelve `true` si se insertó algo nuevo.
+#[allow(clippy::too_many_arguments)]
 pub async fn suggest_contact(
     state: &AppState,
     user_id: Uuid,
