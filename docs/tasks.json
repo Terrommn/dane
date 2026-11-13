@@ -681,7 +681,7 @@
       ],
       "status": "completed",
       "acceptance": "Playwright verde + capturas responsive",
-      "evidence": "Playwright 13/13 (Chrome real, server real): check-in, offline, aislamiento, Mini App firmada/alterada, responsive 29 pantallas, demo; capturas revisadas"
+      "evidence": "Playwright 14/14 (Chrome real, server real): check-in, offline, aislamiento, Mini App firmada/alterada, responsive 29 pantallas, demo; capturas revisadas"
     },
     {
       "id": "T62",

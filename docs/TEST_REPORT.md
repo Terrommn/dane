@@ -15,7 +15,7 @@ Comando: `pnpm verify` → tabla de pasos con código de salida (logs en `.data/
 | web typecheck | ✅ aprobado | TypeScript 7 estricto |
 | web unit tests | ✅ aprobado | **137 aprobadas**, 1 omitida (contrato en vivo, requiere `VIDA_LIVE_API`) |
 | web build | ✅ aprobado | un solo build Mini App/web/PWA; SW con 90 entradas precacheadas, sin `/api` |
-| web e2e (Playwright) | ✅ aprobado | **13 pruebas** en móvil (Pixel 7) y escritorio (1280×800) |
+| web e2e (Playwright) | ✅ aprobado | **14 pruebas** en móvil (Pixel 7) y escritorio (1280×800) |
 | backup/restore | ✅ aprobado | respaldo y restauración en BD temporal con verificación de datos |
 
 ## Rust por suite
@@ -48,7 +48,7 @@ Comando: `pnpm verify` → tabla de pasos con código de salida (logs en `.data/
 * **Vitest (137):** cola offline (orden, reintento con la misma clave, 409, sin red), particionado por usuario y limpieza al
   salir, middleware de API (Bearer/CSRF/Idempotency), start_param, dinero sin floats, formularios de finanzas, merge
   parcial del check-in, estados de hábitos, Markdown seguro (sin HTML ni `javascript:`), componentes clave.
-* **Playwright (13, Chrome real contra el server Rust real sirviendo el build):**
+* **Playwright (14, Chrome real contra el server Rust real sirviendo el build):**
   | Prueba | Móvil | Escritorio |
   |---|---|---|
   | check-in: guardar, recargar, mismo dato en server y dashboard | ✅ | ✅ |
@@ -57,7 +57,7 @@ Comando: `pnpm verify` → tabla de pasos con código de salida (logs en `.data/
   | Mini App: initData firmado → Bearer en memoria, sin cookies ni tokens en storage, fecha objetivo | ✅ | ✅ |
   | Mini App: initData alterado no inicia sesión | ✅ | ✅ |
   | **revisión responsive de 29 pantallas**: sin errores, sin "pendiente", sin scroll horizontal (capturas en `apps/web/test-results/screens/`) | ✅ | ✅ |
-  | espacio demo poblado y aislado en 12 módulos | — | ✅ |
+  | espacio demo poblado y aislado en 12 módulos | ✅ | ✅ |
 
 ## Bugs encontrados por las pruebas y corregidos
 * Limpieza de flujos OIDC con `now()` de la BD en vez del reloj de la app (borraba el flujo recién creado).
