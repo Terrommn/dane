@@ -485,9 +485,9 @@
       "deps": [
         "T09"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Bot compila y se comunica solo por API interna",
-      "evidence": ""
+      "evidence": "Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9)"
     },
     {
       "id": "T45",
@@ -496,9 +496,9 @@
       "deps": [
         "T44"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "14 comandos y botones web_app con fecha",
-      "evidence": ""
+      "evidence": "Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9)"
     },
     {
       "id": "T46",
@@ -507,9 +507,9 @@
       "deps": [
         "T44"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Durabilidad y dedupe probados",
-      "evidence": ""
+      "evidence": "Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9)"
     },
     {
       "id": "T47",
@@ -518,9 +518,9 @@
       "deps": [
         "T08"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Dos workers, lease vencido, ack obsoleto, 429",
-      "evidence": ""
+      "evidence": "Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9)"
     },
     {
       "id": "T48",
@@ -529,9 +529,9 @@
       "deps": [
         "T47"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Horario local/DST, cancelación, pausa",
-      "evidence": ""
+      "evidence": "Scheduler diario/semanal/mensual por fecha local+DST, pausa/reanudar, cancelación por check-in terminado, sin avalancha; GET /reminders con estados de entrega"
     },
     {
       "id": "T49",

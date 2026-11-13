@@ -5,7 +5,7 @@ Generado por `node scripts/tasks.mjs` desde `docs/tasks.json`. No editar a mano.
 
 Estados: ✅ completed · 🔄 in_progress · ⏳ pending · ⛔ blocked_external (en la herramienta queda `pending`).
 
-Resumen: 15 completadas · 45 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
+Resumen: 20 completadas · 40 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
 
 | ID | Tarea | Responsable | Depende de | Estado | Criterio de aceptación | Evidencia |
 |---|---|---|---|---|---|---|
@@ -52,11 +52,11 @@ Resumen: 15 completadas · 45 en curso · 6 pendientes · 0 bloqueadas extername
 | T41 | Implementar deudas, pagos, transferencias y vínculos con metas | finance | T37 | 🔄 in_progress | Sin doble conteo; hito al saldar | — |
 | T42 | Implementar plan de crédito y sugerencia explicable de tarjeta | finance | T41 | 🔄 in_progress | Reglas D-022 probadas | — |
 | T43 | Implementar dashboard financiero, proyecciones e histórico | finance | T39, T40, T41 | 🔄 in_progress | Métricas separadas y corrección del neto | — |
-| T44 | Crear servicio bot Rust y cliente de API interna | bot | T09 | 🔄 in_progress | Bot compila y se comunica solo por API interna | — |
-| T45 | Implementar /start, comandos, menús y enlaces a Mini App | bot | T44 | 🔄 in_progress | 14 comandos y botones web_app con fecha | — |
-| T46 | Implementar polling/webhook seguro e ingestión durable de updates | bot+backend | T44 | 🔄 in_progress | Durabilidad y dedupe probados | — |
-| T47 | Implementar scheduler/outbox, claims, leases, ack y recuperación | backend | T08 | 🔄 in_progress | Dos workers, lease vencido, ack obsoleto, 429 | — |
-| T48 | Implementar recordatorios, pausa, preferencias y estados de entrega | backend | T47 | 🔄 in_progress | Horario local/DST, cancelación, pausa | — |
+| T44 | Crear servicio bot Rust y cliente de API interna | bot | T09 | ✅ completed | Bot compila y se comunica solo por API interna | Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9) |
+| T45 | Implementar /start, comandos, menús y enlaces a Mini App | bot | T44 | ✅ completed | 14 comandos y botones web_app con fecha | Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9) |
+| T46 | Implementar polling/webhook seguro e ingestión durable de updates | bot+backend | T44 | ✅ completed | Durabilidad y dedupe probados | Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9) |
+| T47 | Implementar scheduler/outbox, claims, leases, ack y recuperación | backend | T08 | ✅ completed | Dos workers, lease vencido, ack obsoleto, 429 | Agente D: tests/telegram_flow.rs (16), telegram-bot tests/bot.rs (5, wiremock), tests/e2e_server.rs (1, server+bot reales con Telegram simulado), domain::reminders (9) |
+| T48 | Implementar recordatorios, pausa, preferencias y estados de entrega | backend | T47 | ✅ completed | Horario local/DST, cancelación, pausa | Scheduler diario/semanal/mensual por fecha local+DST, pausa/reanudar, cancelación por check-in terminado, sin avalancha; GET /reminders con estados de entrega |
 | T49 | Implementar adaptador Calendar de lectura y pruebas | integrations | T09 | 🔄 in_progress | Pruebas con servidor HTTP simulado | — |
 | T50 | Implementar adaptador Gmail de lectura y pruebas | integrations | T49 | 🔄 in_progress | Filtra automáticos; propone interacciones | — |
 | T51 | Implementar adaptador ClickUp por vista y pruebas | integrations | T24 | 🔄 in_progress | Orden fáciles/resto/need info; solo lectura | — |
