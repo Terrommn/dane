@@ -340,8 +340,10 @@ export function GoalsSection({
             />
           )}
         </div>
-        {/* TODO(fase 2): "Ejercicio 4 veces por semana" y los hábitos fijos (devocional, ejercicio, lectura) se crean con la
-            API de hábitos (agente A). Proponerlos aquí como ejemplos desmarcados y crearlos solo al confirmar. */}
+        <p className="text-sm text-muted">
+          La meta de ejercicio (N veces por semana) es la frecuencia de su hábito fijo: se configura en
+          Hábitos.
+        </p>
         {err && (
           <p role="alert" className="text-sm text-danger">
             {err}

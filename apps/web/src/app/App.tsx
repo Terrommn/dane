@@ -6,9 +6,9 @@ import { ErrorState, LoadingState } from "../components/ui/States";
 import { ToastProvider } from "../components/ui/Toast";
 import { AuthProvider, useAuth } from "../features/auth/AuthProvider";
 import { LoginPage } from "../features/auth/LoginPage";
-import { TodayPage } from "../features/daily/TodayPage";
 import { ModulePending } from "../features/more/ModulePending";
 import { MorePage } from "../features/more/MorePage";
+import { TodayPage } from "../features/today/TodayPage";
 import { AppShell } from "../layout/AppShell";
 import { startTargetPath } from "../lib/telegram";
 import { queryClient } from "./queryClient";
@@ -75,52 +75,41 @@ const AgendaPage = lazy(() =>
 );
 const ViewsPage = lazy(() => import("../features/views/ViewsPage").then((m) => ({ default: m.ViewsPage })));
 
+// Núcleo (fase 2): objetivos, hábitos, dashboard, semanal, devocionales y lecturas.
+const GoalsPage = lazy(() => import("../features/goals/GoalsPage").then((m) => ({ default: m.GoalsPage })));
+const GoalDetailPage = lazy(() =>
+  import("../features/goals/GoalDetailPage").then((m) => ({ default: m.GoalDetailPage })),
+);
+const PlanningPage = lazy(() =>
+  import("../features/goals/PlanningPage").then((m) => ({ default: m.PlanningPage })),
+);
+const HabitsPage = lazy(() =>
+  import("../features/habits/HabitsPage").then((m) => ({ default: m.HabitsPage })),
+);
+const HabitDetailPage = lazy(() =>
+  import("../features/habits/HabitDetailPage").then((m) => ({ default: m.HabitDetailPage })),
+);
+const DashboardPage = lazy(() =>
+  import("../features/dashboard/DashboardPage").then((m) => ({ default: m.DashboardPage })),
+);
+const WeeklyPage = lazy(() =>
+  import("../features/weekly/WeeklyPage").then((m) => ({ default: m.WeeklyPage })),
+);
+const DevotionalsPage = lazy(() =>
+  import("../features/devotionals/DevotionalsPage").then((m) => ({ default: m.DevotionalsPage })),
+);
+const DevotionalEditorPage = lazy(() =>
+  import("../features/devotionals/DevotionalsPage").then((m) => ({ default: m.DevotionalEditorPage })),
+);
+const ReadingsPage = lazy(() =>
+  import("../features/readings/ReadingsPage").then((m) => ({ default: m.ReadingsPage })),
+);
+const ReadingEditorPage = lazy(() =>
+  import("../features/readings/ReadingsPage").then((m) => ({ default: m.ReadingEditorPage })),
+);
+
 /** Pantallas registradas cuyo módulo se completa en la fase 2 (ver ModulePending). */
 const PENDING: { path: string; title: string; includes: string[] }[] = [
-  {
-    path: "/objetivos",
-    title: "Objetivos",
-    includes: [
-      "Objetivos mensuales y semanales con relación semana → mes",
-      "Progreso cuantitativo, ritmo y cierre",
-    ],
-  },
-  {
-    path: "/objetivos/planificar",
-    title: "Planificar objetivos",
-    includes: [
-      "Revisión del periodo anterior",
-      "Mes antes que semana; 1–3 hábitos por objetivo con avisos de carga",
-    ],
-  },
-  {
-    path: "/habitos",
-    title: "Hábitos",
-    includes: ["Fijos, del mes y de la semana", "Últimos 30 días, heatmap y rachas"],
-  },
-  {
-    path: "/dashboard",
-    title: "Dashboard",
-    includes: [
-      "Objetivos vs avance, hábitos, devocional, peso, energía, paz y finanzas",
-      "Comparación con el mismo tramo anterior",
-    ],
-  },
-  {
-    path: "/semanal",
-    title: "Revisión semanal",
-    includes: ["Resumen automático editable, paz 1–5 y tres prioridades", "Cierre de objetivos"],
-  },
-  {
-    path: "/devocionales",
-    title: "Devocionales",
-    includes: ["Pasaje, versículo/acción, aprendizaje, oración y canción", "Historial y búsqueda"],
-  },
-  {
-    path: "/lecturas",
-    title: "Lecturas",
-    includes: ["Libros y artículos por estado", "Aporte a objetivos de lectura"],
-  },
   {
     path: "/captura/:id",
     title: "Revisar captura",
@@ -192,6 +181,17 @@ export function App() {
               >
                 <Route index element={<Navigate to="/hoy" replace />} />
                 <Route path="/hoy" element={<TodayPage />} />
+                <Route path="/objetivos" element={<GoalsPage />} />
+                <Route path="/objetivos/planificar" element={<PlanningPage />} />
+                <Route path="/objetivos/:id" element={<GoalDetailPage />} />
+                <Route path="/habitos" element={<HabitsPage />} />
+                <Route path="/habitos/:id" element={<HabitDetailPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/semanal" element={<WeeklyPage />} />
+                <Route path="/devocionales" element={<DevotionalsPage />} />
+                <Route path="/devocionales/:date" element={<DevotionalEditorPage />} />
+                <Route path="/lecturas" element={<ReadingsPage />} />
+                <Route path="/lecturas/:id" element={<ReadingEditorPage />} />
                 <Route path="/mas" element={<MorePage />} />
                 <Route path="/proyectos" element={<ProjectsPage />} />
                 <Route path="/proyectos/:id" element={<ProjectDetailPage />} />

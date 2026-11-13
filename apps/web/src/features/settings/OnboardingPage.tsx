@@ -1,13 +1,14 @@
 // Onboarding por pasos. Cada paso guarda solo lo que el usuario confirma; se puede saltar y completar después.
 // Los ejemplos del vault (70 kg, 5 fallas, 4 ejercicios/semana) se proponen desmarcados: no son datos del usuario.
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Button } from "../../components/ui/Button";
 import { ConflictDialog } from "../../components/ui/ConflictDialog";
 import { Card, PageHeader } from "../../components/ui/Display";
 import { QueryState } from "../../components/ui/States";
 import { useToast } from "../../components/ui/Toast";
 import { errorMessage } from "../../lib/errors";
+import { FixedHabitsSetup } from "../habits/FixedHabitsSetup";
 import { AreasEditor } from "../projects/AreasEditor";
 import {
   GoalsSection,
@@ -18,7 +19,16 @@ import {
 } from "./sections";
 import { useSaveSettings, useSettings } from "./settingsApi";
 
-const STEPS = ["Bienvenida", "Región", "Áreas", "Módulos", "Recordatorios", "Metas", "Telegram"] as const;
+const STEPS = [
+  "Bienvenida",
+  "Región",
+  "Áreas",
+  "Módulos",
+  "Recordatorios",
+  "Hábitos",
+  "Metas",
+  "Telegram",
+] as const;
 
 export function OnboardingPage() {
   const settings = useSettings();
@@ -121,6 +131,20 @@ export function OnboardingPage() {
             )}
             {step === 5 && (
               <>
+                <FixedHabitsSetup
+                  devotionalMode={s.devotional_mode}
+                  devotionalEnabled={(s.modules as Record<string, unknown>).devotional !== false}
+                  onDone={next}
+                />
+                <p className="text-sm text-muted">
+                  Los hábitos de tus objetivos se proponen al{" "}
+                  <Link to="/objetivos/planificar">planificar</Link>; los vínculos automáticos (peso, gastos,
+                  algo bueno, devocional) se configuran en <Link to="/habitos">Hábitos</Link>.
+                </p>
+              </>
+            )}
+            {step === 6 && (
+              <>
                 <GoalsSection
                   key={s.version}
                   settings={s}
@@ -130,14 +154,12 @@ export function OnboardingPage() {
                   onSaved={next}
                   asExamples
                 />
-                {/* TODO(fase 2): paso de hábitos fijos (devocional diario, ejercicio N/semana, lectura) y primeros objetivos,
-                    cuando exista la API de hábitos/objetivos. Propuestos desmarcados; se crean solo al confirmar. */}
                 <Button variant="ghost" onClick={next}>
                   Omitir metas
                 </Button>
               </>
             )}
-            {step === 6 && (
+            {step === 7 && (
               <>
                 <TelegramStatusCard />
                 <Button onClick={() => void finish()} loading={saving}>
