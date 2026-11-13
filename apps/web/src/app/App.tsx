@@ -27,6 +27,9 @@ const OnboardingPage = lazy(() =>
   import("../features/settings/OnboardingPage").then((m) => ({ default: m.OnboardingPage })),
 );
 const SyncPage = lazy(() => import("../features/settings/SyncPage").then((m) => ({ default: m.SyncPage })));
+const FinanceRoutes = lazy(() =>
+  import("../features/finance/FinanceRoutes").then((m) => ({ default: m.FinanceRoutes })),
+);
 const InstallPage = lazy(() =>
   import("../features/install/InstallPage").then((m) => ({ default: m.InstallPage })),
 );
@@ -79,19 +82,6 @@ const PENDING: { path: string; title: string; includes: string[] }[] = [
     path: "/semanal",
     title: "Revisión semanal",
     includes: ["Resumen automático editable, paz 1–5 y tres prioridades", "Cierre de objetivos"],
-  },
-  {
-    path: "/finanzas",
-    title: "Finanzas",
-    includes: [
-      "Dashboard: consumo, deudas, ingresos, flujo, presupuesto y proyección",
-      "Cuentas, tarjetas, deudas y plan de crédito",
-    ],
-  },
-  {
-    path: "/finanzas/movimientos",
-    title: "Movimientos",
-    includes: ["Gastos, ingresos, transferencias y pagos", "Filtros, totales e histórico"],
   },
   {
     path: "/personas",
@@ -205,6 +195,7 @@ export function App() {
                 <Route path="/onboarding" element={<OnboardingPage />} />
                 <Route path="/sincronizacion" element={<SyncPage />} />
                 <Route path="/instalar" element={<InstallPage />} />
+                <Route path="/finanzas/*" element={<FinanceRoutes />} />
                 {PENDING.map((p) => (
                   <Route
                     key={p.path}
