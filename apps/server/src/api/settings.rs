@@ -125,7 +125,10 @@ pub fn apply_patch(cur: &mut UserSettings, p: SettingsPatch, now: DateTime<Utc>)
         if let Some(d) = &v
             && !["decrease", "increase", "maintain"].contains(&d.as_str())
         {
-            return Err(ApiError::validation("weight_direction", "decrease, increase o maintain"));
+            return Err(ApiError::validation(
+                "weight_direction",
+                "decrease, increase o maintain",
+            ));
         }
         cur.weight_direction = v;
     }
