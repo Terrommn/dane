@@ -8,6 +8,13 @@ const apiTarget =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VIDA_API_URL ??
   "http://127.0.0.1:8080";
 
+/** Chunk que pertenece solo al editor de dibujos: el lienzo o dependencias exclusivas de Excalidraw. */
+function isDrawingChunk(chunk: { name: string; moduleIds: string[] }): boolean {
+  if (chunk.name.includes("ExcalidrawCanvas")) return true;
+  const ids = chunk.moduleIds ?? [];
+  return ids.length > 0 && ids.every((id) => id.includes("/node_modules/")) && ids.some((id) => id.includes("excalidraw") || /\/node_modules\/\.pnpm\/(mermaid|katex|cytoscape|@mermaid-js|roughjs|d3|dagre|elkjs|khroma|langium|chevrotain|vscode)/.test(id));
+}
+
 // Un solo build para Mini App de Telegram, navegador y PWA instalable.
 export default defineConfig({
   plugins: [
@@ -39,6 +46,8 @@ export default defineConfig({
       workbox: {
         // Solo el app shell (assets estáticos del build). Nada de /api, /auth ni respuestas privadas.
         globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+        // El editor de dibujos (Excalidraw y sus dependencias, ~8 MB) se descarga solo al abrir un dibujo.
+        globIgnores: ["assets/lazy/**"],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api\//, /^\/internal\//, /^\/healthz/, /^\/readyz/],
         runtimeCaching: [],
@@ -64,6 +73,12 @@ export default defineConfig({
   build: {
     target: "es2022",
     sourcemap: true,
+    rolldownOptions: {
+      output: {
+        // Chunks del editor de dibujos en assets/lazy/ (fuera del precache del service worker).
+        chunkFileNames: (chunk) => (isDrawingChunk(chunk) ? "assets/lazy/[name]-[hash].js" : "assets/[name]-[hash].js"),
+      },
+    },
   },
   test: {
     environment: "jsdom",

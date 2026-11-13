@@ -108,7 +108,7 @@ describe("cola offline", () => {
     const [retry] = await listQueue(A);
     expect(retry?.status).toBe("pending");
     expect(retry?.id).not.toBe(q?.id);
-    expect((retry?.body as { version: number }).version).toBe(4);
+    expect((retry?.body as { version: number } | undefined)?.version).toBe(4);
     await flushQueue(A, ok(5));
     expect((await getDraft(A, "checkin", "2026-11-11"))?.status).toBe("saved");
   });

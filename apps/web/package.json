@@ -14,6 +14,7 @@
     "icons": "node scripts/make-icons.mjs"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "0.18.1",
     "@hookform/resolvers": "7.0.6",
     "@tanstack/react-query": "5.107.1",
     "@vida/api-client": "workspace:*",
