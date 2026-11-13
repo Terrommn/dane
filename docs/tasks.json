@@ -397,7 +397,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Centavos, categorías editables, idempotencia",
-      "evidence": ""
+      "evidence": "Agente C (backend): tests/finance_flows.rs (12) + domain finance (9); UI en fase 2 web"
     },
     {
       "id": "T37",
@@ -408,7 +408,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Saldo estimado con reglas y semántica legacy probadas",
-      "evidence": ""
+      "evidence": "Agente C (backend): tests/finance_flows.rs (12) + domain finance (9); UI en fase 2 web"
     },
     {
       "id": "T38",
@@ -419,7 +419,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Captura individual/múltiple, filtros, FX explícito",
-      "evidence": ""
+      "evidence": "Agente C (backend): tests/finance_flows.rs (12) + domain finance (9); UI en fase 2 web"
     },
     {
       "id": "T39",
@@ -430,7 +430,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Snapshot mensual y rubros",
-      "evidence": ""
+      "evidence": "Agente C (backend): tests/finance_flows.rs (12) + domain finance (9); UI en fase 2 web"
     },
     {
       "id": "T40",
@@ -441,7 +441,7 @@
       ],
       "status": "in_progress",
       "acceptance": "UNIQUE por periodo, conciliación, catch-up",
-      "evidence": ""
+      "evidence": "Agente C (backend): tests/finance_flows.rs (12) + domain finance (9); UI en fase 2 web"
     },
     {
       "id": "T41",
@@ -452,7 +452,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Sin doble conteo; hito al saldar",
-      "evidence": ""
+      "evidence": "Agente C (backend): tests/finance_flows.rs (12) + domain finance (9); UI en fase 2 web"
     },
     {
       "id": "T42",
@@ -463,7 +463,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Reglas D-022 probadas",
-      "evidence": ""
+      "evidence": "Agente C (backend): tests/finance_flows.rs (12) + domain finance (9); UI en fase 2 web"
     },
     {
       "id": "T43",
@@ -476,7 +476,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Métricas separadas y corrección del neto",
-      "evidence": ""
+      "evidence": "Agente C (backend): tests/finance_flows.rs (12) + domain finance (9); UI en fase 2 web"
     },
     {
       "id": "T44",
