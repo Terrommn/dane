@@ -118,17 +118,17 @@ async fn status(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<Rem
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct PauseBody {
+pub struct ReminderPauseBody {
     /// Días de pausa (1–365). Sin valor: pausa indefinida hasta reanudar.
     pub days: Option<i64>,
 }
 
 /// Pausa los recordatorios y cancela los pendientes.
-#[utoipa::path(post, path = "/reminders/pause", tag = "reminders", request_body = PauseBody, responses((status = 200, body = ReminderStatus)))]
+#[utoipa::path(post, path = "/reminders/pause", tag = "reminders", request_body = ReminderPauseBody, responses((status = 200, body = ReminderStatus)))]
 async fn pause(
     State(s): State<AppState>,
     auth: AuthUser,
-    Json(b): Json<PauseBody>,
+    Json(b): Json<ReminderPauseBody>,
 ) -> ApiResult<Json<ReminderStatus>> {
     let mut tx = s.pool.begin().await?;
     match b.days {

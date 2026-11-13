@@ -1,6 +1,16 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { closeAll, deleteUserDb, openUserDb } from "./db";
-import { draftId, enqueue, flushQueue, getDraft, listQueue, pendingCount, resolveConflict, type Sender, saveDraft } from "./store";
+import {
+  draftId,
+  enqueue,
+  flushQueue,
+  getDraft,
+  listQueue,
+  pendingCount,
+  resolveConflict,
+  type Sender,
+  saveDraft,
+} from "./store";
 
 const A = "user-a";
 const B = "user-b";
@@ -19,7 +29,13 @@ describe("cola offline", () => {
   it("un borrador local no se marca como guardado hasta que el servidor confirma", async () => {
     await saveDraft(A, "checkin", "2026-11-12", { energy: 4 }, 1);
     expect((await getDraft(A, "checkin", "2026-11-12"))?.status).toBe("draft");
-    await enqueue(A, { method: "PUT", path: "/checkins/2026-11-12", body: { energy: 4, version: 1 }, baseVersion: 1, draftId: draftId("checkin", "2026-11-12") });
+    await enqueue(A, {
+      method: "PUT",
+      path: "/checkins/2026-11-12",
+      body: { energy: 4, version: 1 },
+      baseVersion: 1,
+      draftId: draftId("checkin", "2026-11-12"),
+    });
     expect((await getDraft(A, "checkin", "2026-11-12"))?.status).toBe("pending");
 
     const offline: Sender = async () => ({ status: 0, body: null });
@@ -61,7 +77,13 @@ describe("cola offline", () => {
 
   it("un 409 queda como conflicto explícito con el estado del servidor y no se reintenta solo", async () => {
     await saveDraft(A, "checkin", "2026-11-11", { energy: 2 }, 3);
-    await enqueue(A, { method: "PUT", path: "/checkins/2026-11-11", body: { energy: 2, version: 3 }, baseVersion: 3, draftId: draftId("checkin", "2026-11-11") });
+    await enqueue(A, {
+      method: "PUT",
+      path: "/checkins/2026-11-11",
+      body: { energy: 2, version: 3 },
+      baseVersion: 3,
+      draftId: draftId("checkin", "2026-11-11"),
+    });
     const conflict: Sender = async () => ({
       status: 409,
       body: { error: { code: "conflict", message: "cambió", current: { energy: 5, version: 4 } } },
@@ -93,8 +115,17 @@ describe("cola offline", () => {
 
   it("resolver con la versión del servidor descarta el cambio local", async () => {
     await saveDraft(A, "inbox", "c1", { text: "x" }, 1);
-    await enqueue(A, { method: "PUT", path: "/inbox/1", body: { text: "x", version: 1 }, baseVersion: 1, draftId: draftId("inbox", "c1") });
-    await flushQueue(A, async () => ({ status: 409, body: { error: { code: "conflict", message: "", current: { text: "y", version: 2 } } } }));
+    await enqueue(A, {
+      method: "PUT",
+      path: "/inbox/1",
+      body: { text: "x", version: 1 },
+      baseVersion: 1,
+      draftId: draftId("inbox", "c1"),
+    });
+    await flushQueue(A, async () => ({
+      status: 409,
+      body: { error: { code: "conflict", message: "", current: { text: "y", version: 2 } } },
+    }));
     const [q] = await listQueue(A);
     await resolveConflict(A, q?.id ?? "", { choice: "theirs" });
     expect(await listQueue(A)).toEqual([]);
@@ -105,7 +136,9 @@ describe("cola offline", () => {
     await enqueue(A, { method: "POST", path: "/inbox", body: { text: "" } });
     await enqueue(A, { method: "POST", path: "/inbox", body: { text: "ok" } });
     const s = await flushQueue(A, async (i) =>
-      (i.body as { text: string }).text ? { status: 201, body: {} } : { status: 422, body: { error: { code: "validation", message: "Texto obligatorio" } } },
+      (i.body as { text: string }).text
+        ? { status: 201, body: {} }
+        : { status: 422, body: { error: { code: "validation", message: "Texto obligatorio" } } },
     );
     expect(s).toMatchObject({ sent: 1, errors: 1, remaining: 1 });
     expect((await listQueue(A))[0]?.lastError).toBe("Texto obligatorio");

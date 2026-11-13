@@ -283,7 +283,7 @@ async fn get_links(
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct LinkBody {
+pub struct EntityLinkBody {
     pub src_type: String,
     pub src_id: Uuid,
     pub dst_type: String,
@@ -292,7 +292,7 @@ pub struct LinkBody {
     pub relation: Option<String>,
 }
 
-fn relation(b: &LinkBody) -> ApiResult<String> {
+fn relation(b: &EntityLinkBody) -> ApiResult<String> {
     let r = b.relation.clone().unwrap_or_else(|| "related".into());
     if !["related", "contributes_to", "mentions", "deliverable_of"].contains(&r.as_str()) {
         return Err(ApiError::validation("relation", "relación no válida"));
@@ -307,11 +307,11 @@ fn relation(b: &LinkBody) -> ApiResult<String> {
 }
 
 /// Crea un enlace validando que ambos extremos existan y sean del usuario.
-#[utoipa::path(post, path = "/links", tag = "notes", request_body = LinkBody, responses((status = 204), (status = 404, body = crate::error::ErrorBody)))]
+#[utoipa::path(post, path = "/links", tag = "notes", request_body = EntityLinkBody, responses((status = 204), (status = 404, body = crate::error::ErrorBody)))]
 async fn add_link(
     State(s): State<AppState>,
     auth: AuthUser,
-    Json(b): Json<LinkBody>,
+    Json(b): Json<EntityLinkBody>,
 ) -> ApiResult<StatusCode> {
     let rel = relation(&b)?;
     if b.src_type == b.dst_type && b.src_id == b.dst_id {
@@ -339,11 +339,11 @@ async fn add_link(
     Ok(StatusCode::NO_CONTENT)
 }
 
-#[utoipa::path(delete, path = "/links", tag = "notes", request_body = LinkBody, responses((status = 204)))]
+#[utoipa::path(delete, path = "/links", tag = "notes", request_body = EntityLinkBody, responses((status = 204)))]
 async fn remove_link(
     State(s): State<AppState>,
     auth: AuthUser,
-    Json(b): Json<LinkBody>,
+    Json(b): Json<EntityLinkBody>,
 ) -> ApiResult<StatusCode> {
     let rel = relation(&b)?;
     repo::remove_link(

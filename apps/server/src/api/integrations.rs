@@ -6,7 +6,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Redirect, Response};
 use chrono::NaiveDate;
 use persistence::repos::integrations::{
-    self as repo, ConnectionStatus, InteractionSuggestion, PersonSuggestion, SyncRun,
+    self as repo, ConnectionStatus, InteractionSuggestion, SuggestedPerson, SyncRun,
 };
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
@@ -420,7 +420,7 @@ async fn clickup_disconnect(State(s): State<AppState>, auth: AuthUser) -> ApiRes
 #[derive(Serialize, ToSchema)]
 pub struct Suggestions {
     pub interactions: Vec<InteractionSuggestion>,
-    pub people: Vec<PersonSuggestion>,
+    pub people: Vec<SuggestedPerson>,
 }
 
 /// Interacciones y personas propuestas desde Calendar/Gmail/dictado (nada se registra sin aceptar).

@@ -34,7 +34,7 @@ async fn list_rules(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct RuleBody {
+pub struct FinanceRuleBody {
     /// `subscription | fixed_income` (no cambia al actualizar).
     pub kind: String,
     pub name: String,
@@ -61,7 +61,7 @@ fn active() -> String {
     "active".into()
 }
 
-async fn validate(s: &AppState, user_id: Uuid, b: &RuleBody, base: &str) -> ApiResult<(String, String)> {
+async fn validate(s: &AppState, user_id: Uuid, b: &FinanceRuleBody, base: &str) -> ApiResult<(String, String)> {
     if !["subscription", "fixed_income"].contains(&b.kind.as_str()) {
         return Err(ApiError::validation("kind", "subscription o fixed_income"));
     }
@@ -107,7 +107,7 @@ async fn validate(s: &AppState, user_id: Uuid, b: &RuleBody, base: &str) -> ApiR
 }
 
 fn input<'a>(
-    b: &'a RuleBody,
+    b: &'a FinanceRuleBody,
     name: &'a str,
     currency: &'a str,
     starts_on: NaiveDate,
@@ -130,11 +130,11 @@ fn input<'a>(
     }
 }
 
-#[utoipa::path(post, path = "/finance/recurring", tag = "finance", request_body = RuleBody, responses((status = 201, body = RecurringRule)))]
+#[utoipa::path(post, path = "/finance/recurring", tag = "finance", request_body = FinanceRuleBody, responses((status = 201, body = RecurringRule)))]
 async fn create_rule(
     State(s): State<AppState>,
     auth: AuthUser,
-    Json(b): Json<RuleBody>,
+    Json(b): Json<FinanceRuleBody>,
 ) -> ApiResult<(StatusCode, Json<RecurringRule>)> {
     let c = ctx(&s, auth.user_id).await?;
     let (name, currency) = validate(&s, auth.user_id, &b, &c.base).await?;
@@ -166,13 +166,13 @@ async fn get_rule(
 }
 
 /// Cambios futuros: las ocurrencias ya creadas conservan su monto y fecha.
-#[utoipa::path(put, path = "/finance/recurring/{id}", tag = "finance", request_body = RuleBody,
+#[utoipa::path(put, path = "/finance/recurring/{id}", tag = "finance", request_body = FinanceRuleBody,
     responses((status = 200, body = RecurringRule), (status = 409, body = crate::error::ErrorBody)))]
 async fn update_rule(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    Json(b): Json<RuleBody>,
+    Json(b): Json<FinanceRuleBody>,
 ) -> ApiResult<Json<RecurringRule>> {
     let c = ctx(&s, auth.user_id).await?;
     let (name, currency) = validate(&s, auth.user_id, &b, &c.base).await?;
@@ -281,14 +281,14 @@ async fn occurrences(
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct MaterializeResult {
+pub struct FinanceMaterializeResult {
     pub created: u64,
 }
 
 /// Registra ahora las ocurrencias vencidas del usuario (el scheduler lo hace solo; esto lo adelanta). Idempotente.
-#[utoipa::path(post, path = "/finance/recurring/materialize", tag = "finance", responses((status = 200, body = MaterializeResult)))]
-async fn materialize(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<MaterializeResult>> {
+#[utoipa::path(post, path = "/finance/recurring/materialize", tag = "finance", responses((status = 200, body = FinanceMaterializeResult)))]
+async fn materialize(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<FinanceMaterializeResult>> {
     let c = ctx(&s, auth.user_id).await?;
     let created = rrepo::materialize_due_for_user(&s.pool, auth.user_id, c.today).await?;
-    Ok(Json(MaterializeResult { created }))
+    Ok(Json(FinanceMaterializeResult { created }))
 }

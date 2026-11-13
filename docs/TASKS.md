@@ -5,7 +5,7 @@ Generado por `node scripts/tasks.mjs` desde `docs/tasks.json`. No editar a mano.
 
 Estados: ✅ completed · 🔄 in_progress · ⏳ pending · ⛔ blocked_external (en la herramienta queda `pending`).
 
-Resumen: 23 completadas · 37 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
+Resumen: 24 completadas · 36 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
 
 | ID | Tarea | Responsable | Depende de | Estado | Criterio de aceptación | Evidencia |
 |---|---|---|---|---|---|---|
@@ -14,7 +14,7 @@ Resumen: 23 completadas · 37 en curso · 6 pendientes · 0 bloqueadas extername
 | T03 | Registrar arquitectura, decisiones, fases, dependencias y DoD | lead | T02 | ✅ completed | ARCHITECTURE.md, DATA_MODEL.md, DECISIONS.md | docs/ARCHITECTURE.md, docs/DATA_MODEL.md, docs/DECISIONS.md (D-001..D-024) |
 | T04 | Crear lista de tareas y espejo TASKS.md; responsables | lead | T03 | ✅ completed | 66 tareas en TaskCreate y TASKS.md generado | TaskCreate #1–#66 (=T01–T66); docs/TASKS.md generado por scripts/tasks.mjs |
 | T05 | Crear Cargo/pnpm workspaces y estructura del monorepo | lead | T04 | ✅ completed | cargo build --workspace y pnpm install OK | Cargo workspace (5 crates) + pnpm workspace; cargo build --workspace y pnpm install OK |
-| T06 | Configurar toolchains, dependencias, lockfiles, formato y lints | lead | T05 | 🔄 in_progress | rustfmt, clippy -D warnings, Biome, tsc strict pasan; lockfiles versionados | — |
+| T06 | Configurar toolchains, dependencias, lockfiles, formato y lints | lead | T05 | ✅ completed | rustfmt, clippy -D warnings, Biome, tsc strict pasan; lockfiles versionados | Rust 1.94 + rustfmt.toml + clippy --workspace --all-targets -D warnings limpio; Biome 2.6 + tsc estricto en web; Cargo.lock y pnpm-lock.yaml versionados |
 | T07 | Preparar Compose, PostgreSQL, variables y comando de arranque local | lead | T05 | 🔄 in_progress | pnpm dev levanta BD, server, bot y web; .env.example documentado; validación al arrancar | — |
 | T08 | Diseñar entidades, constraints, ownership, índices y migraciones | lead | T03, T07 | ✅ completed | Migraciones aplican en BD limpia; FKs compuestas de ownership probadas | 6 migraciones (62 tablas) aplicadas en BD limpia; FK compuesta rechaza cruce de dueños y búsqueda unaccent verificada (psql); pruebas sqlx en T59 |
 | T09 | Implementar API base, validación, errores y OpenAPI/cliente generado | lead | T08 | ✅ completed | /api/v1 con errores consistentes; openapi.json y packages/api-client generados y verificados | api/mod.rs (/api/v1, errores ErrorBody, límites, request-id, timeout), OpenAPI utoipa → packages/api-client (scripts/gen-api.sh, --check) |

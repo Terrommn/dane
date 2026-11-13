@@ -331,18 +331,18 @@ async fn update_person(
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct NoteBody {
+pub struct PersonNoteBody {
     /// Por defecto hoy.
     pub on_date: Option<NaiveDate>,
     pub text: String,
 }
 
-#[utoipa::path(post, path = "/people/{id}/notes", tag = "people", request_body = NoteBody, responses((status = 201, body = PersonNote)))]
+#[utoipa::path(post, path = "/people/{id}/notes", tag = "people", request_body = PersonNoteBody, responses((status = 201, body = PersonNote)))]
 async fn add_note(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    Json(b): Json<NoteBody>,
+    Json(b): Json<PersonNoteBody>,
 ) -> ApiResult<(StatusCode, Json<PersonNote>)> {
     let text = required("text", &b.text, 5000)?;
     let date = match b.on_date {

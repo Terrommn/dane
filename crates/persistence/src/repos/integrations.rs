@@ -303,7 +303,7 @@ pub struct InteractionSuggestion {
 }
 
 #[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
-pub struct PersonSuggestion {
+pub struct SuggestedPerson {
     pub id: Uuid,
     pub name: String,
     pub email: Option<String>,
@@ -330,8 +330,8 @@ pub async fn pending_interaction_suggestions(
 pub async fn pending_person_suggestions(
     db: impl PgExecutor<'_>,
     user_id: Uuid,
-) -> RepoResult<Vec<PersonSuggestion>> {
-    Ok(sqlx::query_as::<_, PersonSuggestion>(
+) -> RepoResult<Vec<SuggestedPerson>> {
+    Ok(sqlx::query_as::<_, SuggestedPerson>(
         "SELECT id, name, email, source, on_date, context, status FROM person_suggestions
          WHERE user_id = $1 AND status = 'pending' ORDER BY on_date DESC NULLS LAST, name LIMIT 200",
     )

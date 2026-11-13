@@ -2895,15 +2895,6 @@ export interface components {
             /** @description Las 5 piezas publicadas más recientes (views, retención y "Resultado") a considerar antes de proponer un guion. */
             recent_published: components["schemas"]["ContentPiece"][];
         };
-        ApplyBody: {
-            /**
-             * Format: int32
-             * @description Versión vista por el usuario al revisar.
-             */
-            version: number;
-            /** @description Acción aceptada o editada explícitamente por el usuario. */
-            action: components["schemas"]["InboxAction"];
-        };
         ApplyResult: {
             item: components["schemas"]["InboxItem"];
             result_type?: string | null;
@@ -2947,12 +2938,6 @@ export interface components {
              * @description Obligatorio al actualizar.
              */
             version?: number | null;
-        };
-        AreaTasks: {
-            /** Format: uuid */
-            area_id?: string | null;
-            area_name: string;
-            tasks: components["schemas"]["TaskBrief"][];
         };
         AuthConfig: {
             miniapp_enabled: boolean;
@@ -3099,6 +3084,10 @@ export interface components {
             excluded_by_rule: boolean;
             selected: boolean;
         };
+        CaptureApplyBody: {
+            /** Format: int32 */
+            version: number;
+        };
         CaptureBody: {
             text: string;
             /** @description ID generado en el dispositivo: reenviar la misma captura (offline) no duplica. */
@@ -3243,6 +3232,12 @@ export interface components {
             version: number;
             /** Format: date-time */
             updated_at: string;
+        };
+        CheckinAreaTasks: {
+            /** Format: uuid */
+            area_id?: string | null;
+            area_name: string;
+            tasks: components["schemas"]["TaskBrief"][];
         };
         CheckinFull: {
             checkin?: components["schemas"]["Checkin"] | null;
@@ -3563,7 +3558,7 @@ export interface components {
         DayTasks: {
             /** Format: date */
             date: string;
-            groups: components["schemas"]["AreaTasks"][];
+            groups: components["schemas"]["TaskDayArea"][];
             open_count: number;
             done_count: number;
         };
@@ -3586,7 +3581,7 @@ export interface components {
             devotional?: components["schemas"]["Devotional"] | null;
             /** @description Agenda del día (propuesta: un evento no prueba asistencia). */
             agenda: components["schemas"]["AgendaItem"][];
-            tasks_by_area: components["schemas"]["AreaTasks"][];
+            tasks_by_area: components["schemas"]["CheckinAreaTasks"][];
             people: components["schemas"]["InteractionBrief"][];
             derived: components["schemas"]["DerivedLog"];
             reminder_done: boolean;
@@ -3924,6 +3919,16 @@ export interface components {
             /** Format: int32 */
             energy: number;
         };
+        EntityLinkBody: {
+            src_type: string;
+            /** Format: uuid */
+            src_id: string;
+            dst_type: string;
+            /** Format: uuid */
+            dst_id: string;
+            /** @description `related` (por defecto) o `contributes_to` (aporte explícito a un objetivo). */
+            relation?: string | null;
+        };
         EntityLinks: {
             links: components["schemas"]["LinkView"][];
             backlinks: components["schemas"]["LinkView"][];
@@ -4035,6 +4040,39 @@ export interface components {
             top_expenses: components["schemas"]["ReportRow"][];
             by_project: components["schemas"]["ProjectSpend"][];
             accounts: components["schemas"]["AccountsSummary"];
+        };
+        FinanceMaterializeResult: {
+            /** Format: int64 */
+            created: number;
+        };
+        FinanceRuleBody: {
+            /** @description `subscription | fixed_income` (no cambia al actualizar). */
+            kind: string;
+            name: string;
+            /** Format: int64 */
+            amount_cents: number;
+            currency?: string | null;
+            /** @description `day | last | penultimate`; con `day` se indica `day` 1–31 (si el mes es corto, se usa el último día). */
+            day_kind: string;
+            /** Format: int32 */
+            day?: number | null;
+            /** Format: uuid */
+            category_id?: string | null;
+            /** Format: uuid */
+            account_id?: string | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** @description `active | cancelled | ended`. Cancelar no altera ocurrencias históricas. */
+            status?: string;
+            /** Format: date */
+            starts_on?: string | null;
+            /** Format: date */
+            ends_on?: string | null;
+            notes_md?: string;
+            /** Format: int32 */
+            version?: number | null;
         };
         /**
          * @description Resumen financiero confirmado de un periodo, en centavos de la moneda base del usuario.
@@ -4293,6 +4331,12 @@ export interface components {
             /** Format: date-time */
             created_at: string;
         };
+        GoalLinkBody: {
+            /** @description `reading | content | task | debt` */
+            src_type: string;
+            /** Format: uuid */
+            src_id: string;
+        };
         GoalView: {
             goal: components["schemas"]["Goal"];
             /** @description Progreso del resultado (independiente de la adherencia a hábitos). */
@@ -4404,6 +4448,10 @@ export interface components {
             habit_id: string;
             habit_name: string;
         };
+        HabitLinkBody: {
+            /** Format: uuid */
+            habit_id: string;
+        };
         HabitPause: {
             /** Format: uuid */
             id: string;
@@ -4414,6 +4462,13 @@ export interface components {
             /** Format: date */
             ends_on?: string | null;
             reason: string;
+        };
+        HabitPauseBody: {
+            /** Format: date */
+            starts_on: string;
+            /** Format: date */
+            ends_on?: string | null;
+            reason?: string;
         };
         HabitStat: {
             habit: components["schemas"]["Habit"];
@@ -4585,6 +4640,15 @@ export interface components {
             /** @enum {string} */
             type: "archive";
         };
+        InboxApplyBody: {
+            /**
+             * Format: int32
+             * @description Versión vista por el usuario al revisar.
+             */
+            version: number;
+            /** @description Acción aceptada o editada explícitamente por el usuario. */
+            action: components["schemas"]["InboxAction"];
+        };
         InboxItem: {
             /** Format: uuid */
             id: string;
@@ -4690,12 +4754,6 @@ export interface components {
             source: string;
             status: string;
         };
-        LinkBody: {
-            /** @description `reading | content | task | debt` */
-            src_type: string;
-            /** Format: uuid */
-            src_id: string;
-        };
         LinkView: {
             src_type: string;
             /** Format: uuid */
@@ -4724,10 +4782,6 @@ export interface components {
             /** Format: int32 */
             position: number;
             source: string;
-        };
-        MaterializeResult: {
-            /** Format: int32 */
-            created: number;
         };
         Me: {
             user: components["schemas"]["User"];
@@ -4813,12 +4867,23 @@ export interface components {
             updated_at: string;
         };
         NoteBody: {
-            /**
-             * Format: date
-             * @description Por defecto hoy.
-             */
-            on_date?: string | null;
-            text: string;
+            /** @description `note` (por defecto), `runbook`, `til`, `snippet`. */
+            kind?: string;
+            title: string;
+            /** @description Markdown; la web lo renderiza sin HTML crudo. */
+            body_md?: string;
+            language?: string | null;
+            aliases?: string[];
+            /** @description Tags tipo `lang/rust`, `tool/git`. */
+            tags?: string[];
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            metadata?: Record<string, never>;
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
         };
         NoteDetail: {
             note: components["schemas"]["Note"];
@@ -4949,13 +5014,6 @@ export interface components {
             next_steps_md: string;
             project_slugs: string[];
         };
-        PauseBody: {
-            /** Format: date */
-            starts_on: string;
-            /** Format: date */
-            ends_on?: string | null;
-            reason?: string;
-        };
         PeacePoint: {
             iso_week: string;
             /** Format: int32 */
@@ -5029,6 +5087,14 @@ export interface components {
             text: string;
             /** Format: date-time */
             created_at: string;
+        };
+        PersonNoteBody: {
+            /**
+             * Format: date
+             * @description Por defecto hoy.
+             */
+            on_date?: string | null;
+            text: string;
         };
         PersonSuggestion: {
             /** Format: uuid */
@@ -5358,6 +5424,13 @@ export interface components {
             date: string;
             text: string;
         };
+        ReminderPauseBody: {
+            /**
+             * Format: int64
+             * @description Días de pausa (1–365). Sin valor: pausa indefinida hasta reanudar.
+             */
+            days?: number | null;
+        };
         ReminderStatus: {
             paused: boolean;
             /** Format: date-time */
@@ -5403,25 +5476,6 @@ export interface components {
             spent_cents: number;
             /** Format: int64 */
             remaining_cents?: number | null;
-        };
-        RuleBody: {
-            title: string;
-            /** Format: uuid */
-            area_id?: string | null;
-            /** Format: uuid */
-            project_id?: string | null;
-            /** @description `day` (con `day` 1–31), `last` o `penultimate`. */
-            day_kind: string;
-            /** Format: int32 */
-            day?: number | null;
-            active?: boolean;
-            /**
-             * Format: date
-             * @description Por defecto hoy: no se generan ocurrencias anteriores a la creación.
-             */
-            starts_on?: string | null;
-            /** Format: int32 */
-            version?: number | null;
         };
         SearchHit: {
             entity_type: string;
@@ -5548,6 +5602,17 @@ export interface components {
             /** Format: uuid */
             goal_id?: string | null;
         };
+        SuggestedPerson: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            email?: string | null;
+            source: string;
+            /** Format: date */
+            on_date?: string | null;
+            context: string;
+            status: string;
+        };
         SuggestionBody: {
             name: string;
             email?: string | null;
@@ -5560,7 +5625,7 @@ export interface components {
         };
         Suggestions: {
             interactions: components["schemas"]["InteractionSuggestion"][];
-            people: components["schemas"]["PersonSuggestion"][];
+            people: components["schemas"]["SuggestedPerson"][];
         };
         SummaryBody: {
             summary_md: string;
@@ -5725,6 +5790,12 @@ export interface components {
             external_status_category?: string | null;
             ease_hint?: string | null;
         };
+        TaskDayArea: {
+            /** Format: uuid */
+            area_id?: string | null;
+            area_name: string;
+            tasks: components["schemas"]["Task"][];
+        };
         TaskDetail: {
             task: components["schemas"]["Task"];
             events: components["schemas"]["TaskEvent"][];
@@ -5741,6 +5812,36 @@ export interface components {
             /** Format: date */
             to_date?: string | null;
             data: Record<string, never>;
+        };
+        TaskMaterializeResult: {
+            /** Format: int32 */
+            created: number;
+        };
+        TaskRuleBody: {
+            title: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** @description `day` (con `day` 1–31), `last` o `penultimate`. */
+            day_kind: string;
+            /** Format: int32 */
+            day?: number | null;
+            active?: boolean;
+            /**
+             * Format: date
+             * @description Por defecto hoy: no se generan ocurrencias anteriores a la creación.
+             */
+            starts_on?: string | null;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        TaskVersionBody: {
+            /**
+             * Format: int32
+             * @description Opcional: si se envía, se valida contra la versión actual.
+             */
+            version?: number | null;
         };
         TelegramStatus: {
             /** @description El bot conoce el chat privado (el usuario envió /start). */
@@ -5902,6 +6003,10 @@ export interface components {
             /** Format: int64 */
             foreign_count: number;
         };
+        TxVersionBody: {
+            /** Format: int32 */
+            version: number;
+        };
         UpcomingReminder: {
             /** @description `daily | weekly | monthly` */
             kind: string;
@@ -5971,13 +6076,6 @@ export interface components {
         VerseActionBody: {
             verse?: string;
             action?: string;
-        };
-        VersionBody: {
-            /**
-             * Format: int32
-             * @description Opcional: si se envía, se valida contra la versión actual.
-             */
-            version?: number | null;
         };
         WeeklyBody: {
             /**
@@ -6818,7 +6916,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ApplyBody"];
+                "application/json": components["schemas"]["CaptureApplyBody"];
             };
         };
         responses: {
@@ -8333,7 +8431,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RuleBody"];
+                "application/json": components["schemas"]["FinanceRuleBody"];
             };
         };
         responses: {
@@ -8361,7 +8459,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MaterializeResult"];
+                    "application/json": components["schemas"]["FinanceMaterializeResult"];
                 };
             };
         };
@@ -8420,7 +8518,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RuleBody"];
+                "application/json": components["schemas"]["FinanceRuleBody"];
             };
         };
         responses: {
@@ -8638,7 +8736,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VersionBody"];
+                "application/json": components["schemas"]["TxVersionBody"];
             };
         };
         responses: {
@@ -8838,7 +8936,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LinkBody"];
+                "application/json": components["schemas"]["GoalLinkBody"];
             };
         };
         responses: {
@@ -8948,7 +9046,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LinkBody"];
+                "application/json": components["schemas"]["HabitLinkBody"];
             };
         };
         responses: {
@@ -9199,7 +9297,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PauseBody"];
+                "application/json": components["schemas"]["HabitPauseBody"];
             };
         };
         responses: {
@@ -9489,7 +9587,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ApplyBody"];
+                "application/json": components["schemas"]["InboxApplyBody"];
             };
         };
         responses: {
@@ -9960,7 +10058,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LinkBody"];
+                "application/json": components["schemas"]["EntityLinkBody"];
             };
         };
         responses: {
@@ -9989,7 +10087,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LinkBody"];
+                "application/json": components["schemas"]["EntityLinkBody"];
             };
         };
         responses: {
@@ -10334,7 +10432,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["NoteBody"];
+                "application/json": components["schemas"]["PersonNoteBody"];
             };
         };
         responses: {
@@ -10725,7 +10823,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PauseBody"];
+                "application/json": components["schemas"]["ReminderPauseBody"];
             };
         };
         responses: {
@@ -11047,7 +11145,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RuleBody"];
+                "application/json": components["schemas"]["TaskRuleBody"];
             };
         };
         responses: {
@@ -11075,7 +11173,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MaterializeResult"];
+                    "application/json": components["schemas"]["TaskMaterializeResult"];
                 };
             };
         };
@@ -11091,7 +11189,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RuleBody"];
+                "application/json": components["schemas"]["TaskRuleBody"];
             };
         };
         responses: {
@@ -11297,7 +11395,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VersionBody"];
+                "application/json": components["schemas"]["TaskVersionBody"];
             };
         };
         responses: {
@@ -11322,7 +11420,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VersionBody"];
+                "application/json": components["schemas"]["TaskVersionBody"];
             };
         };
         responses: {
@@ -11347,7 +11445,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VersionBody"];
+                "application/json": components["schemas"]["TaskVersionBody"];
             };
         };
         responses: {

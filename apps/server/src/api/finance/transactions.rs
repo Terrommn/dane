@@ -588,18 +588,18 @@ async fn update_transaction(
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct VersionBody {
+pub struct TxVersionBody {
     pub version: i32,
 }
 
 /// Anula un movimiento sin borrarlo (deja de contar en saldos y totales).
-#[utoipa::path(post, path = "/finance/transactions/{id}/void", tag = "finance", request_body = VersionBody,
+#[utoipa::path(post, path = "/finance/transactions/{id}/void", tag = "finance", request_body = TxVersionBody,
     responses((status = 200, body = Transaction), (status = 409, body = crate::error::ErrorBody)))]
 async fn void_transaction(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    Json(b): Json<VersionBody>,
+    Json(b): Json<TxVersionBody>,
 ) -> ApiResult<Json<Transaction>> {
     let mut tx = s.pool.begin().await?;
     let t = repo::set_transaction_status(

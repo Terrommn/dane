@@ -245,17 +245,17 @@ async fn update_capture(
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct ApplyBody {
+pub struct CaptureApplyBody {
     pub version: i32,
 }
 
 /// Confirma y aplica la propuesta en una sola transacción. Repetir no duplica (claves de idempotencia por elemento).
-#[utoipa::path(post, path = "/captures/{id}/apply", tag = "captures", request_body = ApplyBody, responses((status = 200, body = CaptureView), (status = 409, body = crate::error::ErrorBody), (status = 422, body = crate::error::ErrorBody)))]
+#[utoipa::path(post, path = "/captures/{id}/apply", tag = "captures", request_body = CaptureApplyBody, responses((status = 200, body = CaptureView), (status = 409, body = crate::error::ErrorBody), (status = 422, body = crate::error::ErrorBody)))]
 async fn apply_capture(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    Json(b): Json<ApplyBody>,
+    Json(b): Json<CaptureApplyBody>,
 ) -> ApiResult<Json<CaptureView>> {
     let row = repo::get(&s.pool, auth.user_id, id).await?;
     if row.status == "applied" {

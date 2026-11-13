@@ -632,7 +632,7 @@ async fn delete_progress(
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct LinkBody {
+pub struct GoalLinkBody {
     /// `reading | content | task | debt`
     pub src_type: String,
     pub src_id: Uuid,
@@ -700,12 +700,12 @@ pub async fn sync_source_contribution(
 }
 
 /// Enlaza una entidad para que aporte al objetivo (una vez por objetivo; enlazarla a la semana y al mes aporta una vez a cada uno).
-#[utoipa::path(post, path = "/goals/{id}/links", tag = "goals", request_body = LinkBody, responses((status = 201, body = GoalDetail)))]
+#[utoipa::path(post, path = "/goals/{id}/links", tag = "goals", request_body = GoalLinkBody, responses((status = 201, body = GoalDetail)))]
 async fn add_link(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    Json(b): Json<LinkBody>,
+    Json(b): Json<GoalLinkBody>,
 ) -> ApiResult<(StatusCode, Json<GoalDetail>)> {
     let (_, settings) = user_ctx(&s.pool, auth.user_id).await?;
     let g = repo::get(&s.pool, auth.user_id, id).await?;

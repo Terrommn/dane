@@ -106,16 +106,41 @@ fn v1() -> OpenApiRouter<AppState> {
 
 /// OpenAPI completo (para `vida-server openapi` y `/api/v1/openapi.json`).
 pub fn openapi() -> utoipa::openapi::OpenApi {
-    let (_, api) = OpenApiRouter::<AppState>::with_openapi(ApiDoc::openapi())
+    let (_, mut api) = OpenApiRouter::<AppState>::with_openapi(ApiDoc::openapi())
         .merge(v1())
         .split_for_parts();
+    unique_operation_ids(&mut api);
     api
 }
 
+/// `operationId` derivado de método + ruta (`get_finance_dashboard`): los nombres de función se repiten entre
+/// módulos y el cliente generado indexa operaciones por ese id.
+fn unique_operation_ids(api: &mut utoipa::openapi::OpenApi) {
+    for (path, item) in api.paths.paths.iter_mut() {
+        let slug = path
+            .split(|c: char| !c.is_ascii_alphanumeric())
+            .filter(|p| !p.is_empty())
+            .collect::<Vec<_>>()
+            .join("_");
+        for (method, op) in [
+            ("get", item.get.as_mut()),
+            ("post", item.post.as_mut()),
+            ("put", item.put.as_mut()),
+            ("patch", item.patch.as_mut()),
+            ("delete", item.delete.as_mut()),
+        ] {
+            if let Some(op) = op {
+                op.operation_id = Some(format!("{method}_{slug}"));
+            }
+        }
+    }
+}
+
 pub fn app(state: AppState) -> Router {
-    let (api_router, api_doc) = OpenApiRouter::with_openapi(ApiDoc::openapi())
+    let (api_router, mut api_doc) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .merge(v1())
         .split_for_parts();
+    unique_operation_ids(&mut api_doc);
     let api_doc = std::sync::Arc::new(api_doc);
     let api = api_router
         .route(

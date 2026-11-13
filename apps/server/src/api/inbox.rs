@@ -184,7 +184,7 @@ pub enum InboxAction {
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct ApplyBody {
+pub struct InboxApplyBody {
     /// Versión vista por el usuario al revisar.
     pub version: i32,
     /// Acción aceptada o editada explícitamente por el usuario.
@@ -199,12 +199,12 @@ pub struct ApplyResult {
 }
 
 /// Aplica la decisión del usuario: crea el destino y cierra el elemento en una sola transacción.
-#[utoipa::path(post, path = "/inbox/{id}/apply", tag = "inbox", request_body = ApplyBody, responses((status = 200, body = ApplyResult), (status = 409, body = crate::error::ErrorBody)))]
+#[utoipa::path(post, path = "/inbox/{id}/apply", tag = "inbox", request_body = InboxApplyBody, responses((status = 200, body = ApplyResult), (status = 409, body = crate::error::ErrorBody)))]
 async fn apply(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    Json(b): Json<ApplyBody>,
+    Json(b): Json<InboxApplyBody>,
 ) -> ApiResult<Json<ApplyResult>> {
     let item = repo::get(&s.pool, auth.user_id, id).await?;
     if item.status != "pending" || item.version != b.version {

@@ -342,7 +342,7 @@ pub struct HabitGroups {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct AreaTasks {
+pub struct CheckinAreaTasks {
     pub area_id: Option<Uuid>,
     pub area_name: String,
     pub tasks: Vec<TaskBrief>,
@@ -389,7 +389,7 @@ pub struct DayView {
     pub devotional: Option<Devotional>,
     /// Agenda del día (propuesta: un evento no prueba asistencia).
     pub agenda: Vec<AgendaItem>,
-    pub tasks_by_area: Vec<AreaTasks>,
+    pub tasks_by_area: Vec<CheckinAreaTasks>,
     pub people: Vec<InteractionBrief>,
     pub derived: DerivedLog,
     pub reminder_done: bool,
@@ -484,14 +484,14 @@ async fn day_view(
     let devotional = persistence::repos::devotionals::get(&s.pool, auth.user_id, date).await?;
     let agenda = dash::agenda(&s.pool, auth.user_id, date).await?;
     let tasks = dash::tasks_for_day(&s.pool, auth.user_id, &st.timezone, date).await?;
-    let mut by_area: Vec<AreaTasks> = Vec::new();
+    let mut by_area: Vec<CheckinAreaTasks> = Vec::new();
     for task in tasks
         .iter()
         .filter(|t| t.status == "open" || t.done_on == Some(date))
     {
         match by_area.iter_mut().find(|a| a.area_id == task.area_id) {
             Some(a) => a.tasks.push(task.clone()),
-            None => by_area.push(AreaTasks {
+            None => by_area.push(CheckinAreaTasks {
                 area_id: task.area_id,
                 area_name: task.area_name.clone().unwrap_or_else(|| "Sin área".into()),
                 tasks: vec![task.clone()],

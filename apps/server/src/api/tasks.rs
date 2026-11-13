@@ -237,18 +237,18 @@ async fn archive_task(
 }
 
 #[derive(Deserialize, ToSchema, Default)]
-pub struct VersionBody {
+pub struct TaskVersionBody {
     /// Opcional: si se envía, se valida contra la versión actual.
     pub version: Option<i32>,
 }
 
 /// Marca como hecha. En tareas de ClickUp solo cambia el estado local (no modifica ClickUp).
-#[utoipa::path(post, path = "/tasks/{id}/complete", tag = "tasks", request_body = VersionBody, responses((status = 200, body = Task)))]
+#[utoipa::path(post, path = "/tasks/{id}/complete", tag = "tasks", request_body = TaskVersionBody, responses((status = 200, body = Task)))]
 async fn complete_task(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    b: Option<Json<VersionBody>>,
+    b: Option<Json<TaskVersionBody>>,
 ) -> ApiResult<Json<Task>> {
     let v = b.and_then(|b| b.0.version);
     Ok(Json(
@@ -256,12 +256,12 @@ async fn complete_task(
     ))
 }
 
-#[utoipa::path(post, path = "/tasks/{id}/reopen", tag = "tasks", request_body = VersionBody, responses((status = 200, body = Task)))]
+#[utoipa::path(post, path = "/tasks/{id}/reopen", tag = "tasks", request_body = TaskVersionBody, responses((status = 200, body = Task)))]
 async fn reopen_task(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    b: Option<Json<VersionBody>>,
+    b: Option<Json<TaskVersionBody>>,
 ) -> ApiResult<Json<Task>> {
     let v = b.and_then(|b| b.0.version);
     Ok(Json(
@@ -269,12 +269,12 @@ async fn reopen_task(
     ))
 }
 
-#[utoipa::path(post, path = "/tasks/{id}/cancel", tag = "tasks", request_body = VersionBody, responses((status = 200, body = Task)))]
+#[utoipa::path(post, path = "/tasks/{id}/cancel", tag = "tasks", request_body = TaskVersionBody, responses((status = 200, body = Task)))]
 async fn cancel_task(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    b: Option<Json<VersionBody>>,
+    b: Option<Json<TaskVersionBody>>,
 ) -> ApiResult<Json<Task>> {
     let v = b.and_then(|b| b.0.version);
     Ok(Json(
@@ -311,7 +311,7 @@ async fn carry_over(
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct AreaTasks {
+pub struct TaskDayArea {
     pub area_id: Option<Uuid>,
     pub area_name: String,
     pub tasks: Vec<Task>,
@@ -320,7 +320,7 @@ pub struct AreaTasks {
 #[derive(Serialize, ToSchema)]
 pub struct DayTasks {
     pub date: NaiveDate,
-    pub groups: Vec<AreaTasks>,
+    pub groups: Vec<TaskDayArea>,
     pub open_count: usize,
     pub done_count: usize,
 }
@@ -335,16 +335,16 @@ async fn tasks_for_day(
     let (tz, _) = user_today(&s, auth.user_id).await?;
     let tasks = repo::for_day(&s.pool, auth.user_id, date, tz.name()).await?;
     let area_list = areas::list_areas(&s.pool, auth.user_id, true).await?;
-    let mut groups: Vec<AreaTasks> = area_list
+    let mut groups: Vec<TaskDayArea> = area_list
         .iter()
         .filter(|a| a.archived_at.is_none())
-        .map(|a| AreaTasks {
+        .map(|a| TaskDayArea {
             area_id: Some(a.id),
             area_name: a.name.clone(),
             tasks: Vec::new(),
         })
         .collect();
-    let mut none = AreaTasks {
+    let mut none = TaskDayArea {
         area_id: None,
         area_name: "Sin área".into(),
         tasks: Vec::new(),
@@ -364,7 +364,7 @@ async fn tasks_for_day(
             None => {
                 // Área archivada: se muestra con su nombre para no esconder pendientes.
                 if let Some(a) = area_list.iter().find(|a| Some(a.id) == t.area_id) {
-                    groups.push(AreaTasks {
+                    groups.push(TaskDayArea {
                         area_id: Some(a.id),
                         area_name: a.name.clone(),
                         tasks: vec![t],
@@ -389,7 +389,7 @@ async fn tasks_for_day(
 // ---------- Recurrentes ----------
 
 #[derive(Deserialize, ToSchema)]
-pub struct RuleBody {
+pub struct TaskRuleBody {
     pub title: String,
     pub area_id: Option<Uuid>,
     pub project_id: Option<Uuid>,
@@ -412,11 +412,11 @@ async fn list_rules(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json
     Ok(Json(repo::list_rules(&s.pool, auth.user_id).await?))
 }
 
-#[utoipa::path(post, path = "/task-recurrences", tag = "tasks", request_body = RuleBody, responses((status = 201, body = RecurrenceRule)))]
+#[utoipa::path(post, path = "/task-recurrences", tag = "tasks", request_body = TaskRuleBody, responses((status = 201, body = RecurrenceRule)))]
 async fn create_rule(
     State(s): State<AppState>,
     auth: AuthUser,
-    Json(b): Json<RuleBody>,
+    Json(b): Json<TaskRuleBody>,
 ) -> ApiResult<(StatusCode, Json<RecurrenceRule>)> {
     let title = required("title", &b.title, 300)?;
     DayOfMonth::from_parts(&b.day_kind, b.day)?;
@@ -443,12 +443,12 @@ async fn create_rule(
 }
 
 /// Editar o desactivar una regla no modifica las tareas ya generadas.
-#[utoipa::path(put, path = "/task-recurrences/{id}", tag = "tasks", request_body = RuleBody, responses((status = 200, body = RecurrenceRule)))]
+#[utoipa::path(put, path = "/task-recurrences/{id}", tag = "tasks", request_body = TaskRuleBody, responses((status = 200, body = RecurrenceRule)))]
 async fn update_rule(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    Json(b): Json<RuleBody>,
+    Json(b): Json<TaskRuleBody>,
 ) -> ApiResult<Json<RecurrenceRule>> {
     let title = required("title", &b.title, 300)?;
     DayOfMonth::from_parts(&b.day_kind, b.day)?;
@@ -476,14 +476,14 @@ async fn update_rule(
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct MaterializeResult {
+pub struct TaskMaterializeResult {
     pub created: u32,
 }
 
 /// Genera las ocurrencias pendientes hasta hoy (idempotente; también lo hace el worker periódicamente).
-#[utoipa::path(post, path = "/task-recurrences/materialize", tag = "tasks", responses((status = 200, body = MaterializeResult)))]
-async fn materialize_rules(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<MaterializeResult>> {
-    Ok(Json(MaterializeResult {
+#[utoipa::path(post, path = "/task-recurrences/materialize", tag = "tasks", responses((status = 200, body = TaskMaterializeResult)))]
+async fn materialize_rules(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<TaskMaterializeResult>> {
+    Ok(Json(TaskMaterializeResult {
         created: materialize_user(&s, auth.user_id).await?,
     }))
 }

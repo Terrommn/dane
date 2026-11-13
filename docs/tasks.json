@@ -60,9 +60,9 @@
       "deps": [
         "T05"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "rustfmt, clippy -D warnings, Biome, tsc strict pasan; lockfiles versionados",
-      "evidence": ""
+      "evidence": "Rust 1.94 + rustfmt.toml + clippy --workspace --all-targets -D warnings limpio; Biome 2.6 + tsc estricto en web; Cargo.lock y pnpm-lock.yaml versionados"
     },
     {
       "id": "T07",

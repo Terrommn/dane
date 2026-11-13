@@ -1038,7 +1038,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ApplyBody"
+                "$ref": "#/components/schemas/CaptureApplyBody"
               }
             }
           },
@@ -3293,7 +3293,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RuleBody"
+                "$ref": "#/components/schemas/FinanceRuleBody"
               }
             }
           },
@@ -3324,7 +3324,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MaterializeResult"
+                  "$ref": "#/components/schemas/FinanceMaterializeResult"
                 }
               }
             }
@@ -3418,7 +3418,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RuleBody"
+                "$ref": "#/components/schemas/FinanceRuleBody"
               }
             }
           },
@@ -3849,7 +3849,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionBody"
+                "$ref": "#/components/schemas/TxVersionBody"
               }
             }
           },
@@ -4192,7 +4192,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LinkBody"
+                "$ref": "#/components/schemas/GoalLinkBody"
               }
             }
           },
@@ -4365,7 +4365,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LinkBody"
+                "$ref": "#/components/schemas/HabitLinkBody"
               }
             }
           },
@@ -4760,7 +4760,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PauseBody"
+                "$ref": "#/components/schemas/HabitPauseBody"
               }
             }
           },
@@ -5182,7 +5182,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ApplyBody"
+                "$ref": "#/components/schemas/InboxApplyBody"
               }
             }
           },
@@ -5815,7 +5815,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LinkBody"
+                "$ref": "#/components/schemas/EntityLinkBody"
               }
             }
           },
@@ -5843,7 +5843,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LinkBody"
+                "$ref": "#/components/schemas/EntityLinkBody"
               }
             }
           },
@@ -6421,7 +6421,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/PersonNoteBody"
               }
             }
           },
@@ -6997,7 +6997,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PauseBody"
+                "$ref": "#/components/schemas/ReminderPauseBody"
               }
             }
           },
@@ -7514,7 +7514,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RuleBody"
+                "$ref": "#/components/schemas/TaskRuleBody"
               }
             }
           },
@@ -7545,7 +7545,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MaterializeResult"
+                  "$ref": "#/components/schemas/TaskMaterializeResult"
                 }
               }
             }
@@ -7575,7 +7575,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RuleBody"
+                "$ref": "#/components/schemas/TaskRuleBody"
               }
             }
           },
@@ -7961,7 +7961,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionBody"
+                "$ref": "#/components/schemas/TaskVersionBody"
               }
             }
           },
@@ -8002,7 +8002,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionBody"
+                "$ref": "#/components/schemas/TaskVersionBody"
               }
             }
           },
@@ -8042,7 +8042,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionBody"
+                "$ref": "#/components/schemas/TaskVersionBody"
               }
             }
           },
@@ -8774,24 +8774,6 @@
           }
         }
       },
-      "ApplyBody": {
-        "type": "object",
-        "required": [
-          "version",
-          "action"
-        ],
-        "properties": {
-          "version": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Versión vista por el usuario al revisar."
-          },
-          "action": {
-            "$ref": "#/components/schemas/InboxAction",
-            "description": "Acción aceptada o editada explícitamente por el usuario."
-          }
-        }
-      },
       "ApplyResult": {
         "type": "object",
         "required": [
@@ -8930,31 +8912,6 @@
             ],
             "format": "int32",
             "description": "Obligatorio al actualizar."
-          }
-        }
-      },
-      "AreaTasks": {
-        "type": "object",
-        "required": [
-          "area_name",
-          "tasks"
-        ],
-        "properties": {
-          "area_id": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "uuid"
-          },
-          "area_name": {
-            "type": "string"
-          },
-          "tasks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TaskBrief"
-            }
           }
         }
       },
@@ -9392,6 +9349,18 @@
           },
           "selected": {
             "type": "boolean"
+          }
+        }
+      },
+      "CaptureApplyBody": {
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -9863,6 +9832,31 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "CheckinAreaTasks": {
+        "type": "object",
+        "required": [
+          "area_name",
+          "tasks"
+        ],
+        "properties": {
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "area_name": {
+            "type": "string"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskBrief"
+            }
           }
         }
       },
@@ -10984,7 +10978,7 @@
           "groups": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/AreaTasks"
+              "$ref": "#/components/schemas/TaskDayArea"
             }
           },
           "open_count": {
@@ -11088,7 +11082,7 @@
               "tasks_by_area": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/AreaTasks"
+                  "$ref": "#/components/schemas/CheckinAreaTasks"
                 }
               },
               "people": {
@@ -12106,6 +12100,38 @@
           }
         }
       },
+      "EntityLinkBody": {
+        "type": "object",
+        "required": [
+          "src_type",
+          "src_id",
+          "dst_type",
+          "dst_id"
+        ],
+        "properties": {
+          "src_type": {
+            "type": "string"
+          },
+          "src_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dst_type": {
+            "type": "string"
+          },
+          "dst_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "relation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`related` (por defecto) o `contributes_to` (aporte explícito a un objetivo)."
+          }
+        }
+      },
       "EntityLinks": {
         "type": "object",
         "required": [
@@ -12465,6 +12491,114 @@
           },
           "accounts": {
             "$ref": "#/components/schemas/AccountsSummary"
+          }
+        }
+      },
+      "FinanceMaterializeResult": {
+        "type": "object",
+        "required": [
+          "created"
+        ],
+        "properties": {
+          "created": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "FinanceRuleBody": {
+        "type": "object",
+        "required": [
+          "kind",
+          "name",
+          "amount_cents",
+          "day_kind"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "`subscription | fixed_income` (no cambia al actualizar)."
+          },
+          "name": {
+            "type": "string"
+          },
+          "amount_cents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "day_kind": {
+            "type": "string",
+            "description": "`day | last | penultimate`; con `day` se indica `day` 1–31 (si el mes es corto, se usa el último día)."
+          },
+          "day": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "category_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "account_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "description": "`active | cancelled | ended`. Cancelar no altera ocurrencias históricas."
+          },
+          "starts_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "ends_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "notes_md": {
+            "type": "string"
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -13150,6 +13284,23 @@
           }
         }
       },
+      "GoalLinkBody": {
+        "type": "object",
+        "required": [
+          "src_type",
+          "src_id"
+        ],
+        "properties": {
+          "src_type": {
+            "type": "string",
+            "description": "`reading | content | task | debt`"
+          },
+          "src_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "GoalView": {
         "type": "object",
         "required": [
@@ -13593,6 +13744,18 @@
           }
         }
       },
+      "HabitLinkBody": {
+        "type": "object",
+        "required": [
+          "habit_id"
+        ],
+        "properties": {
+          "habit_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "HabitPause": {
         "type": "object",
         "required": [
@@ -13610,6 +13773,28 @@
             "type": "string",
             "format": "uuid"
           },
+          "starts_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "ends_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "HabitPauseBody": {
+        "type": "object",
+        "required": [
+          "starts_on"
+        ],
+        "properties": {
           "starts_on": {
             "type": "string",
             "format": "date"
@@ -14225,6 +14410,24 @@
           }
         ]
       },
+      "InboxApplyBody": {
+        "type": "object",
+        "required": [
+          "version",
+          "action"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Versión vista por el usuario al revisar."
+          },
+          "action": {
+            "$ref": "#/components/schemas/InboxAction",
+            "description": "Acción aceptada o editada explícitamente por el usuario."
+          }
+        }
+      },
       "InboxItem": {
         "type": "object",
         "required": [
@@ -14519,23 +14722,6 @@
           }
         }
       },
-      "LinkBody": {
-        "type": "object",
-        "required": [
-          "src_type",
-          "src_id"
-        ],
-        "properties": {
-          "src_type": {
-            "type": "string",
-            "description": "`reading | content | task | debt`"
-          },
-          "src_id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
       "LinkView": {
         "type": "object",
         "required": [
@@ -14626,19 +14812,6 @@
           },
           "source": {
             "type": "string"
-          }
-        }
-      },
-      "MaterializeResult": {
-        "type": "object",
-        "required": [
-          "created"
-        ],
-        "properties": {
-          "created": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
           }
         }
       },
@@ -14907,19 +15080,65 @@
       "NoteBody": {
         "type": "object",
         "required": [
-          "text"
+          "title"
         ],
         "properties": {
-          "on_date": {
+          "kind": {
+            "type": "string",
+            "description": "`note` (por defecto), `runbook`, `til`, `snippet`."
+          },
+          "title": {
+            "type": "string"
+          },
+          "body_md": {
+            "type": "string",
+            "description": "Markdown; la web lo renderiza sin HTML crudo."
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags tipo `lang/rust`, `tool/git`."
+          },
+          "area_id": {
             "type": [
               "string",
               "null"
             ],
-            "format": "date",
-            "description": "Por defecto hoy."
+            "format": "uuid"
           },
-          "text": {
-            "type": "string"
+          "project_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -15392,28 +15611,6 @@
           }
         }
       },
-      "PauseBody": {
-        "type": "object",
-        "required": [
-          "starts_on"
-        ],
-        "properties": {
-          "starts_on": {
-            "type": "string",
-            "format": "date"
-          },
-          "ends_on": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date"
-          },
-          "reason": {
-            "type": "string"
-          }
-        }
-      },
       "PeacePoint": {
         "type": "object",
         "required": [
@@ -15696,6 +15893,25 @@
           "created_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "PersonNoteBody": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "on_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Por defecto hoy."
+          },
+          "text": {
+            "type": "string"
           }
         }
       },
@@ -16826,6 +17042,19 @@
           }
         }
       },
+      "ReminderPauseBody": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Días de pausa (1–365). Sin valor: pausa indefinida hasta reanudar."
+          }
+        }
+      },
       "ReminderStatus": {
         "type": "object",
         "required": [
@@ -16982,61 +17211,6 @@
               "null"
             ],
             "format": "int64"
-          }
-        }
-      },
-      "RuleBody": {
-        "type": "object",
-        "required": [
-          "title",
-          "day_kind"
-        ],
-        "properties": {
-          "title": {
-            "type": "string"
-          },
-          "area_id": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "uuid"
-          },
-          "project_id": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "uuid"
-          },
-          "day_kind": {
-            "type": "string",
-            "description": "`day` (con `day` 1–31), `last` o `penultimate`."
-          },
-          "day": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "active": {
-            "type": "boolean"
-          },
-          "starts_on": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date",
-            "description": "Por defecto hoy: no se generan ocurrencias anteriores a la creación."
-          },
-          "version": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
           }
         }
       },
@@ -17467,6 +17641,47 @@
           }
         }
       },
+      "SuggestedPerson": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "source",
+          "context",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "on_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "context": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
       "SuggestionBody": {
         "type": "object",
         "required": [
@@ -17519,7 +17734,7 @@
           "people": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PersonSuggestion"
+              "$ref": "#/components/schemas/SuggestedPerson"
             }
           }
         }
@@ -18098,6 +18313,31 @@
           }
         }
       },
+      "TaskDayArea": {
+        "type": "object",
+        "required": [
+          "area_name",
+          "tasks"
+        ],
+        "properties": {
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "area_name": {
+            "type": "string"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Task"
+            }
+          }
+        }
+      },
       "TaskDetail": {
         "type": "object",
         "required": [
@@ -18153,6 +18393,87 @@
           },
           "data": {
             "type": "object"
+          }
+        }
+      },
+      "TaskMaterializeResult": {
+        "type": "object",
+        "required": [
+          "created"
+        ],
+        "properties": {
+          "created": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "TaskRuleBody": {
+        "type": "object",
+        "required": [
+          "title",
+          "day_kind"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "day_kind": {
+            "type": "string",
+            "description": "`day` (con `day` 1–31), `last` o `penultimate`."
+          },
+          "day": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "starts_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Por defecto hoy: no se generan ocurrencias anteriores a la creación."
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "TaskVersionBody": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Opcional: si se envía, se valida contra la versión actual."
           }
         }
       },
@@ -18634,6 +18955,18 @@
           }
         }
       },
+      "TxVersionBody": {
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "UpcomingReminder": {
         "type": "object",
         "required": [
@@ -18862,19 +19195,6 @@
           },
           "action": {
             "type": "string"
-          }
-        }
-      },
-      "VersionBody": {
-        "type": "object",
-        "properties": {
-          "version": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "description": "Opcional: si se envía, se valida contra la versión actual."
           }
         }
       },

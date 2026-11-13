@@ -3,16 +3,4 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 OUT=packages/api-client
-cargo run -q -p server --bin vida-server -- openapi > "$OUT/openapi.json.tmp"
-mv "$OUT/openapi.json.tmp" "$OUT/openapi.json"
-pnpm -C "$OUT" exec openapi-typescript openapi.json -o src/schema.d.ts >/dev/null
-if [ "${1:-}" = "--check" ]; then
-  if ! git diff --quiet -- "$OUT/openapi.json" "$OUT/src/schema.d.ts"; then
-    echo "✗ El contrato OpenAPI/cliente generado no coincide con el servidor. Ejecuta: pnpm gen:api" >&2
-    git --no-pager diff --stat -- "$OUT"
-    exit 1
-  fi
-  echo "✓ Contrato OpenAPI y cliente TypeScript al día"
-else
-  echo "✓ packages/api-client regenerado"
-fi
+python3 scripts/check-schema-names.py

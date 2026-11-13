@@ -491,7 +491,7 @@ async fn add_version(
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct PauseBody {
+pub struct HabitPauseBody {
     pub starts_on: NaiveDate,
     pub ends_on: Option<NaiveDate>,
     #[serde(default)]
@@ -499,12 +499,12 @@ pub struct PauseBody {
 }
 
 /// Pausa: los días cubiertos salen del denominador.
-#[utoipa::path(post, path = "/habits/{id}/pauses", tag = "habits", request_body = PauseBody, responses((status = 201, body = HabitPause)))]
+#[utoipa::path(post, path = "/habits/{id}/pauses", tag = "habits", request_body = HabitPauseBody, responses((status = 201, body = HabitPause)))]
 async fn add_pause(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(id): Path<Uuid>,
-    Json(b): Json<PauseBody>,
+    Json(b): Json<HabitPauseBody>,
 ) -> ApiResult<(StatusCode, Json<HabitPause>)> {
     if b.ends_on.is_some_and(|e| e < b.starts_on) {
         return Err(ApiError::validation(
@@ -837,16 +837,16 @@ async fn list_links(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct LinkBody {
+pub struct HabitLinkBody {
     pub habit_id: Uuid,
 }
 
-#[utoipa::path(put, path = "/habit-links/{trigger}", tag = "habits", request_body = LinkBody, responses((status = 200, body = Vec<HabitLink>)))]
+#[utoipa::path(put, path = "/habit-links/{trigger}", tag = "habits", request_body = HabitLinkBody, responses((status = 200, body = Vec<HabitLink>)))]
 async fn set_link(
     State(s): State<AppState>,
     auth: AuthUser,
     Path(trigger): Path<String>,
-    Json(b): Json<LinkBody>,
+    Json(b): Json<HabitLinkBody>,
 ) -> ApiResult<Json<Vec<HabitLink>>> {
     if !TRIGGERS.contains(&trigger.as_str()) {
         return Err(ApiError::validation("trigger", "disparador inválido"));
