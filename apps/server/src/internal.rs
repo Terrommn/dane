@@ -11,7 +11,7 @@ use crate::state::AppState;
 
 pub fn router(state: AppState) -> Router<AppState> {
     Router::new()
-        // INTERNAL: los endpoints del bot (updates, jobs) se agregan aquí.
+        .merge(crate::telegram::internal_api::router())
         .layer(middleware::from_fn_with_state(state, require_internal_token))
 }
 
