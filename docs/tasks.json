@@ -149,9 +149,9 @@
       "deps": [
         "T09"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Shell navegable, componentes accesibles, adaptador Telegram con detección",
-      "evidence": ""
+      "evidence": "apps/web shell (nav Hoy/Objetivos/Dashboard/Más), componentes accesibles, capa API (Bearer/CSRF/Idempotency/409), adaptador Telegram; vitest 32/32, tsc y biome limpios"
     },
     {
       "id": "T15",
@@ -608,9 +608,9 @@
       "deps": [
         "T14"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Manifest válido, SW, instrucciones",
-      "evidence": ""
+      "evidence": "manifest+iconos maskable, SW Workbox sin /api /internal ni runtime cache (verificado en sw.js), aviso de actualización, /instalar por plataforma; build OK"
     },
     {
       "id": "T56",

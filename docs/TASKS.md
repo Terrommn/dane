@@ -5,7 +5,7 @@ Generado por `node scripts/tasks.mjs` desde `docs/tasks.json`. No editar a mano.
 
 Estados: ✅ completed · 🔄 in_progress · ⏳ pending · ⛔ blocked_external (en la herramienta queda `pending`).
 
-Resumen: 13 completadas · 47 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
+Resumen: 15 completadas · 45 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
 
 | ID | Tarea | Responsable | Depende de | Estado | Criterio de aceptación | Evidencia |
 |---|---|---|---|---|---|---|
@@ -22,7 +22,7 @@ Resumen: 13 completadas · 47 en curso · 6 pendientes · 0 bloqueadas extername
 | T11 | Implementar auth Mini App y sesiones | lead | T09 | ✅ completed | Tests firma inválida, initData vencido, sesión revocable | auth/miniapp.rs (5 unit) + tests/auth_isolation.rs miniapp_login_validates_signature_freshness_and_allowlist, unauthenticated_and_revoked_sessions_are_rejected |
 | T12 | Implementar Telegram Login OIDC y vinculación de identidad PWA | lead | T11 | ✅ completed | Tests state/nonce/iss/aud/exp/firma inválidos; misma identidad en ambas superficies | tests/auth_oidc.rs (5): flujo válido + vínculo con Mini App (sub≠id), nonce/aud/iss/exp/firma/claim id inválidos, state único, allowlist, open redirect, rate limit |
 | T13 | Implementar allowlist, autorización, CSRF y aislamiento de usuarios | lead | T11 | ✅ completed | Tests allowlist, CSRF y acceso cruzado entre dos usuarios | tests/auth_isolation.rs: cookie_sessions_require_matching_csrf, users_cannot_read_or_link_each_others_data, allowlist 403; config.rs dev_login_is_impossible_in_production |
-| T14 | Crear shell frontend, componentes base y adaptación Telegram | frontend | T09 | 🔄 in_progress | Shell navegable, componentes accesibles, adaptador Telegram con detección | — |
+| T14 | Crear shell frontend, componentes base y adaptación Telegram | frontend | T09 | ✅ completed | Shell navegable, componentes accesibles, adaptador Telegram con detección | apps/web shell (nav Hoy/Objetivos/Dashboard/Más), componentes accesibles, capa API (Bearer/CSRF/Idempotency/409), adaptador Telegram; vitest 32/32, tsc y biome limpios |
 | T15 | Implementar onboarding y preferencias | frontend | T14, T19 | 🔄 in_progress | Onboarding completo con ejemplos editables; ajustes persistidos | — |
 | T16 | Implementar áreas/proyectos y relaciones | backend | T09 | 🔄 in_progress | CRUD API+UI, actividad reciente, renombrar conserva IDs | API y repos áreas/proyectos + actividad; falta UI |
 | T17 | Implementar objetivos mensuales/semanales y planificación | backend | T16 | 🔄 in_progress | CRUD, relación semana→mes, avisos de carga, cierre | — |
@@ -63,7 +63,7 @@ Resumen: 13 completadas · 47 en curso · 6 pendientes · 0 bloqueadas extername
 | T52 | Implementar captura libre/LLM, propuestas tipadas y confirmación | integrations | T38, T24 | 🔄 in_progress | Validación de esquema, preview, confirmación, modo manual | — |
 | T53 | Implementar importación del vault, dry-run, conflictos y trazabilidad | integrations | T38, T27 | 🔄 in_progress | Dry-run, idempotente, ZIP peligroso rechazado | — |
 | T54 | Implementar exportación JSON/CSV/Markdown y round-trip representativo | integrations | T53 | 🔄 in_progress | Round-trip conserva vínculos; sin secretos | — |
-| T55 | Implementar manifest, iconos, service worker e instalación PWA | frontend | T14 | 🔄 in_progress | Manifest válido, SW, instrucciones | — |
+| T55 | Implementar manifest, iconos, service worker e instalación PWA | frontend | T14 | ✅ completed | Manifest válido, SW, instrucciones | manifest+iconos maskable, SW Workbox sin /api /internal ni runtime cache (verificado en sw.js), aviso de actualización, /instalar por plataforma; build OK |
 | T56 | Implementar borradores offline, cola, sincronización y conflictos | frontend | T20, T21 | 🔄 in_progress | Borrador offline sincroniza; conflicto explícito | — |
 | T57 | Verificar caché, logout, actualizaciones y aislamiento de datos locales | frontend | T56 | 🔄 in_progress | SW sin /api; logout limpia; update preserva borradores | — |
 | T58 | Completar estados vacíos/carga/error, accesibilidad y responsive | frontend | T14 | 🔄 in_progress | Sin scroll horizontal; a11y básica verificada | — |
