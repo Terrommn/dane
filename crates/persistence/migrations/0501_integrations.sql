@@ -31,3 +31,7 @@ CREATE TABLE integration_sync_runs (
     error         text
 );
 CREATE INDEX integration_sync_runs_user ON integration_sync_runs (user_id, provider, started_at DESC);
+
+-- Metadatos de propuestas (p. ej. IDs de Inbox de origen, semana u objetivo de una sugerencia de IA).
+ALTER TABLE capture_proposals ADD COLUMN meta jsonb NOT NULL DEFAULT '{}';
+ALTER TABLE capture_proposals ADD COLUMN mode text NOT NULL DEFAULT 'manual' CHECK (mode IN ('manual', 'llm'));
