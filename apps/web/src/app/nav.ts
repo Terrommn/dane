@@ -33,6 +33,8 @@ export const MORE_NAV: NavItem[] = [
   { to: "/notas", label: "Notas", icon: "📝", group: "conocimiento" },
   { to: "/dibujos", label: "Dibujos", icon: "✏️", group: "conocimiento" },
   { to: "/buscar", label: "Buscar", icon: "🔎", group: "sistema" },
+  { to: "/captura/nueva", label: "Captura libre", icon: "✍️", group: "sistema" },
+  { to: "/ajustes/integraciones", label: "Integraciones", icon: "🔌", group: "sistema" },
   { to: "/importar", label: "Importar / exportar", icon: "⇅", group: "sistema" },
   { to: "/sincronizacion", label: "Sincronización", icon: "⟳", group: "sistema" },
   { to: "/instalar", label: "Instalar app", icon: "📲", group: "sistema" },

@@ -46,7 +46,9 @@ describe("errores de la API", () => {
     expect(e.message).toBe("Cambió");
     expect(toApiError(500, null).message).toMatch(/servidor/);
     expect(toApiError(0, null).isNetwork).toBe(true);
-    expect(toApiError(422, { error: { code: "validation", message: "x", field: "name" } }).field).toBe("name");
+    expect(toApiError(422, { error: { code: "validation", message: "x", field: "name" } }).field).toBe(
+      "name",
+    );
   });
 
   it("lee cookies con valores codificados", () => {

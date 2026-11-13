@@ -10,6 +10,7 @@ import { TextField } from "../../components/ui/Field";
 import { ErrorState, LoadingState } from "../../components/ui/States";
 import { api } from "../../lib/api";
 import { errorMessage, unwrap } from "../../lib/errors";
+import { DemoEntry } from "../demo/Demo";
 import { useAuth } from "./AuthProvider";
 
 const ERRORS: Record<string, string> = {
@@ -133,6 +134,11 @@ export function LoginPage() {
             {cfg.data.dev_login_enabled && (
               <div className="border-t border-line pt-4">
                 <DevLogin redirectTo={redirectTo} />
+              </div>
+            )}
+            {cfg.data.dev_login_enabled && (
+              <div className="border-t border-line pt-4">
+                <DemoEntry redirectTo={redirectTo} />
               </div>
             )}
           </div>

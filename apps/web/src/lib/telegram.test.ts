@@ -1,5 +1,15 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { applySafeAreas, applyTelegramTheme, isTelegramLaunch, isValidIsoDate, parseStartParam, resolveTargetDate, startTargetPath, type TgWebApp, validWebApp } from "./telegram";
+import {
+  applySafeAreas,
+  applyTelegramTheme,
+  isTelegramLaunch,
+  isValidIsoDate,
+  parseStartParam,
+  resolveTargetDate,
+  startTargetPath,
+  type TgWebApp,
+  validWebApp,
+} from "./telegram";
 
 afterEach(() => {
   delete window.Telegram;
@@ -7,7 +17,11 @@ afterEach(() => {
 
 describe("start_param y fecha objetivo", () => {
   it("parsea el check-in de un mensaje anterior", () => {
-    expect(parseStartParam("checkin_2026-11-11")).toEqual({ screen: "checkin", date: "2026-11-11", ref: null });
+    expect(parseStartParam("checkin_2026-11-11")).toEqual({
+      screen: "checkin",
+      date: "2026-11-11",
+      ref: null,
+    });
     expect(startTargetPath(parseStartParam("checkin_2026-11-11"))).toBe("/hoy?date=2026-11-11");
   });
 
@@ -22,7 +36,9 @@ describe("start_param y fecha objetivo", () => {
   it("otras pantallas", () => {
     expect(startTargetPath(parseStartParam("semanal_2026-W46"))).toBe("/semanal?week=2026-W46");
     expect(startTargetPath(parseStartParam("semanal_bad"))).toBe("/semanal");
-    expect(startTargetPath(parseStartParam("captura_123e4567-e89b-12d3-a456-426614174000"))).toBe("/captura/123e4567-e89b-12d3-a456-426614174000");
+    expect(startTargetPath(parseStartParam("captura_123e4567-e89b-12d3-a456-426614174000"))).toBe(
+      "/captura/123e4567-e89b-12d3-a456-426614174000",
+    );
     expect(startTargetPath(parseStartParam("dashboard"))).toBe("/dashboard");
   });
 
