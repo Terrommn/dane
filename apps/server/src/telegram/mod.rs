@@ -44,7 +44,7 @@ pub fn workers(state: &AppState, shutdown: &Shutdown) -> Vec<tokio::task::JoinHa
                     Ok(_) => {}
                     Err(e) => tracing::error!(error = %e, "scheduler de recordatorios"),
                 }
-                if ticks % 1440 == 0 {
+                if ticks.is_multiple_of(1440) {
                     retention(&state).await;
                 }
                 ticks += 1;

@@ -224,7 +224,9 @@ pub async fn ack(
     now: DateTime<Utc>,
 ) -> Result<AckOutcome, AckError> {
     let mut tx = pool.begin().await?;
-    let row: Option<(String, Option<Uuid>, i32, i32, Option<Uuid>, DateTime<Utc>)> = sqlx::query_as(
+    // (status, lease_token, attempts, max_attempts, user_id, run_at)
+    type AckRow = (String, Option<Uuid>, i32, i32, Option<Uuid>, DateTime<Utc>);
+    let row: Option<AckRow> = sqlx::query_as(
         "SELECT status, lease_token, attempts, max_attempts, user_id, run_at FROM jobs WHERE id = $1 FOR UPDATE",
     )
     .bind(id)
@@ -286,16 +288,14 @@ pub async fn ack(
         }
         AckKind::Failed { error, chat_blocked } => {
             mark_failed(&mut tx, id, &truncate(&error)).await?;
-            if chat_blocked {
-                if let Some(u) = user_id {
-                    sqlx::query(
-                        "UPDATE telegram_chats SET can_message = false, last_error = $2 WHERE user_id = $1",
-                    )
-                    .bind(u)
-                    .bind(truncate(&error))
-                    .execute(&mut *tx)
-                    .await?;
-                }
+            if let (true, Some(u)) = (chat_blocked, user_id) {
+                sqlx::query(
+                    "UPDATE telegram_chats SET can_message = false, last_error = $2 WHERE user_id = $1",
+                )
+                .bind(u)
+                .bind(truncate(&error))
+                .execute(&mut *tx)
+                .await?;
             }
             AckOutcome {
                 status: "failed".into(),

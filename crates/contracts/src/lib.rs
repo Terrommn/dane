@@ -103,6 +103,25 @@ pub fn path_ack(id: Uuid) -> String {
     format!("/internal/v1/jobs/{id}/ack")
 }
 
+/// Comandos del bot (nombres válidos de Telegram) con su descripción y el comando equivalente del vault.
+/// Fuente única para `setMyCommands` (bot) y `/help` (server).
+pub const COMMANDS: &[(&str, &str, &str)] = &[
+    ("start", "Conectar el bot y abrir la app", ""),
+    ("daily", "Check-in de hoy (o dicta tu día)", "daily"),
+    ("checkin", "Abrir el check-in (opcional: ayer o AAAA-MM-DD)", ""),
+    ("objetivos", "Objetivos del mes y la semana", "objetivos"),
+    ("dump", "Vaciar pendientes en texto libre", "dump"),
+    ("gasto", "Registrar gastos", "gasto"),
+    ("ingreso", "Registrar ingresos", "ingreso"),
+    ("weekly_review", "Revisión semanal", "weekly-review"),
+    ("log_session", "Registrar una sesión de código", "log-session"),
+    ("dashboard", "Ver tu dashboard", ""),
+    ("settings", "Ajustes y recordatorios", ""),
+    ("help", "Ayuda y comandos", ""),
+    ("pause", "Pausar recordatorios (opcional: días)", ""),
+    ("resume", "Reanudar recordatorios", ""),
+];
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -127,22 +146,3 @@ mod tests {
         assert!(m.buttons.is_empty());
     }
 }
-
-/// Comandos del bot (nombres válidos de Telegram) con su descripción y el comando equivalente del vault.
-/// Fuente única para `setMyCommands` (bot) y `/help` (server).
-pub const COMMANDS: &[(&str, &str, &str)] = &[
-    ("start", "Conectar el bot y abrir la app", ""),
-    ("daily", "Check-in de hoy (o dicta tu día)", "daily"),
-    ("checkin", "Abrir el check-in (opcional: ayer o AAAA-MM-DD)", ""),
-    ("objetivos", "Objetivos del mes y la semana", "objetivos"),
-    ("dump", "Vaciar pendientes en texto libre", "dump"),
-    ("gasto", "Registrar gastos", "gasto"),
-    ("ingreso", "Registrar ingresos", "ingreso"),
-    ("weekly_review", "Revisión semanal", "weekly-review"),
-    ("log_session", "Registrar una sesión de código", "log-session"),
-    ("dashboard", "Ver tu dashboard", ""),
-    ("settings", "Ajustes y recordatorios", ""),
-    ("help", "Ayuda y comandos", ""),
-    ("pause", "Pausar recordatorios (opcional: días)", ""),
-    ("resume", "Reanudar recordatorios", ""),
-];

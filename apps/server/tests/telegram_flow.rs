@@ -553,7 +553,7 @@ async fn pause_via_bot_and_api_cancels_and_resume_reschedules(pool: PgPool) {
     let (_, s) = a.post("/reminders/resume", json!({})).await;
     assert_eq!(s["paused"], false);
     assert!(!s["upcoming"].as_array().unwrap().is_empty());
-    assert_eq!(s["recent"][0]["status"].as_str().is_some(), true);
+    assert!(s["recent"][0]["status"].as_str().is_some());
     // La ocurrencia cancelada no se reprograma (UNIQUE), y no se duplica.
     assert_eq!(scheduler::run_once(&t.state).await.unwrap(), 0);
     let (_, s) = a.post("/reminders/pause", json!({"days": 2})).await;
