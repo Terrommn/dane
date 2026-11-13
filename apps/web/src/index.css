@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* Tokens de color. En la Mini App se sobrescriben con el tema de Telegram (--tg-*). Contraste AA verificado para
+   texto normal sobre --c-bg / --c-surface en claro y oscuro. */
+:root {
+  --c-bg: var(--tg-bg, #f8fafc);
+  --c-surface: var(--tg-section, #ffffff);
+  --c-surface-2: var(--tg-bg-2, #f1f5f9);
+  --c-text: var(--tg-text, #0f172a);
+  --c-muted: var(--tg-hint, #475569);
+  --c-border: #cbd5e1;
+  --c-accent: var(--tg-button, #0f766e);
+  --c-accent-text: var(--tg-button-text, #ffffff);
+  --c-link: var(--tg-link, #0f766e);
+  --c-danger: var(--tg-danger, #b91c1c);
+  --c-ok: #15803d;
+  --c-warn: #a16207;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-telegram]) {
+    --c-bg: #0b1220;
+    --c-surface: #111a2e;
+    --c-surface-2: #172238;
+    --c-text: #e2e8f0;
+    --c-muted: #a3b1c6;
+    --c-border: #2d3a52;
+    --c-accent: #2dd4bf;
+    --c-accent-text: #042f2e;
+    --c-link: #5eead4;
+    --c-danger: #f87171;
+    --c-ok: #4ade80;
+    --c-warn: #facc15;
+    color-scheme: dark;
+  }
+}
+:root[data-telegram][data-theme="dark"] {
+  --c-border: #3b4a63;
+  --c-ok: #4ade80;
+  --c-warn: #facc15;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-fg: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-line: var(--c-border);
+  --color-accent: var(--c-accent);
+  --color-accent-fg: var(--c-accent-text);
+  --color-link: var(--c-link);
+  --color-danger: var(--c-danger);
+  --color-ok: var(--c-ok);
+  --color-warn: var(--c-warn);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
+/* Foco visible y consistente para teclado. */
+:focus-visible {
+  outline: 3px solid var(--c-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+a {
+  color: var(--c-link);
+}
+
+dialog::backdrop {
+  background: rgb(15 23 42 / 0.55);
+}
+
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
