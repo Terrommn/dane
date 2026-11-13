@@ -20,7 +20,7 @@
           "areas"
         ],
         "summary": "\"Dev reciente\" (Proyectos.base): actividad de todos los proyectos.",
-        "operationId": "recent_activity",
+        "operationId": "get_activity",
         "responses": {
           "200": {
             "content": {
@@ -42,7 +42,7 @@
         "tags": [
           "dev"
         ],
-        "operationId": "list_adrs",
+        "operationId": "get_adrs",
         "parameters": [
           {
             "name": "project_id",
@@ -88,7 +88,7 @@
           "dev"
         ],
         "summary": "Crea un ADR con el siguiente número libre del proyecto (estado inicial: propuesta).",
-        "operationId": "create_adr",
+        "operationId": "post_adrs",
         "requestBody": {
           "content": {
             "application/json": {
@@ -117,7 +117,7 @@
         "tags": [
           "dev"
         ],
-        "operationId": "get_adr",
+        "operationId": "get_adrs_id",
         "parameters": [
           {
             "name": "id",
@@ -145,7 +145,7 @@
         "tags": [
           "dev"
         ],
-        "operationId": "update_adr",
+        "operationId": "put_adrs_id",
         "parameters": [
           {
             "name": "id",
@@ -194,7 +194,7 @@
         "tags": [
           "agenda"
         ],
-        "operationId": "list_range",
+        "operationId": "get_agenda",
         "parameters": [
           {
             "name": "from",
@@ -234,7 +234,7 @@
         "tags": [
           "agenda"
         ],
-        "operationId": "create_event",
+        "operationId": "post_agenda",
         "requestBody": {
           "content": {
             "application/json": {
@@ -264,7 +264,7 @@
           "agenda"
         ],
         "summary": "Agenda de un día (manual + sincronizada), ordenada por hora.",
-        "operationId": "day_agenda",
+        "operationId": "get_agenda_day_date",
         "parameters": [
           {
             "name": "date",
@@ -297,7 +297,7 @@
         "tags": [
           "agenda"
         ],
-        "operationId": "update_event",
+        "operationId": "put_agenda_id",
         "parameters": [
           {
             "name": "id",
@@ -344,7 +344,7 @@
         "tags": [
           "agenda"
         ],
-        "operationId": "delete_event",
+        "operationId": "delete_agenda_id",
         "parameters": [
           {
             "name": "id",
@@ -367,7 +367,7 @@
           "notes"
         ],
         "summary": "Elementos archivados de todos los módulos (para recuperarlos).",
-        "operationId": "list_archived",
+        "operationId": "get_archive",
         "responses": {
           "200": {
             "content": {
@@ -389,7 +389,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "archive_entity",
+        "operationId": "post_archive_entity_type_id",
         "parameters": [
           {
             "name": "entity_type",
@@ -419,7 +419,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "restore_entity",
+        "operationId": "post_archive_entity_type_id_restore",
         "parameters": [
           {
             "name": "entity_type",
@@ -450,7 +450,7 @@
           "areas"
         ],
         "summary": "Lista de áreas.",
-        "operationId": "list_areas",
+        "operationId": "get_areas",
         "parameters": [
           {
             "name": "limit",
@@ -520,7 +520,7 @@
         "tags": [
           "areas"
         ],
-        "operationId": "create_area",
+        "operationId": "post_areas",
         "requestBody": {
           "content": {
             "application/json": {
@@ -549,7 +549,7 @@
         "tags": [
           "areas"
         ],
-        "operationId": "get_area",
+        "operationId": "get_areas_id",
         "parameters": [
           {
             "name": "id",
@@ -587,7 +587,7 @@
           "areas"
         ],
         "summary": "Renombrar o archivar un área conserva su ID y sus relaciones.",
-        "operationId": "update_area",
+        "operationId": "put_areas_id",
         "parameters": [
           {
             "name": "id",
@@ -637,7 +637,7 @@
           "auth"
         ],
         "summary": "Métodos de inicio de sesión disponibles (público).",
-        "operationId": "auth_config",
+        "operationId": "get_auth_config",
         "responses": {
           "200": {
             "content": {
@@ -657,7 +657,7 @@
           "auth"
         ],
         "summary": "Solo desarrollo/pruebas (bloqueado en producción por configuración). Respeta la allowlist.",
-        "operationId": "dev_login",
+        "operationId": "post_auth_dev_login",
         "requestBody": {
           "content": {
             "application/json": {
@@ -687,7 +687,7 @@
           "auth"
         ],
         "summary": "Cierra la sesión actual.",
-        "operationId": "logout",
+        "operationId": "post_auth_logout",
         "responses": {
           "204": {}
         }
@@ -699,7 +699,7 @@
           "auth"
         ],
         "summary": "Revoca todas las sesiones del usuario (todos los dispositivos).",
-        "operationId": "logout_all",
+        "operationId": "post_auth_logout_all",
         "responses": {
           "204": {}
         }
@@ -711,7 +711,7 @@
           "auth"
         ],
         "summary": "Callback OIDC: valida state, intercambia el código con PKCE, verifica el ID token y crea la sesión con cookie.",
-        "operationId": "oidc_callback",
+        "operationId": "get_auth_oidc_callback",
         "parameters": [
           {
             "name": "code",
@@ -758,7 +758,7 @@
           "auth"
         ],
         "summary": "Redirige a Telegram Login (OIDC + PKCE).",
-        "operationId": "oidc_start",
+        "operationId": "get_auth_oidc_start",
         "parameters": [
           {
             "name": "redirect_to",
@@ -784,7 +784,7 @@
           "auth"
         ],
         "summary": "Inicia sesión desde la Mini App validando `initData` (firma y antigüedad) en el servidor.",
-        "operationId": "miniapp_login",
+        "operationId": "post_auth_telegram_miniapp",
         "requestBody": {
           "content": {
             "application/json": {
@@ -831,7 +831,7 @@
         "tags": [
           "captures"
         ],
-        "operationId": "list_captures",
+        "operationId": "get_captures",
         "parameters": [
           {
             "name": "status",
@@ -865,7 +865,7 @@
           "captures"
         ],
         "summary": "Crea una captura desde la app y, si hay IA, propone su interpretación.",
-        "operationId": "create_capture",
+        "operationId": "post_captures",
         "requestBody": {
           "content": {
             "application/json": {
@@ -895,7 +895,7 @@
           "captures"
         ],
         "summary": "Sugerencia asistida por IA sobre datos propios (resumen semanal, clasificación de Inbox, hábitos para un objetivo).\nSe crea como propuesta que requiere confirmación; los datos se envían como texto delimitado y mínimo.",
-        "operationId": "suggest",
+        "operationId": "post_captures_suggest",
         "requestBody": {
           "content": {
             "application/json": {
@@ -934,7 +934,7 @@
           "captures"
         ],
         "summary": "Obtiene la captura; si viene del bot y aún no tiene propuesta, la extrae (o explica el modo manual).",
-        "operationId": "get_capture",
+        "operationId": "get_captures_id",
         "parameters": [
           {
             "name": "id",
@@ -972,7 +972,7 @@
           "captures"
         ],
         "summary": "Edita la propuesta (vista previa). Se valida formato y catálogos; el autor es el usuario.",
-        "operationId": "update_capture",
+        "operationId": "put_captures_id",
         "parameters": [
           {
             "name": "id",
@@ -1022,7 +1022,7 @@
           "captures"
         ],
         "summary": "Confirma y aplica la propuesta en una sola transacción. Repetir no duplica (claves de idempotencia por elemento).",
-        "operationId": "apply_capture",
+        "operationId": "post_captures_id_apply",
         "parameters": [
           {
             "name": "id",
@@ -1081,7 +1081,7 @@
           "captures"
         ],
         "summary": "Descarta la captura sin aplicar nada.",
-        "operationId": "reject_capture",
+        "operationId": "post_captures_id_reject",
         "parameters": [
           {
             "name": "id",
@@ -1112,7 +1112,7 @@
           "checkins"
         ],
         "summary": "Check-ins de un rango (historial; no incluye días sin registro).",
-        "operationId": "list_checkins",
+        "operationId": "get_checkins",
         "parameters": [
           {
             "name": "from",
@@ -1154,7 +1154,7 @@
         "tags": [
           "checkins"
         ],
-        "operationId": "get_checkin",
+        "operationId": "get_checkins_date",
         "parameters": [
           {
             "name": "date",
@@ -1183,7 +1183,7 @@
           "checkins"
         ],
         "summary": "Aplica el check-in (mañana o noche) sobre el registro único del día.",
-        "operationId": "put_checkin",
+        "operationId": "put_checkins_date",
         "parameters": [
           {
             "name": "date",
@@ -1242,7 +1242,7 @@
           "checkins"
         ],
         "summary": "Todo lo necesario para la pantalla Hoy de una fecha (también días anteriores).",
-        "operationId": "day_view",
+        "operationId": "get_checkins_date_view",
         "parameters": [
           {
             "name": "date",
@@ -1272,7 +1272,7 @@
         "tags": [
           "school"
         ],
-        "operationId": "list_class_notes",
+        "operationId": "get_class_notes",
         "parameters": [
           {
             "name": "subject_id",
@@ -1330,7 +1330,7 @@
         "tags": [
           "school"
         ],
-        "operationId": "create_class_note",
+        "operationId": "post_class_notes",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1359,7 +1359,7 @@
         "tags": [
           "school"
         ],
-        "operationId": "get_class_note",
+        "operationId": "get_class_notes_id",
         "parameters": [
           {
             "name": "id",
@@ -1387,7 +1387,7 @@
         "tags": [
           "school"
         ],
-        "operationId": "update_class_note",
+        "operationId": "put_class_notes_id",
         "parameters": [
           {
             "name": "id",
@@ -1428,7 +1428,7 @@
           "school"
         ],
         "summary": "Crea una entrega como tarea ligada a la clase (área de la materia, aparece en la daily el día de entrega).",
-        "operationId": "add_deliverable",
+        "operationId": "post_class_notes_id_deliverables",
         "parameters": [
           {
             "name": "id",
@@ -1469,7 +1469,7 @@
           "content"
         ],
         "summary": "Tabla del pipeline (Pipeline.base), con días para publicar.",
-        "operationId": "list_content",
+        "operationId": "get_content",
         "parameters": [
           {
             "name": "status",
@@ -1524,7 +1524,7 @@
         "tags": [
           "content"
         ],
-        "operationId": "create_content",
+        "operationId": "post_content",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1553,7 +1553,7 @@
         "tags": [
           "content"
         ],
-        "operationId": "content_ai_context",
+        "operationId": "get_content_ai_context",
         "responses": {
           "200": {
             "content": {
@@ -1573,7 +1573,7 @@
           "content"
         ],
         "summary": "Kanban por estado (idea → guion → grabado → editado → publicado).",
-        "operationId": "content_board",
+        "operationId": "get_content_board",
         "responses": {
           "200": {
             "content": {
@@ -1596,7 +1596,7 @@
           "content"
         ],
         "summary": "Publicados ordenados por métricas.",
-        "operationId": "content_published",
+        "operationId": "get_content_published",
         "parameters": [
           {
             "name": "sort",
@@ -1644,7 +1644,7 @@
         "tags": [
           "content"
         ],
-        "operationId": "get_content",
+        "operationId": "get_content_id",
         "parameters": [
           {
             "name": "id",
@@ -1672,7 +1672,7 @@
         "tags": [
           "content"
         ],
-        "operationId": "update_content",
+        "operationId": "put_content_id",
         "parameters": [
           {
             "name": "id",
@@ -1722,7 +1722,7 @@
           "dashboard"
         ],
         "summary": "Dashboard general.",
-        "operationId": "dashboard",
+        "operationId": "get_dashboard",
         "parameters": [
           {
             "name": "date",
@@ -1769,7 +1769,7 @@
           "demo"
         ],
         "summary": "Entra a un espacio demo aislado (solo desarrollo).",
-        "operationId": "demo_session",
+        "operationId": "post_demo_session",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1807,7 +1807,7 @@
         "tags": [
           "dev"
         ],
-        "operationId": "update_session",
+        "operationId": "put_devlog_sessions_id",
         "parameters": [
           {
             "name": "id",
@@ -1845,7 +1845,7 @@
         "tags": [
           "dev"
         ],
-        "operationId": "delete_session",
+        "operationId": "delete_devlog_sessions_id",
         "parameters": [
           {
             "name": "id",
@@ -1867,7 +1867,7 @@
         "tags": [
           "dev"
         ],
-        "operationId": "list_devlogs",
+        "operationId": "get_devlogs",
         "parameters": [
           {
             "name": "from",
@@ -1916,7 +1916,7 @@
           "dev"
         ],
         "summary": "Crea una sesión desde el texto pegado (guarda también el texto original).",
-        "operationId": "import_text",
+        "operationId": "post_devlogs_import",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1946,7 +1946,7 @@
           "dev"
         ],
         "summary": "Vista previa del texto pegado sin guardar nada.",
-        "operationId": "preview_import",
+        "operationId": "post_devlogs_import_preview",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1975,7 +1975,7 @@
         "tags": [
           "dev"
         ],
-        "operationId": "get_devlog",
+        "operationId": "get_devlogs_date",
         "parameters": [
           {
             "name": "date",
@@ -2003,7 +2003,7 @@
         "tags": [
           "dev"
         ],
-        "operationId": "set_summary",
+        "operationId": "put_devlogs_date",
         "parameters": [
           {
             "name": "date",
@@ -2044,7 +2044,7 @@
           "dev"
         ],
         "summary": "Agrega una sesión al devlog del día (varias por día).",
-        "operationId": "add_session",
+        "operationId": "post_devlogs_date_sessions",
         "parameters": [
           {
             "name": "date",
@@ -2085,7 +2085,7 @@
           "devotionals"
         ],
         "summary": "Historial (Devocionales.base: fecha desc con pasaje) con búsqueda sin acentos.",
-        "operationId": "list_devotionals",
+        "operationId": "get_devotionals",
         "parameters": [
           {
             "name": "limit",
@@ -2155,7 +2155,7 @@
           "devotionals"
         ],
         "summary": "Plantilla vigente: la personalizada en ajustes (`devotional_template`) o la del vault según el modo.",
-        "operationId": "get_template",
+        "operationId": "get_devotionals_template",
         "responses": {
           "200": {
             "content": {
@@ -2174,7 +2174,7 @@
         "tags": [
           "devotionals"
         ],
-        "operationId": "get_devotional",
+        "operationId": "get_devotionals_date",
         "parameters": [
           {
             "name": "date",
@@ -2212,7 +2212,7 @@
           "devotionals"
         ],
         "summary": "Crea/actualiza el devocional del día. Con contenido real marca el hábito vinculado (`devotional_content`) de esa\nfecha; si queda vacío, retira la marca automática.",
-        "operationId": "put_devotional",
+        "operationId": "put_devotionals_date",
         "parameters": [
           {
             "name": "date",
@@ -2259,7 +2259,7 @@
         "tags": [
           "devotionals"
         ],
-        "operationId": "delete_devotional",
+        "operationId": "delete_devotionals_date",
         "parameters": [
           {
             "name": "date",
@@ -2281,7 +2281,7 @@
         "tags": [
           "drawings"
         ],
-        "operationId": "list_drawings",
+        "operationId": "get_drawings",
         "parameters": [
           {
             "name": "note_id",
@@ -2326,7 +2326,7 @@
         "tags": [
           "drawings"
         ],
-        "operationId": "create_drawing",
+        "operationId": "post_drawings",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2355,7 +2355,7 @@
         "tags": [
           "drawings"
         ],
-        "operationId": "get_drawing",
+        "operationId": "get_drawings_id",
         "parameters": [
           {
             "name": "id",
@@ -2383,7 +2383,7 @@
         "tags": [
           "drawings"
         ],
-        "operationId": "update_drawing",
+        "operationId": "put_drawings_id",
         "parameters": [
           {
             "name": "id",
@@ -2433,7 +2433,7 @@
           "exports"
         ],
         "summary": "Todos los datos propios en JSON (excluye sesiones, identidades, credenciales y claves de idempotencia).",
-        "operationId": "export_json",
+        "operationId": "get_exports_json",
         "responses": {
           "200": {
             "content": {
@@ -2453,7 +2453,7 @@
           "exports"
         ],
         "summary": "ZIP con `vida-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault).",
-        "operationId": "export_zip",
+        "operationId": "get_exports_zip",
         "responses": {
           "200": {
             "content": {
@@ -2477,7 +2477,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "list_favorites",
+        "operationId": "get_favorites",
         "responses": {
           "200": {
             "content": {
@@ -2499,7 +2499,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "add_favorite",
+        "operationId": "put_favorites_entity_type_id",
         "parameters": [
           {
             "name": "entity_type",
@@ -2527,7 +2527,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "remove_favorite",
+        "operationId": "delete_favorites_entity_type_id",
         "parameters": [
           {
             "name": "entity_type",
@@ -2558,7 +2558,7 @@
           "finance"
         ],
         "summary": "Cuentas y tarjetas con saldo/disponible estimado y antigüedad del snapshot (sin conexión al banco).",
-        "operationId": "list_accounts",
+        "operationId": "get_finance_accounts",
         "parameters": [
           {
             "name": "archived",
@@ -2591,7 +2591,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "create_account",
+        "operationId": "post_finance_accounts",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2620,7 +2620,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "get_account",
+        "operationId": "get_finance_accounts_id",
         "parameters": [
           {
             "name": "id",
@@ -2648,7 +2648,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "update_account",
+        "operationId": "put_finance_accounts_id",
         "parameters": [
           {
             "name": "id",
@@ -2697,7 +2697,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "list_snapshots",
+        "operationId": "get_finance_accounts_id_snapshots",
         "parameters": [
           {
             "name": "id",
@@ -2729,7 +2729,7 @@
           "finance"
         ],
         "summary": "Registra el saldo/disponible observado (conciliación manual). Los movimientos posteriores se suman/restan al estimado.",
-        "operationId": "add_snapshot",
+        "operationId": "post_finance_accounts_id_snapshots",
         "parameters": [
           {
             "name": "id",
@@ -2770,7 +2770,7 @@
           "finance"
         ],
         "summary": "Presupuesto del mes (snapshot propio del mes; si no existe, propuesta copiada del mes anterior).",
-        "operationId": "get_budget",
+        "operationId": "get_finance_budgets_month",
         "parameters": [
           {
             "name": "month",
@@ -2799,7 +2799,7 @@
           "finance"
         ],
         "summary": "Guarda el presupuesto del mes. Solo modifica este mes; los meses anteriores conservan su snapshot.\nLas categorías con rubros de proyecto toman como línea la suma de sus rubros.",
-        "operationId": "put_budget",
+        "operationId": "put_finance_budgets_month",
         "parameters": [
           {
             "name": "month",
@@ -2849,7 +2849,7 @@
           "finance"
         ],
         "summary": "Tarjeta sugerida para gastar hoy según disponible, uso máximo del plan, corte, deudas y gasto planeado (D-022).\nEs una recomendación personal; no ejecuta pagos ni consulta bancos.",
-        "operationId": "card_suggestion",
+        "operationId": "get_finance_card_suggestion",
         "parameters": [
           {
             "name": "date",
@@ -2897,7 +2897,7 @@
           "finance"
         ],
         "summary": "Catálogo de categorías (gasto e ingreso).",
-        "operationId": "list_categories",
+        "operationId": "get_finance_categories",
         "parameters": [
           {
             "name": "archived",
@@ -2930,7 +2930,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "create_category",
+        "operationId": "post_finance_categories",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2960,7 +2960,7 @@
           "finance"
         ],
         "summary": "Renombrar/archivar conserva el ID y los movimientos históricos.",
-        "operationId": "update_category",
+        "operationId": "put_finance_categories_id",
         "parameters": [
           {
             "name": "id",
@@ -3010,7 +3010,7 @@
           "finance"
         ],
         "summary": "Plan de crédito (meta, pasos, reglas, tarjetas excluidas, % máximo de uso). El 30% es una regla personal inicial,\nno una garantía financiera.",
-        "operationId": "get_plan",
+        "operationId": "get_finance_credit_plan",
         "responses": {
           "200": {
             "content": {
@@ -3027,7 +3027,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "put_plan",
+        "operationId": "put_finance_credit_plan",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3066,7 +3066,7 @@
           "finance"
         ],
         "summary": "Dashboard financiero del mes (por defecto, el actual).",
-        "operationId": "dashboard",
+        "operationId": "get_finance_dashboard",
         "parameters": [
           {
             "name": "month",
@@ -3099,7 +3099,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "list_debts",
+        "operationId": "get_finance_debts",
         "responses": {
           "200": {
             "content": {
@@ -3119,7 +3119,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "create_debt",
+        "operationId": "post_finance_debts",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3148,7 +3148,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "get_debt",
+        "operationId": "get_finance_debts_id",
         "parameters": [
           {
             "name": "id",
@@ -3176,7 +3176,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "update_debt",
+        "operationId": "put_finance_debts_id",
         "parameters": [
           {
             "name": "id",
@@ -3226,7 +3226,7 @@
           "finance"
         ],
         "summary": "Gastos de un proyecto derivados del registro general (sin duplicar movimientos), por rubro y por mes.",
-        "operationId": "project_report",
+        "operationId": "get_finance_projects_id_report",
         "parameters": [
           {
             "name": "month",
@@ -3268,7 +3268,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "list_rules",
+        "operationId": "get_finance_recurring",
         "responses": {
           "200": {
             "content": {
@@ -3288,7 +3288,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "create_rule",
+        "operationId": "post_finance_recurring",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3318,7 +3318,7 @@
           "finance"
         ],
         "summary": "Registra ahora las ocurrencias vencidas del usuario (el scheduler lo hace solo; esto lo adelanta). Idempotente.",
-        "operationId": "materialize",
+        "operationId": "post_finance_recurring_materialize",
         "responses": {
           "200": {
             "content": {
@@ -3337,7 +3337,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "occurrences",
+        "operationId": "get_finance_recurring_occurrences",
         "parameters": [
           {
             "name": "month",
@@ -3373,7 +3373,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "get_rule",
+        "operationId": "get_finance_recurring_id",
         "parameters": [
           {
             "name": "id",
@@ -3402,7 +3402,7 @@
           "finance"
         ],
         "summary": "Cambios futuros: las ocurrencias ya creadas conservan su monto y fecha.",
-        "operationId": "update_rule",
+        "operationId": "put_finance_recurring_id",
         "parameters": [
           {
             "name": "id",
@@ -3452,7 +3452,7 @@
           "finance"
         ],
         "summary": "Histórico de movimientos con filtros, orden, paginación y totales.",
-        "operationId": "list_transactions",
+        "operationId": "get_finance_transactions",
         "parameters": [
           {
             "name": "from",
@@ -3626,7 +3626,7 @@
           "finance"
         ],
         "summary": "Registra un movimiento confirmado por el usuario.",
-        "operationId": "create_transaction",
+        "operationId": "post_finance_transactions",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3666,7 +3666,7 @@
           "finance"
         ],
         "summary": "Captura múltiple atómica: si un elemento es inválido no se guarda ninguno (422 con el índice en `field`).",
-        "operationId": "create_batch",
+        "operationId": "post_finance_transactions_batch",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3704,7 +3704,7 @@
         "tags": [
           "finance"
         ],
-        "operationId": "get_transaction",
+        "operationId": "get_finance_transactions_id",
         "parameters": [
           {
             "name": "id",
@@ -3733,7 +3733,7 @@
           "finance"
         ],
         "summary": "Edita un movimiento (versión obligatoria). El tipo no cambia; se recalculan deudas afectadas.",
-        "operationId": "update_transaction",
+        "operationId": "put_finance_transactions_id",
         "parameters": [
           {
             "name": "id",
@@ -3783,7 +3783,7 @@
           "finance"
         ],
         "summary": "Confirma (y opcionalmente corrige) una ocurrencia pendiente de conciliación. Actualiza la **misma** fila; los efectos\nse activan una sola vez. Confirmar algo ya confirmado devuelve el movimiento sin repetir efectos.",
-        "operationId": "confirm_transaction",
+        "operationId": "post_finance_transactions_id_confirm",
         "parameters": [
           {
             "name": "id",
@@ -3833,7 +3833,7 @@
           "finance"
         ],
         "summary": "Anula un movimiento sin borrarlo (deja de contar en saldos y totales).",
-        "operationId": "void_transaction",
+        "operationId": "post_finance_transactions_id_void",
         "parameters": [
           {
             "name": "id",
@@ -3883,7 +3883,7 @@
           "goals"
         ],
         "summary": "Objetivos (vista Objetivos.base: agrupables por tipo, con periodo, inicio, fin y estado).",
-        "operationId": "list_goals",
+        "operationId": "get_goals",
         "parameters": [
           {
             "name": "kind",
@@ -3975,7 +3975,7 @@
           "goals"
         ],
         "summary": "Crea un objetivo. No se crean objetivos sin decisión explícita del usuario (esta llamada es esa decisión).",
-        "operationId": "create_goal",
+        "operationId": "post_goals",
         "requestBody": {
           "content": {
             "application/json": {
@@ -4005,7 +4005,7 @@
           "goals"
         ],
         "summary": "Contexto para planear la semana (y el mes primero cuando toca), con avisos de carga de hábitos.",
-        "operationId": "planning",
+        "operationId": "get_goals_planning",
         "parameters": [
           {
             "name": "week",
@@ -4038,7 +4038,7 @@
         "tags": [
           "goals"
         ],
-        "operationId": "get_goal",
+        "operationId": "get_goals_id",
         "parameters": [
           {
             "name": "id",
@@ -4076,7 +4076,7 @@
           "goals"
         ],
         "summary": "Edita el objetivo (no cambia tipo ni periodo). Logros subjetivos se confirman con el cierre explícito.",
-        "operationId": "update_goal",
+        "operationId": "put_goals_id",
         "parameters": [
           {
             "name": "id",
@@ -4126,7 +4126,7 @@
           "goals"
         ],
         "summary": "Cierre del objetivo (acción diferenciada de editar o archivar): estado final + logro, aprendizaje, dificultades y ajustes.",
-        "operationId": "close_goal",
+        "operationId": "post_goals_id_close",
         "parameters": [
           {
             "name": "id",
@@ -4176,7 +4176,7 @@
           "goals"
         ],
         "summary": "Enlaza una entidad para que aporte al objetivo (una vez por objetivo; enlazarla a la semana y al mes aporta una vez a cada uno).",
-        "operationId": "add_link",
+        "operationId": "post_goals_id_links",
         "parameters": [
           {
             "name": "id",
@@ -4216,7 +4216,7 @@
         "tags": [
           "goals"
         ],
-        "operationId": "delete_link",
+        "operationId": "delete_goals_id_links_src_type_src_id",
         "parameters": [
           {
             "name": "id",
@@ -4256,7 +4256,7 @@
           "goals"
         ],
         "summary": "Evento manual de progreso (debe coincidir con el tipo de progreso del objetivo).",
-        "operationId": "add_progress",
+        "operationId": "post_goals_id_progress",
         "parameters": [
           {
             "name": "id",
@@ -4296,7 +4296,7 @@
         "tags": [
           "goals"
         ],
-        "operationId": "delete_progress",
+        "operationId": "delete_goals_id_progress_event_id",
         "parameters": [
           {
             "name": "id",
@@ -4328,7 +4328,7 @@
           "habits"
         ],
         "summary": "Vínculos configurados (registrar peso → \"Pesarme\", gasto → \"Registrar gastos\", etc.).",
-        "operationId": "list_links",
+        "operationId": "get_habit_links",
         "responses": {
           "200": {
             "content": {
@@ -4350,7 +4350,7 @@
         "tags": [
           "habits"
         ],
-        "operationId": "set_link",
+        "operationId": "put_habit_links_trigger",
         "parameters": [
           {
             "name": "trigger",
@@ -4390,7 +4390,7 @@
         "tags": [
           "habits"
         ],
-        "operationId": "delete_link",
+        "operationId": "delete_habit_links_trigger",
         "parameters": [
           {
             "name": "trigger",
@@ -4412,7 +4412,7 @@
           "habits"
         ],
         "summary": "Hábitos con estado de hoy, rachas y cumplimiento de 30 días.",
-        "operationId": "list_habits",
+        "operationId": "get_habits",
         "parameters": [
           {
             "name": "date",
@@ -4459,7 +4459,7 @@
           "habits"
         ],
         "summary": "Crea un hábito con su primera versión. Un hábito de objetivo rige solo dentro del periodo del objetivo.",
-        "operationId": "create_habit",
+        "operationId": "post_habits",
         "requestBody": {
           "content": {
             "application/json": {
@@ -4489,7 +4489,7 @@
           "habits"
         ],
         "summary": "Confirma los hábitos fijos propuestos en onboarding (devocional, ejercicio, lectura). Nada se crea sin esta\nconfirmación. Idempotente: si ya existe, actualiza su frecuencia desde `starts_on` o lo archiva si `enabled=false`.",
-        "operationId": "setup_fixed_habits",
+        "operationId": "post_habits_fixed",
         "requestBody": {
           "content": {
             "application/json": {
@@ -4522,7 +4522,7 @@
           "habits"
         ],
         "summary": "Historial por día (por defecto últimos 30 días) con energía, peso y estado de cada hábito.",
-        "operationId": "habit_history",
+        "operationId": "get_habits_history",
         "parameters": [
           {
             "name": "from",
@@ -4567,7 +4567,7 @@
         "tags": [
           "habits"
         ],
-        "operationId": "get_habit",
+        "operationId": "get_habits_id",
         "parameters": [
           {
             "name": "id",
@@ -4605,7 +4605,7 @@
           "habits"
         ],
         "summary": "Edita la identidad (nombre, área, unidad, archivo). La frecuencia se cambia con una versión nueva.",
-        "operationId": "update_habit",
+        "operationId": "put_habits_id",
         "parameters": [
           {
             "name": "id",
@@ -4655,7 +4655,7 @@
           "habits"
         ],
         "summary": "Registra el estado de un día (una sola ocurrencia por hábito y fecha).",
-        "operationId": "put_entry",
+        "operationId": "put_habits_id_entries_date",
         "parameters": [
           {
             "name": "id",
@@ -4712,7 +4712,7 @@
           "habits"
         ],
         "summary": "Vuelve el día a \"sin registrar\".",
-        "operationId": "delete_entry",
+        "operationId": "delete_habits_id_entries_date",
         "parameters": [
           {
             "name": "id",
@@ -4744,7 +4744,7 @@
           "habits"
         ],
         "summary": "Pausa: los días cubiertos salen del denominador.",
-        "operationId": "add_pause",
+        "operationId": "post_habits_id_pauses",
         "parameters": [
           {
             "name": "id",
@@ -4784,7 +4784,7 @@
         "tags": [
           "habits"
         ],
-        "operationId": "delete_pause",
+        "operationId": "delete_habits_id_pauses_pause_id",
         "parameters": [
           {
             "name": "id",
@@ -4816,7 +4816,7 @@
           "habits"
         ],
         "summary": "Cambia la frecuencia/meta desde una fecha sin alterar el historial.",
-        "operationId": "add_version",
+        "operationId": "post_habits_id_versions",
         "parameters": [
           {
             "name": "id",
@@ -4856,7 +4856,7 @@
         "tags": [
           "imports"
         ],
-        "operationId": "list_runs",
+        "operationId": "get_imports",
         "responses": {
           "200": {
             "content": {
@@ -4877,7 +4877,7 @@
           "imports"
         ],
         "summary": "Sube un ZIP del vault (`Content-Type: application/zip`, cuerpo binario) y genera el dry-run. No escribe datos.",
-        "operationId": "upload_zip",
+        "operationId": "post_imports",
         "parameters": [
           {
             "name": "name",
@@ -4935,7 +4935,7 @@
           "imports"
         ],
         "summary": "Sube una carpeta del vault (selección de carpeta en el navegador) y genera el dry-run.",
-        "operationId": "upload_folder",
+        "operationId": "post_imports_folder",
         "requestBody": {
           "content": {
             "application/json": {
@@ -4973,7 +4973,7 @@
         "tags": [
           "imports"
         ],
-        "operationId": "get_run",
+        "operationId": "get_imports_id",
         "parameters": [
           {
             "name": "id",
@@ -5004,7 +5004,7 @@
           "imports"
         ],
         "summary": "Confirma y aplica un dry-run en una sola transacción. Las acciones se recalculan contra el estado actual\n(si algo cambió desde el dry-run, se respeta lo que hay en la app).",
-        "operationId": "apply_run",
+        "operationId": "post_imports_id_apply",
         "parameters": [
           {
             "name": "id",
@@ -5043,7 +5043,7 @@
         "tags": [
           "inbox"
         ],
-        "operationId": "list_inbox",
+        "operationId": "get_inbox",
         "parameters": [
           {
             "name": "status",
@@ -5078,7 +5078,7 @@
           "inbox"
         ],
         "summary": "Captura sin clasificar. 201 si es nueva, 200 si el `client_id` ya existía.",
-        "operationId": "capture",
+        "operationId": "post_inbox",
         "requestBody": {
           "content": {
             "application/json": {
@@ -5116,7 +5116,7 @@
         "tags": [
           "inbox"
         ],
-        "operationId": "edit_item",
+        "operationId": "put_inbox_id",
         "parameters": [
           {
             "name": "id",
@@ -5166,7 +5166,7 @@
           "inbox"
         ],
         "summary": "Aplica la decisión del usuario: crea el destino y cierra el elemento en una sola transacción.",
-        "operationId": "apply",
+        "operationId": "post_inbox_id_apply",
         "parameters": [
           {
             "name": "id",
@@ -5216,7 +5216,7 @@
           "inbox"
         ],
         "summary": "Calcula una propuesta determinista (no mueve nada). La IA, si está configurada, la propone el módulo de capturas.",
-        "operationId": "propose",
+        "operationId": "post_inbox_id_propose",
         "parameters": [
           {
             "name": "id",
@@ -5247,7 +5247,7 @@
           "inbox"
         ],
         "summary": "Recupera un elemento archivado o descartado a pendiente.",
-        "operationId": "reopen",
+        "operationId": "post_inbox_id_reopen",
         "parameters": [
           {
             "name": "id",
@@ -5278,7 +5278,7 @@
           "integrations"
         ],
         "summary": "Estado de todas las integraciones: conexión, última sincronización y errores.",
-        "operationId": "overview",
+        "operationId": "get_integrations",
         "responses": {
           "200": {
             "content": {
@@ -5297,7 +5297,7 @@
         "tags": [
           "integrations"
         ],
-        "operationId": "clickup_connect",
+        "operationId": "put_integrations_clickup",
         "requestBody": {
           "content": {
             "application/json": {
@@ -5324,7 +5324,7 @@
         "tags": [
           "integrations"
         ],
-        "operationId": "clickup_disconnect",
+        "operationId": "delete_integrations_clickup",
         "responses": {
           "204": {}
         }
@@ -5336,7 +5336,7 @@
           "integrations"
         ],
         "summary": "Lee la vista configurada de ClickUp ahora (no modifica nada en ClickUp).",
-        "operationId": "clickup_sync",
+        "operationId": "post_integrations_clickup_sync",
         "responses": {
           "200": {
             "content": {
@@ -5356,7 +5356,7 @@
           "integrations"
         ],
         "summary": "Tareas abiertas de ClickUp en el orden de la daily: fáciles (con razón), resto, need info.",
-        "operationId": "clickup_tasks",
+        "operationId": "get_integrations_clickup_tasks",
         "responses": {
           "200": {
             "content": {
@@ -5379,7 +5379,7 @@
           "integrations"
         ],
         "summary": "Revoca el acceso en Google y borra las credenciales.",
-        "operationId": "google_disconnect",
+        "operationId": "delete_integrations_google",
         "responses": {
           "204": {}
         }
@@ -5391,7 +5391,7 @@
           "integrations"
         ],
         "summary": "Calendarios disponibles; los de festivos/observancias se marcan como excluidos siempre.",
-        "operationId": "google_calendars",
+        "operationId": "get_integrations_google_calendars",
         "responses": {
           "200": {
             "content": {
@@ -5414,7 +5414,7 @@
           "integrations"
         ],
         "summary": "Callback de Google. El `state` (un solo uso) identifica al usuario; no requiere sesión.",
-        "operationId": "google_callback",
+        "operationId": "get_integrations_google_callback",
         "parameters": [
           {
             "name": "code",
@@ -5460,7 +5460,7 @@
         "tags": [
           "integrations"
         ],
-        "operationId": "google_config",
+        "operationId": "put_integrations_google_config",
         "requestBody": {
           "content": {
             "application/json": {
@@ -5499,7 +5499,7 @@
           "integrations"
         ],
         "summary": "Inicia la conexión con Google (OAuth + PKCE, scopes de solo lectura).",
-        "operationId": "google_connect",
+        "operationId": "get_integrations_google_connect",
         "parameters": [
           {
             "name": "redirect_to",
@@ -5532,7 +5532,7 @@
           "integrations"
         ],
         "summary": "Sincroniza ahora (agenda y correos enviados). Ventana máxima de 62 días.",
-        "operationId": "google_sync",
+        "operationId": "post_integrations_google_sync",
         "requestBody": {
           "content": {
             "application/json": {
@@ -5565,7 +5565,7 @@
           "integrations"
         ],
         "summary": "Interacciones y personas propuestas desde Calendar/Gmail/dictado (nada se registra sin aceptar).",
-        "operationId": "suggestions",
+        "operationId": "get_integrations_suggestions",
         "responses": {
           "200": {
             "content": {
@@ -5584,7 +5584,7 @@
         "tags": [
           "integrations"
         ],
-        "operationId": "accept_interaction",
+        "operationId": "post_integrations_suggestions_interactions_id_accept",
         "parameters": [
           {
             "name": "id",
@@ -5624,7 +5624,7 @@
         "tags": [
           "integrations"
         ],
-        "operationId": "dismiss_interaction",
+        "operationId": "post_integrations_suggestions_interactions_id_dismiss",
         "parameters": [
           {
             "name": "id",
@@ -5647,7 +5647,7 @@
           "integrations"
         ],
         "summary": "Crea la persona sugerida (decisión explícita del usuario).",
-        "operationId": "accept_person",
+        "operationId": "post_integrations_suggestions_people_id_accept",
         "parameters": [
           {
             "name": "id",
@@ -5679,7 +5679,7 @@
         "tags": [
           "integrations"
         ],
-        "operationId": "dismiss_person",
+        "operationId": "post_integrations_suggestions_people_id_dismiss",
         "parameters": [
           {
             "name": "id",
@@ -5701,7 +5701,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "list_interactions",
+        "operationId": "get_interactions",
         "parameters": [
           {
             "name": "date",
@@ -5750,7 +5750,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "delete_interaction",
+        "operationId": "delete_interactions_id",
         "parameters": [
           {
             "name": "id",
@@ -5810,7 +5810,7 @@
           "notes"
         ],
         "summary": "Crea un enlace validando que ambos extremos existan y sean del usuario.",
-        "operationId": "add_link",
+        "operationId": "post_links",
         "requestBody": {
           "content": {
             "application/json": {
@@ -5838,7 +5838,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "remove_link",
+        "operationId": "delete_links",
         "requestBody": {
           "content": {
             "application/json": {
@@ -5860,7 +5860,7 @@
           "auth"
         ],
         "summary": "Perfil del usuario autenticado.",
-        "operationId": "me",
+        "operationId": "get_me",
         "responses": {
           "200": {
             "content": {
@@ -5888,7 +5888,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "list_notes",
+        "operationId": "get_notes",
         "parameters": [
           {
             "name": "kind",
@@ -6000,7 +6000,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "create_note",
+        "operationId": "post_notes",
         "requestBody": {
           "content": {
             "application/json": {
@@ -6029,7 +6029,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "get_note",
+        "operationId": "get_notes_id",
         "parameters": [
           {
             "name": "id",
@@ -6057,7 +6057,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "update_note",
+        "operationId": "put_notes_id",
         "parameters": [
           {
             "name": "id",
@@ -6106,7 +6106,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "list_people",
+        "operationId": "get_people",
         "parameters": [
           {
             "name": "q",
@@ -6163,7 +6163,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "create_person",
+        "operationId": "post_people",
         "requestBody": {
           "content": {
             "application/json": {
@@ -6192,7 +6192,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "upcoming_birthdays",
+        "operationId": "get_people_birthdays",
         "parameters": [
           {
             "name": "days",
@@ -6230,7 +6230,7 @@
           "people"
         ],
         "summary": "Vista Personas.base: agrupado por área, con días sin hablar y cumpleaños.",
-        "operationId": "people_by_area",
+        "operationId": "get_people_by_area",
         "responses": {
           "200": {
             "content": {
@@ -6253,7 +6253,7 @@
           "people"
         ],
         "summary": "Busca a quién se refiere un nombre o apodo, sin crear nada.",
-        "operationId": "resolve_people",
+        "operationId": "get_people_resolve",
         "parameters": [
           {
             "name": "name",
@@ -6286,7 +6286,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "get_person",
+        "operationId": "get_people_id",
         "parameters": [
           {
             "name": "id",
@@ -6315,7 +6315,7 @@
           "people"
         ],
         "summary": "Editar no borra el cumpleaños existente salvo que se envíe vacío explícitamente.",
-        "operationId": "update_person",
+        "operationId": "put_people_id",
         "parameters": [
           {
             "name": "id",
@@ -6365,7 +6365,7 @@
           "people"
         ],
         "summary": "Registra con quién habló el usuario ese día; actualiza \"último contacto\".",
-        "operationId": "add_interaction",
+        "operationId": "post_people_id_interactions",
         "parameters": [
           {
             "name": "id",
@@ -6405,7 +6405,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "add_note",
+        "operationId": "post_people_id_notes",
         "parameters": [
           {
             "name": "id",
@@ -6445,7 +6445,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "delete_note",
+        "operationId": "delete_people_id_notes_note_id",
         "parameters": [
           {
             "name": "id",
@@ -6476,7 +6476,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "list_suggestions",
+        "operationId": "get_person_suggestions",
         "parameters": [
           {
             "name": "status",
@@ -6511,7 +6511,7 @@
           "people"
         ],
         "summary": "Sugiere una persona detectada (no la crea).",
-        "operationId": "create_suggestion",
+        "operationId": "post_person_suggestions",
         "requestBody": {
           "content": {
             "application/json": {
@@ -6540,7 +6540,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "accept_suggestion",
+        "operationId": "post_person_suggestions_id_accept",
         "parameters": [
           {
             "name": "id",
@@ -6580,7 +6580,7 @@
         "tags": [
           "people"
         ],
-        "operationId": "dismiss_suggestion",
+        "operationId": "post_person_suggestions_id_dismiss",
         "parameters": [
           {
             "name": "id",
@@ -6602,7 +6602,7 @@
         "tags": [
           "areas"
         ],
-        "operationId": "list_projects",
+        "operationId": "get_projects",
         "parameters": [
           {
             "name": "area_id",
@@ -6647,7 +6647,7 @@
         "tags": [
           "areas"
         ],
-        "operationId": "create_project",
+        "operationId": "post_projects",
         "requestBody": {
           "content": {
             "application/json": {
@@ -6676,7 +6676,7 @@
         "tags": [
           "areas"
         ],
-        "operationId": "get_project",
+        "operationId": "get_projects_id",
         "parameters": [
           {
             "name": "id",
@@ -6704,7 +6704,7 @@
         "tags": [
           "areas"
         ],
-        "operationId": "update_project",
+        "operationId": "put_projects_id",
         "parameters": [
           {
             "name": "id",
@@ -6754,7 +6754,7 @@
           "areas"
         ],
         "summary": "Actividad reciente relacionada con un proyecto (tareas, notas, ADRs, devlog, contenido).",
-        "operationId": "project_activity",
+        "operationId": "get_projects_id_activity",
         "parameters": [
           {
             "name": "id",
@@ -6788,7 +6788,7 @@
           "readings"
         ],
         "summary": "Lecturas (tabla y tarjetas por estado).",
-        "operationId": "list_readings",
+        "operationId": "get_readings",
         "parameters": [
           {
             "name": "status",
@@ -6844,7 +6844,7 @@
         "tags": [
           "readings"
         ],
-        "operationId": "create_reading",
+        "operationId": "post_readings",
         "requestBody": {
           "content": {
             "application/json": {
@@ -6873,7 +6873,7 @@
         "tags": [
           "readings"
         ],
-        "operationId": "get_reading",
+        "operationId": "get_readings_id",
         "parameters": [
           {
             "name": "id",
@@ -6901,7 +6901,7 @@
         "tags": [
           "readings"
         ],
-        "operationId": "update_reading",
+        "operationId": "put_readings_id",
         "parameters": [
           {
             "name": "id",
@@ -6949,7 +6949,7 @@
           "readings"
         ],
         "summary": "Borra la lectura y retira sus aportes a objetivos.",
-        "operationId": "delete_reading",
+        "operationId": "delete_readings_id",
         "parameters": [
           {
             "name": "id",
@@ -6972,7 +6972,7 @@
           "reminders"
         ],
         "summary": "Próximos recordatorios, estado del chat y entregas recientes.",
-        "operationId": "status",
+        "operationId": "get_reminders",
         "responses": {
           "200": {
             "content": {
@@ -6992,7 +6992,7 @@
           "reminders"
         ],
         "summary": "Pausa los recordatorios y cancela los pendientes.",
-        "operationId": "pause",
+        "operationId": "post_reminders_pause",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7022,7 +7022,7 @@
           "reminders"
         ],
         "summary": "Reanuda los recordatorios (el scheduler programa la próxima ocurrencia vigente; no envía atrasados).",
-        "operationId": "resume",
+        "operationId": "post_reminders_resume",
         "responses": {
           "200": {
             "content": {
@@ -7041,7 +7041,7 @@
         "tags": [
           "search"
         ],
-        "operationId": "search",
+        "operationId": "get_search",
         "parameters": [
           {
             "name": "q",
@@ -7175,7 +7175,7 @@
           "settings"
         ],
         "summary": "Actualiza preferencias. Cambiar la zona afecta cálculos futuros; las fechas guardadas no se reclasifican.",
-        "operationId": "update_settings",
+        "operationId": "put_settings",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7213,7 +7213,7 @@
         "tags": [
           "school"
         ],
-        "operationId": "list_subjects",
+        "operationId": "get_subjects",
         "parameters": [
           {
             "name": "archived",
@@ -7246,7 +7246,7 @@
         "tags": [
           "school"
         ],
-        "operationId": "create_subject",
+        "operationId": "post_subjects",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7275,7 +7275,7 @@
         "tags": [
           "school"
         ],
-        "operationId": "update_subject",
+        "operationId": "put_subjects_id",
         "parameters": [
           {
             "name": "id",
@@ -7315,7 +7315,7 @@
         "tags": [
           "content"
         ],
-        "operationId": "list_swipe",
+        "operationId": "get_swipe",
         "parameters": [
           {
             "name": "tag",
@@ -7370,7 +7370,7 @@
         "tags": [
           "content"
         ],
-        "operationId": "create_swipe",
+        "operationId": "post_swipe",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7399,7 +7399,7 @@
         "tags": [
           "content"
         ],
-        "operationId": "get_swipe",
+        "operationId": "get_swipe_id",
         "parameters": [
           {
             "name": "id",
@@ -7427,7 +7427,7 @@
         "tags": [
           "content"
         ],
-        "operationId": "update_swipe",
+        "operationId": "put_swipe_id",
         "parameters": [
           {
             "name": "id",
@@ -7467,7 +7467,7 @@
         "tags": [
           "notes"
         ],
-        "operationId": "list_tags",
+        "operationId": "get_tags",
         "responses": {
           "200": {
             "content": {
@@ -7489,7 +7489,7 @@
         "tags": [
           "tasks"
         ],
-        "operationId": "list_rules",
+        "operationId": "get_task_recurrences",
         "responses": {
           "200": {
             "content": {
@@ -7509,7 +7509,7 @@
         "tags": [
           "tasks"
         ],
-        "operationId": "create_rule",
+        "operationId": "post_task_recurrences",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7539,7 +7539,7 @@
           "tasks"
         ],
         "summary": "Genera las ocurrencias pendientes hasta hoy (idempotente; también lo hace el worker periódicamente).",
-        "operationId": "materialize_rules",
+        "operationId": "post_task_recurrences_materialize",
         "responses": {
           "200": {
             "content": {
@@ -7559,7 +7559,7 @@
           "tasks"
         ],
         "summary": "Editar o desactivar una regla no modifica las tareas ya generadas.",
-        "operationId": "update_rule",
+        "operationId": "put_task_recurrences_id",
         "parameters": [
           {
             "name": "id",
@@ -7599,7 +7599,7 @@
         "tags": [
           "tasks"
         ],
-        "operationId": "list_tasks",
+        "operationId": "get_tasks",
         "parameters": [
           {
             "name": "status",
@@ -7748,7 +7748,7 @@
         "tags": [
           "tasks"
         ],
-        "operationId": "create_task",
+        "operationId": "post_tasks",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7778,7 +7778,7 @@
           "tasks"
         ],
         "summary": "Arrastra las pendientes abiertas de días anteriores al día indicado, conservando ID e historial.",
-        "operationId": "carry_over",
+        "operationId": "post_tasks_carry_over",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7808,7 +7808,7 @@
           "tasks"
         ],
         "summary": "Pendientes del día agrupados por área (Personal/Trabajo/Negocio/Escuela + las que agregue el usuario).",
-        "operationId": "tasks_for_day",
+        "operationId": "get_tasks_day_date",
         "parameters": [
           {
             "name": "date",
@@ -7838,7 +7838,7 @@
         "tags": [
           "tasks"
         ],
-        "operationId": "get_task",
+        "operationId": "get_tasks_id",
         "parameters": [
           {
             "name": "id",
@@ -7875,7 +7875,7 @@
         "tags": [
           "tasks"
         ],
-        "operationId": "update_task",
+        "operationId": "put_tasks_id",
         "parameters": [
           {
             "name": "id",
@@ -7923,7 +7923,7 @@
           "tasks"
         ],
         "summary": "Archiva (no borra). Se recupera con `POST /archive/task/{id}/restore`.",
-        "operationId": "archive_task",
+        "operationId": "delete_tasks_id",
         "parameters": [
           {
             "name": "id",
@@ -7945,7 +7945,7 @@
         "tags": [
           "tasks"
         ],
-        "operationId": "cancel_task",
+        "operationId": "post_tasks_id_cancel",
         "parameters": [
           {
             "name": "id",
@@ -7986,7 +7986,7 @@
           "tasks"
         ],
         "summary": "Marca como hecha. En tareas de ClickUp solo cambia el estado local (no modifica ClickUp).",
-        "operationId": "complete_task",
+        "operationId": "post_tasks_id_complete",
         "parameters": [
           {
             "name": "id",
@@ -8026,7 +8026,7 @@
         "tags": [
           "tasks"
         ],
-        "operationId": "reopen_task",
+        "operationId": "post_tasks_id_reopen",
         "parameters": [
           {
             "name": "id",
@@ -8067,7 +8067,7 @@
           "notes"
         ],
         "summary": "Vista Proyectos.base: actividad reciente + ADRs.",
-        "operationId": "projects_view",
+        "operationId": "get_views_projects",
         "responses": {
           "200": {
             "content": {
@@ -8086,7 +8086,7 @@
         "tags": [
           "weekly"
         ],
-        "operationId": "list_reviews",
+        "operationId": "get_weekly_reviews",
         "responses": {
           "200": {
             "content": {
@@ -8108,7 +8108,7 @@
         "tags": [
           "weekly"
         ],
-        "operationId": "get_review",
+        "operationId": "get_weekly_reviews_iso_week",
         "parameters": [
           {
             "name": "iso_week",
@@ -8136,7 +8136,7 @@
           "weekly"
         ],
         "summary": "Guarda la revisión (con snapshot del resumen calculado y sus evidencias).",
-        "operationId": "put_review",
+        "operationId": "put_weekly_reviews_iso_week",
         "parameters": [
           {
             "name": "iso_week",
@@ -8185,7 +8185,7 @@
           "weekly"
         ],
         "summary": "Resumen automático (editable en el formulario; no se guarda hasta `PUT`).",
-        "operationId": "summary",
+        "operationId": "get_weekly_reviews_iso_week_summary",
         "parameters": [
           {
             "name": "iso_week",

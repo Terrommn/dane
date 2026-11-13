@@ -312,7 +312,7 @@ export function useRecurringMutations() {
   const invalidate = useInvalidateFinance();
   const create = useMutation({
     mutationFn: async (body: FinanceRuleBody) =>
-      unwrap(await api.POST("/finance/recurring", { body: body as unknown as Schemas["RuleBody"] })),
+      unwrap(await api.POST("/finance/recurring", { body })),
     onSuccess: invalidate,
   });
   const update = useMutation({
@@ -320,7 +320,7 @@ export function useRecurringMutations() {
       unwrap(
         await api.PUT("/finance/recurring/{id}", {
           params: { path: { id } },
-          body: body as unknown as Schemas["RuleBody"],
+          body,
         }),
       ),
     onSuccess: invalidate,

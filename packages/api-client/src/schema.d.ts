@@ -12,7 +12,7 @@ export interface paths {
             cookie?: never;
         };
         /** "Dev reciente" (Proyectos.base): actividad de todos los proyectos. */
-        get: operations["recent_activity"];
+        get: operations["get_activity"];
         put?: never;
         post?: never;
         delete?: never;
@@ -28,10 +28,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_adrs"];
+        get: operations["get_adrs"];
         put?: never;
         /** Crea un ADR con el siguiente número libre del proyecto (estado inicial: propuesta). */
-        post: operations["create_adr"];
+        post: operations["post_adrs"];
         delete?: never;
         options?: never;
         head?: never;
@@ -45,8 +45,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_adr"];
-        put: operations["update_adr"];
+        get: operations["get_adrs_id"];
+        put: operations["put_adrs_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -61,9 +61,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_range"];
+        get: operations["get_agenda"];
         put?: never;
-        post: operations["create_event"];
+        post: operations["post_agenda"];
         delete?: never;
         options?: never;
         head?: never;
@@ -78,7 +78,7 @@ export interface paths {
             cookie?: never;
         };
         /** Agenda de un día (manual + sincronizada), ordenada por hora. */
-        get: operations["day_agenda"];
+        get: operations["get_agenda_day_date"];
         put?: never;
         post?: never;
         delete?: never;
@@ -95,9 +95,9 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["update_event"];
+        put: operations["put_agenda_id"];
         post?: never;
-        delete: operations["delete_event"];
+        delete: operations["delete_agenda_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -111,7 +111,7 @@ export interface paths {
             cookie?: never;
         };
         /** Elementos archivados de todos los módulos (para recuperarlos). */
-        get: operations["list_archived"];
+        get: operations["get_archive"];
         put?: never;
         post?: never;
         delete?: never;
@@ -129,7 +129,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["archive_entity"];
+        post: operations["post_archive_entity_type_id"];
         delete?: never;
         options?: never;
         head?: never;
@@ -145,7 +145,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["restore_entity"];
+        post: operations["post_archive_entity_type_id_restore"];
         delete?: never;
         options?: never;
         head?: never;
@@ -160,9 +160,9 @@ export interface paths {
             cookie?: never;
         };
         /** Lista de áreas. */
-        get: operations["list_areas"];
+        get: operations["get_areas"];
         put?: never;
-        post: operations["create_area"];
+        post: operations["post_areas"];
         delete?: never;
         options?: never;
         head?: never;
@@ -176,9 +176,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_area"];
+        get: operations["get_areas_id"];
         /** Renombrar o archivar un área conserva su ID y sus relaciones. */
-        put: operations["update_area"];
+        put: operations["put_areas_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -194,7 +194,7 @@ export interface paths {
             cookie?: never;
         };
         /** Métodos de inicio de sesión disponibles (público). */
-        get: operations["auth_config"];
+        get: operations["get_auth_config"];
         put?: never;
         post?: never;
         delete?: never;
@@ -213,7 +213,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Solo desarrollo/pruebas (bloqueado en producción por configuración). Respeta la allowlist. */
-        post: operations["dev_login"];
+        post: operations["post_auth_dev_login"];
         delete?: never;
         options?: never;
         head?: never;
@@ -230,7 +230,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cierra la sesión actual. */
-        post: operations["logout"];
+        post: operations["post_auth_logout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -247,7 +247,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Revoca todas las sesiones del usuario (todos los dispositivos). */
-        post: operations["logout_all"];
+        post: operations["post_auth_logout_all"];
         delete?: never;
         options?: never;
         head?: never;
@@ -262,7 +262,7 @@ export interface paths {
             cookie?: never;
         };
         /** Callback OIDC: valida state, intercambia el código con PKCE, verifica el ID token y crea la sesión con cookie. */
-        get: operations["oidc_callback"];
+        get: operations["get_auth_oidc_callback"];
         put?: never;
         post?: never;
         delete?: never;
@@ -279,7 +279,7 @@ export interface paths {
             cookie?: never;
         };
         /** Redirige a Telegram Login (OIDC + PKCE). */
-        get: operations["oidc_start"];
+        get: operations["get_auth_oidc_start"];
         put?: never;
         post?: never;
         delete?: never;
@@ -298,7 +298,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Inicia sesión desde la Mini App validando `initData` (firma y antigüedad) en el servidor. */
-        post: operations["miniapp_login"];
+        post: operations["post_auth_telegram_miniapp"];
         delete?: never;
         options?: never;
         head?: never;
@@ -312,10 +312,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_captures"];
+        get: operations["get_captures"];
         put?: never;
         /** Crea una captura desde la app y, si hay IA, propone su interpretación. */
-        post: operations["create_capture"];
+        post: operations["post_captures"];
         delete?: never;
         options?: never;
         head?: never;
@@ -335,7 +335,7 @@ export interface paths {
          * Sugerencia asistida por IA sobre datos propios (resumen semanal, clasificación de Inbox, hábitos para un objetivo).
          *     Se crea como propuesta que requiere confirmación; los datos se envían como texto delimitado y mínimo.
          */
-        post: operations["suggest"];
+        post: operations["post_captures_suggest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -350,9 +350,9 @@ export interface paths {
             cookie?: never;
         };
         /** Obtiene la captura; si viene del bot y aún no tiene propuesta, la extrae (o explica el modo manual). */
-        get: operations["get_capture"];
+        get: operations["get_captures_id"];
         /** Edita la propuesta (vista previa). Se valida formato y catálogos; el autor es el usuario. */
-        put: operations["update_capture"];
+        put: operations["put_captures_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -370,7 +370,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Confirma y aplica la propuesta en una sola transacción. Repetir no duplica (claves de idempotencia por elemento). */
-        post: operations["apply_capture"];
+        post: operations["post_captures_id_apply"];
         delete?: never;
         options?: never;
         head?: never;
@@ -387,7 +387,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Descarta la captura sin aplicar nada. */
-        post: operations["reject_capture"];
+        post: operations["post_captures_id_reject"];
         delete?: never;
         options?: never;
         head?: never;
@@ -402,7 +402,7 @@ export interface paths {
             cookie?: never;
         };
         /** Check-ins de un rango (historial; no incluye días sin registro). */
-        get: operations["list_checkins"];
+        get: operations["get_checkins"];
         put?: never;
         post?: never;
         delete?: never;
@@ -418,9 +418,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_checkin"];
+        get: operations["get_checkins_date"];
         /** Aplica el check-in (mañana o noche) sobre el registro único del día. */
-        put: operations["put_checkin"];
+        put: operations["put_checkins_date"];
         post?: never;
         delete?: never;
         options?: never;
@@ -436,7 +436,7 @@ export interface paths {
             cookie?: never;
         };
         /** Todo lo necesario para la pantalla Hoy de una fecha (también días anteriores). */
-        get: operations["day_view"];
+        get: operations["get_checkins_date_view"];
         put?: never;
         post?: never;
         delete?: never;
@@ -452,9 +452,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_class_notes"];
+        get: operations["get_class_notes"];
         put?: never;
-        post: operations["create_class_note"];
+        post: operations["post_class_notes"];
         delete?: never;
         options?: never;
         head?: never;
@@ -468,8 +468,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_class_note"];
-        put: operations["update_class_note"];
+        get: operations["get_class_notes_id"];
+        put: operations["put_class_notes_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -487,7 +487,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Crea una entrega como tarea ligada a la clase (área de la materia, aparece en la daily el día de entrega). */
-        post: operations["add_deliverable"];
+        post: operations["post_class_notes_id_deliverables"];
         delete?: never;
         options?: never;
         head?: never;
@@ -502,9 +502,9 @@ export interface paths {
             cookie?: never;
         };
         /** Tabla del pipeline (Pipeline.base), con días para publicar. */
-        get: operations["list_content"];
+        get: operations["get_content"];
         put?: never;
-        post: operations["create_content"];
+        post: operations["post_content"];
         delete?: never;
         options?: never;
         head?: never;
@@ -518,7 +518,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["content_ai_context"];
+        get: operations["get_content_ai_context"];
         put?: never;
         post?: never;
         delete?: never;
@@ -535,7 +535,7 @@ export interface paths {
             cookie?: never;
         };
         /** Kanban por estado (idea → guion → grabado → editado → publicado). */
-        get: operations["content_board"];
+        get: operations["get_content_board"];
         put?: never;
         post?: never;
         delete?: never;
@@ -552,7 +552,7 @@ export interface paths {
             cookie?: never;
         };
         /** Publicados ordenados por métricas. */
-        get: operations["content_published"];
+        get: operations["get_content_published"];
         put?: never;
         post?: never;
         delete?: never;
@@ -568,8 +568,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_content"];
-        put: operations["update_content"];
+        get: operations["get_content_id"];
+        put: operations["put_content_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -585,7 +585,7 @@ export interface paths {
             cookie?: never;
         };
         /** Dashboard general. */
-        get: operations["dashboard"];
+        get: operations["get_dashboard"];
         put?: never;
         post?: never;
         delete?: never;
@@ -604,7 +604,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Entra a un espacio demo aislado (solo desarrollo). */
-        post: operations["demo_session"];
+        post: operations["post_demo_session"];
         delete?: never;
         options?: never;
         head?: never;
@@ -619,9 +619,9 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["update_session"];
+        put: operations["put_devlog_sessions_id"];
         post?: never;
-        delete: operations["delete_session"];
+        delete: operations["delete_devlog_sessions_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -634,7 +634,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_devlogs"];
+        get: operations["get_devlogs"];
         put?: never;
         post?: never;
         delete?: never;
@@ -653,7 +653,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Crea una sesión desde el texto pegado (guarda también el texto original). */
-        post: operations["import_text"];
+        post: operations["post_devlogs_import"];
         delete?: never;
         options?: never;
         head?: never;
@@ -670,7 +670,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Vista previa del texto pegado sin guardar nada. */
-        post: operations["preview_import"];
+        post: operations["post_devlogs_import_preview"];
         delete?: never;
         options?: never;
         head?: never;
@@ -684,8 +684,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_devlog"];
-        put: operations["set_summary"];
+        get: operations["get_devlogs_date"];
+        put: operations["put_devlogs_date"];
         post?: never;
         delete?: never;
         options?: never;
@@ -703,7 +703,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Agrega una sesión al devlog del día (varias por día). */
-        post: operations["add_session"];
+        post: operations["post_devlogs_date_sessions"];
         delete?: never;
         options?: never;
         head?: never;
@@ -718,7 +718,7 @@ export interface paths {
             cookie?: never;
         };
         /** Historial (Devocionales.base: fecha desc con pasaje) con búsqueda sin acentos. */
-        get: operations["list_devotionals"];
+        get: operations["get_devotionals"];
         put?: never;
         post?: never;
         delete?: never;
@@ -735,7 +735,7 @@ export interface paths {
             cookie?: never;
         };
         /** Plantilla vigente: la personalizada en ajustes (`devotional_template`) o la del vault según el modo. */
-        get: operations["get_template"];
+        get: operations["get_devotionals_template"];
         put?: never;
         post?: never;
         delete?: never;
@@ -751,14 +751,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_devotional"];
+        get: operations["get_devotionals_date"];
         /**
          * Crea/actualiza el devocional del día. Con contenido real marca el hábito vinculado (`devotional_content`) de esa
          *     fecha; si queda vacío, retira la marca automática.
          */
-        put: operations["put_devotional"];
+        put: operations["put_devotionals_date"];
         post?: never;
-        delete: operations["delete_devotional"];
+        delete: operations["delete_devotionals_date"];
         options?: never;
         head?: never;
         patch?: never;
@@ -771,9 +771,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_drawings"];
+        get: operations["get_drawings"];
         put?: never;
-        post: operations["create_drawing"];
+        post: operations["post_drawings"];
         delete?: never;
         options?: never;
         head?: never;
@@ -787,8 +787,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_drawing"];
-        put: operations["update_drawing"];
+        get: operations["get_drawings_id"];
+        put: operations["put_drawings_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -804,7 +804,7 @@ export interface paths {
             cookie?: never;
         };
         /** Todos los datos propios en JSON (excluye sesiones, identidades, credenciales y claves de idempotencia). */
-        get: operations["export_json"];
+        get: operations["get_exports_json"];
         put?: never;
         post?: never;
         delete?: never;
@@ -821,7 +821,7 @@ export interface paths {
             cookie?: never;
         };
         /** ZIP con `vida-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault). */
-        get: operations["export_zip"];
+        get: operations["get_exports_zip"];
         put?: never;
         post?: never;
         delete?: never;
@@ -837,7 +837,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_favorites"];
+        get: operations["get_favorites"];
         put?: never;
         post?: never;
         delete?: never;
@@ -854,9 +854,9 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["add_favorite"];
+        put: operations["put_favorites_entity_type_id"];
         post?: never;
-        delete: operations["remove_favorite"];
+        delete: operations["delete_favorites_entity_type_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -870,9 +870,9 @@ export interface paths {
             cookie?: never;
         };
         /** Cuentas y tarjetas con saldo/disponible estimado y antigüedad del snapshot (sin conexión al banco). */
-        get: operations["list_accounts"];
+        get: operations["get_finance_accounts"];
         put?: never;
-        post: operations["create_account"];
+        post: operations["post_finance_accounts"];
         delete?: never;
         options?: never;
         head?: never;
@@ -886,8 +886,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_account"];
-        put: operations["update_account"];
+        get: operations["get_finance_accounts_id"];
+        put: operations["put_finance_accounts_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -902,10 +902,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_snapshots"];
+        get: operations["get_finance_accounts_id_snapshots"];
         put?: never;
         /** Registra el saldo/disponible observado (conciliación manual). Los movimientos posteriores se suman/restan al estimado. */
-        post: operations["add_snapshot"];
+        post: operations["post_finance_accounts_id_snapshots"];
         delete?: never;
         options?: never;
         head?: never;
@@ -920,12 +920,12 @@ export interface paths {
             cookie?: never;
         };
         /** Presupuesto del mes (snapshot propio del mes; si no existe, propuesta copiada del mes anterior). */
-        get: operations["get_budget"];
+        get: operations["get_finance_budgets_month"];
         /**
          * Guarda el presupuesto del mes. Solo modifica este mes; los meses anteriores conservan su snapshot.
          *     Las categorías con rubros de proyecto toman como línea la suma de sus rubros.
          */
-        put: operations["put_budget"];
+        put: operations["put_finance_budgets_month"];
         post?: never;
         delete?: never;
         options?: never;
@@ -944,7 +944,7 @@ export interface paths {
          * Tarjeta sugerida para gastar hoy según disponible, uso máximo del plan, corte, deudas y gasto planeado (D-022).
          *     Es una recomendación personal; no ejecuta pagos ni consulta bancos.
          */
-        get: operations["card_suggestion"];
+        get: operations["get_finance_card_suggestion"];
         put?: never;
         post?: never;
         delete?: never;
@@ -961,9 +961,9 @@ export interface paths {
             cookie?: never;
         };
         /** Catálogo de categorías (gasto e ingreso). */
-        get: operations["list_categories"];
+        get: operations["get_finance_categories"];
         put?: never;
-        post: operations["create_category"];
+        post: operations["post_finance_categories"];
         delete?: never;
         options?: never;
         head?: never;
@@ -979,7 +979,7 @@ export interface paths {
         };
         get?: never;
         /** Renombrar/archivar conserva el ID y los movimientos históricos. */
-        put: operations["update_category"];
+        put: operations["put_finance_categories_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -998,8 +998,8 @@ export interface paths {
          * Plan de crédito (meta, pasos, reglas, tarjetas excluidas, % máximo de uso). El 30% es una regla personal inicial,
          *     no una garantía financiera.
          */
-        get: operations["get_plan"];
-        put: operations["put_plan"];
+        get: operations["get_finance_credit_plan"];
+        put: operations["put_finance_credit_plan"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1015,7 +1015,7 @@ export interface paths {
             cookie?: never;
         };
         /** Dashboard financiero del mes (por defecto, el actual). */
-        get: operations["dashboard"];
+        get: operations["get_finance_dashboard"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1031,9 +1031,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_debts"];
+        get: operations["get_finance_debts"];
         put?: never;
-        post: operations["create_debt"];
+        post: operations["post_finance_debts"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1047,8 +1047,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_debt"];
-        put: operations["update_debt"];
+        get: operations["get_finance_debts_id"];
+        put: operations["put_finance_debts_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1064,7 +1064,7 @@ export interface paths {
             cookie?: never;
         };
         /** Gastos de un proyecto derivados del registro general (sin duplicar movimientos), por rubro y por mes. */
-        get: operations["project_report"];
+        get: operations["get_finance_projects_id_report"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1080,9 +1080,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_rules"];
+        get: operations["get_finance_recurring"];
         put?: never;
-        post: operations["create_rule"];
+        post: operations["post_finance_recurring"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1099,7 +1099,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Registra ahora las ocurrencias vencidas del usuario (el scheduler lo hace solo; esto lo adelanta). Idempotente. */
-        post: operations["materialize"];
+        post: operations["post_finance_recurring_materialize"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1113,7 +1113,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["occurrences"];
+        get: operations["get_finance_recurring_occurrences"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1129,9 +1129,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_rule"];
+        get: operations["get_finance_recurring_id"];
         /** Cambios futuros: las ocurrencias ya creadas conservan su monto y fecha. */
-        put: operations["update_rule"];
+        put: operations["put_finance_recurring_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1147,10 +1147,10 @@ export interface paths {
             cookie?: never;
         };
         /** Histórico de movimientos con filtros, orden, paginación y totales. */
-        get: operations["list_transactions"];
+        get: operations["get_finance_transactions"];
         put?: never;
         /** Registra un movimiento confirmado por el usuario. */
-        post: operations["create_transaction"];
+        post: operations["post_finance_transactions"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1167,7 +1167,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Captura múltiple atómica: si un elemento es inválido no se guarda ninguno (422 con el índice en `field`). */
-        post: operations["create_batch"];
+        post: operations["post_finance_transactions_batch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1181,9 +1181,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_transaction"];
+        get: operations["get_finance_transactions_id"];
         /** Edita un movimiento (versión obligatoria). El tipo no cambia; se recalculan deudas afectadas. */
-        put: operations["update_transaction"];
+        put: operations["put_finance_transactions_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1204,7 +1204,7 @@ export interface paths {
          * Confirma (y opcionalmente corrige) una ocurrencia pendiente de conciliación. Actualiza la **misma** fila; los efectos
          *     se activan una sola vez. Confirmar algo ya confirmado devuelve el movimiento sin repetir efectos.
          */
-        post: operations["confirm_transaction"];
+        post: operations["post_finance_transactions_id_confirm"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1221,7 +1221,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Anula un movimiento sin borrarlo (deja de contar en saldos y totales). */
-        post: operations["void_transaction"];
+        post: operations["post_finance_transactions_id_void"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1236,10 +1236,10 @@ export interface paths {
             cookie?: never;
         };
         /** Objetivos (vista Objetivos.base: agrupables por tipo, con periodo, inicio, fin y estado). */
-        get: operations["list_goals"];
+        get: operations["get_goals"];
         put?: never;
         /** Crea un objetivo. No se crean objetivos sin decisión explícita del usuario (esta llamada es esa decisión). */
-        post: operations["create_goal"];
+        post: operations["post_goals"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1254,7 +1254,7 @@ export interface paths {
             cookie?: never;
         };
         /** Contexto para planear la semana (y el mes primero cuando toca), con avisos de carga de hábitos. */
-        get: operations["planning"];
+        get: operations["get_goals_planning"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1270,9 +1270,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_goal"];
+        get: operations["get_goals_id"];
         /** Edita el objetivo (no cambia tipo ni periodo). Logros subjetivos se confirman con el cierre explícito. */
-        put: operations["update_goal"];
+        put: operations["put_goals_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1290,7 +1290,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cierre del objetivo (acción diferenciada de editar o archivar): estado final + logro, aprendizaje, dificultades y ajustes. */
-        post: operations["close_goal"];
+        post: operations["post_goals_id_close"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1307,7 +1307,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Enlaza una entidad para que aporte al objetivo (una vez por objetivo; enlazarla a la semana y al mes aporta una vez a cada uno). */
-        post: operations["add_link"];
+        post: operations["post_goals_id_links"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1324,7 +1324,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["delete_link"];
+        delete: operations["delete_goals_id_links_src_type_src_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1340,7 +1340,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Evento manual de progreso (debe coincidir con el tipo de progreso del objetivo). */
-        post: operations["add_progress"];
+        post: operations["post_goals_id_progress"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1357,7 +1357,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["delete_progress"];
+        delete: operations["delete_goals_id_progress_event_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1371,7 +1371,7 @@ export interface paths {
             cookie?: never;
         };
         /** Vínculos configurados (registrar peso → "Pesarme", gasto → "Registrar gastos", etc.). */
-        get: operations["list_links"];
+        get: operations["get_habit_links"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1388,9 +1388,9 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["set_link"];
+        put: operations["put_habit_links_trigger"];
         post?: never;
-        delete: operations["delete_link"];
+        delete: operations["delete_habit_links_trigger"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1404,10 +1404,10 @@ export interface paths {
             cookie?: never;
         };
         /** Hábitos con estado de hoy, rachas y cumplimiento de 30 días. */
-        get: operations["list_habits"];
+        get: operations["get_habits"];
         put?: never;
         /** Crea un hábito con su primera versión. Un hábito de objetivo rige solo dentro del periodo del objetivo. */
-        post: operations["create_habit"];
+        post: operations["post_habits"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1427,7 +1427,7 @@ export interface paths {
          * Confirma los hábitos fijos propuestos en onboarding (devocional, ejercicio, lectura). Nada se crea sin esta
          *     confirmación. Idempotente: si ya existe, actualiza su frecuencia desde `starts_on` o lo archiva si `enabled=false`.
          */
-        post: operations["setup_fixed_habits"];
+        post: operations["post_habits_fixed"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1442,7 +1442,7 @@ export interface paths {
             cookie?: never;
         };
         /** Historial por día (por defecto últimos 30 días) con energía, peso y estado de cada hábito. */
-        get: operations["habit_history"];
+        get: operations["get_habits_history"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1458,9 +1458,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_habit"];
+        get: operations["get_habits_id"];
         /** Edita la identidad (nombre, área, unidad, archivo). La frecuencia se cambia con una versión nueva. */
-        put: operations["update_habit"];
+        put: operations["put_habits_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1477,10 +1477,10 @@ export interface paths {
         };
         get?: never;
         /** Registra el estado de un día (una sola ocurrencia por hábito y fecha). */
-        put: operations["put_entry"];
+        put: operations["put_habits_id_entries_date"];
         post?: never;
         /** Vuelve el día a "sin registrar". */
-        delete: operations["delete_entry"];
+        delete: operations["delete_habits_id_entries_date"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1496,7 +1496,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Pausa: los días cubiertos salen del denominador. */
-        post: operations["add_pause"];
+        post: operations["post_habits_id_pauses"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1513,7 +1513,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["delete_pause"];
+        delete: operations["delete_habits_id_pauses_pause_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1529,7 +1529,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cambia la frecuencia/meta desde una fecha sin alterar el historial. */
-        post: operations["add_version"];
+        post: operations["post_habits_id_versions"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1543,10 +1543,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_runs"];
+        get: operations["get_imports"];
         put?: never;
         /** Sube un ZIP del vault (`Content-Type: application/zip`, cuerpo binario) y genera el dry-run. No escribe datos. */
-        post: operations["upload_zip"];
+        post: operations["post_imports"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1563,7 +1563,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Sube una carpeta del vault (selección de carpeta en el navegador) y genera el dry-run. */
-        post: operations["upload_folder"];
+        post: operations["post_imports_folder"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1577,7 +1577,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_run"];
+        get: operations["get_imports_id"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1599,7 +1599,7 @@ export interface paths {
          * Confirma y aplica un dry-run en una sola transacción. Las acciones se recalculan contra el estado actual
          *     (si algo cambió desde el dry-run, se respeta lo que hay en la app).
          */
-        post: operations["apply_run"];
+        post: operations["post_imports_id_apply"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1613,10 +1613,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_inbox"];
+        get: operations["get_inbox"];
         put?: never;
         /** Captura sin clasificar. 201 si es nueva, 200 si el `client_id` ya existía. */
-        post: operations["capture"];
+        post: operations["post_inbox"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1631,7 +1631,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["edit_item"];
+        put: operations["put_inbox_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1649,7 +1649,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Aplica la decisión del usuario: crea el destino y cierra el elemento en una sola transacción. */
-        post: operations["apply"];
+        post: operations["post_inbox_id_apply"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1666,7 +1666,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Calcula una propuesta determinista (no mueve nada). La IA, si está configurada, la propone el módulo de capturas. */
-        post: operations["propose"];
+        post: operations["post_inbox_id_propose"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1683,7 +1683,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Recupera un elemento archivado o descartado a pendiente. */
-        post: operations["reopen"];
+        post: operations["post_inbox_id_reopen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1698,7 +1698,7 @@ export interface paths {
             cookie?: never;
         };
         /** Estado de todas las integraciones: conexión, última sincronización y errores. */
-        get: operations["overview"];
+        get: operations["get_integrations"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1715,9 +1715,9 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["clickup_connect"];
+        put: operations["put_integrations_clickup"];
         post?: never;
-        delete: operations["clickup_disconnect"];
+        delete: operations["delete_integrations_clickup"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1733,7 +1733,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Lee la vista configurada de ClickUp ahora (no modifica nada en ClickUp). */
-        post: operations["clickup_sync"];
+        post: operations["post_integrations_clickup_sync"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1748,7 +1748,7 @@ export interface paths {
             cookie?: never;
         };
         /** Tareas abiertas de ClickUp en el orden de la daily: fáciles (con razón), resto, need info. */
-        get: operations["clickup_tasks"];
+        get: operations["get_integrations_clickup_tasks"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1768,7 +1768,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Revoca el acceso en Google y borra las credenciales. */
-        delete: operations["google_disconnect"];
+        delete: operations["delete_integrations_google"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1782,7 +1782,7 @@ export interface paths {
             cookie?: never;
         };
         /** Calendarios disponibles; los de festivos/observancias se marcan como excluidos siempre. */
-        get: operations["google_calendars"];
+        get: operations["get_integrations_google_calendars"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1799,7 +1799,7 @@ export interface paths {
             cookie?: never;
         };
         /** Callback de Google. El `state` (un solo uso) identifica al usuario; no requiere sesión. */
-        get: operations["google_callback"];
+        get: operations["get_integrations_google_callback"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1816,7 +1816,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["google_config"];
+        put: operations["put_integrations_google_config"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1832,7 +1832,7 @@ export interface paths {
             cookie?: never;
         };
         /** Inicia la conexión con Google (OAuth + PKCE, scopes de solo lectura). */
-        get: operations["google_connect"];
+        get: operations["get_integrations_google_connect"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1851,7 +1851,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Sincroniza ahora (agenda y correos enviados). Ventana máxima de 62 días. */
-        post: operations["google_sync"];
+        post: operations["post_integrations_google_sync"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1866,7 +1866,7 @@ export interface paths {
             cookie?: never;
         };
         /** Interacciones y personas propuestas desde Calendar/Gmail/dictado (nada se registra sin aceptar). */
-        get: operations["suggestions"];
+        get: operations["get_integrations_suggestions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1884,7 +1884,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["accept_interaction"];
+        post: operations["post_integrations_suggestions_interactions_id_accept"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1900,7 +1900,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["dismiss_interaction"];
+        post: operations["post_integrations_suggestions_interactions_id_dismiss"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1917,7 +1917,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Crea la persona sugerida (decisión explícita del usuario). */
-        post: operations["accept_person"];
+        post: operations["post_integrations_suggestions_people_id_accept"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1933,7 +1933,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["dismiss_person"];
+        post: operations["post_integrations_suggestions_people_id_dismiss"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1947,7 +1947,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_interactions"];
+        get: operations["get_interactions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1966,7 +1966,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["delete_interaction"];
+        delete: operations["delete_interactions_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1983,8 +1983,8 @@ export interface paths {
         get: operations["get_links"];
         put?: never;
         /** Crea un enlace validando que ambos extremos existan y sean del usuario. */
-        post: operations["add_link"];
-        delete: operations["remove_link"];
+        post: operations["post_links"];
+        delete: operations["delete_links"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1998,7 +1998,7 @@ export interface paths {
             cookie?: never;
         };
         /** Perfil del usuario autenticado. */
-        get: operations["me"];
+        get: operations["get_me"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2014,9 +2014,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_notes"];
+        get: operations["get_notes"];
         put?: never;
-        post: operations["create_note"];
+        post: operations["post_notes"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2030,8 +2030,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_note"];
-        put: operations["update_note"];
+        get: operations["get_notes_id"];
+        put: operations["put_notes_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2046,9 +2046,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_people"];
+        get: operations["get_people"];
         put?: never;
-        post: operations["create_person"];
+        post: operations["post_people"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2062,7 +2062,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["upcoming_birthdays"];
+        get: operations["get_people_birthdays"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2079,7 +2079,7 @@ export interface paths {
             cookie?: never;
         };
         /** Vista Personas.base: agrupado por área, con días sin hablar y cumpleaños. */
-        get: operations["people_by_area"];
+        get: operations["get_people_by_area"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2096,7 +2096,7 @@ export interface paths {
             cookie?: never;
         };
         /** Busca a quién se refiere un nombre o apodo, sin crear nada. */
-        get: operations["resolve_people"];
+        get: operations["get_people_resolve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2112,9 +2112,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_person"];
+        get: operations["get_people_id"];
         /** Editar no borra el cumpleaños existente salvo que se envíe vacío explícitamente. */
-        put: operations["update_person"];
+        put: operations["put_people_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2132,7 +2132,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Registra con quién habló el usuario ese día; actualiza "último contacto". */
-        post: operations["add_interaction"];
+        post: operations["post_people_id_interactions"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2148,7 +2148,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["add_note"];
+        post: operations["post_people_id_notes"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2165,7 +2165,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["delete_note"];
+        delete: operations["delete_people_id_notes_note_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2178,10 +2178,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_suggestions"];
+        get: operations["get_person_suggestions"];
         put?: never;
         /** Sugiere una persona detectada (no la crea). */
-        post: operations["create_suggestion"];
+        post: operations["post_person_suggestions"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2197,7 +2197,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["accept_suggestion"];
+        post: operations["post_person_suggestions_id_accept"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2213,7 +2213,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["dismiss_suggestion"];
+        post: operations["post_person_suggestions_id_dismiss"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2227,9 +2227,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_projects"];
+        get: operations["get_projects"];
         put?: never;
-        post: operations["create_project"];
+        post: operations["post_projects"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2243,8 +2243,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_project"];
-        put: operations["update_project"];
+        get: operations["get_projects_id"];
+        put: operations["put_projects_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2260,7 +2260,7 @@ export interface paths {
             cookie?: never;
         };
         /** Actividad reciente relacionada con un proyecto (tareas, notas, ADRs, devlog, contenido). */
-        get: operations["project_activity"];
+        get: operations["get_projects_id_activity"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2277,9 +2277,9 @@ export interface paths {
             cookie?: never;
         };
         /** Lecturas (tabla y tarjetas por estado). */
-        get: operations["list_readings"];
+        get: operations["get_readings"];
         put?: never;
-        post: operations["create_reading"];
+        post: operations["post_readings"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2293,11 +2293,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_reading"];
-        put: operations["update_reading"];
+        get: operations["get_readings_id"];
+        put: operations["put_readings_id"];
         post?: never;
         /** Borra la lectura y retira sus aportes a objetivos. */
-        delete: operations["delete_reading"];
+        delete: operations["delete_readings_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2311,7 +2311,7 @@ export interface paths {
             cookie?: never;
         };
         /** Próximos recordatorios, estado del chat y entregas recientes. */
-        get: operations["status"];
+        get: operations["get_reminders"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2330,7 +2330,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Pausa los recordatorios y cancela los pendientes. */
-        post: operations["pause"];
+        post: operations["post_reminders_pause"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2347,7 +2347,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reanuda los recordatorios (el scheduler programa la próxima ocurrencia vigente; no envía atrasados). */
-        post: operations["resume"];
+        post: operations["post_reminders_resume"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2361,7 +2361,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["search"];
+        get: operations["get_search"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2379,7 +2379,7 @@ export interface paths {
         };
         get: operations["get_settings"];
         /** Actualiza preferencias. Cambiar la zona afecta cálculos futuros; las fechas guardadas no se reclasifican. */
-        put: operations["update_settings"];
+        put: operations["put_settings"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2394,9 +2394,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_subjects"];
+        get: operations["get_subjects"];
         put?: never;
-        post: operations["create_subject"];
+        post: operations["post_subjects"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2411,7 +2411,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["update_subject"];
+        put: operations["put_subjects_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2426,9 +2426,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_swipe"];
+        get: operations["get_swipe"];
         put?: never;
-        post: operations["create_swipe"];
+        post: operations["post_swipe"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2442,8 +2442,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_swipe"];
-        put: operations["update_swipe"];
+        get: operations["get_swipe_id"];
+        put: operations["put_swipe_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2458,7 +2458,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_tags"];
+        get: operations["get_tags"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2474,9 +2474,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_rules"];
+        get: operations["get_task_recurrences"];
         put?: never;
-        post: operations["create_rule"];
+        post: operations["post_task_recurrences"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2493,7 +2493,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Genera las ocurrencias pendientes hasta hoy (idempotente; también lo hace el worker periódicamente). */
-        post: operations["materialize_rules"];
+        post: operations["post_task_recurrences_materialize"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2509,7 +2509,7 @@ export interface paths {
         };
         get?: never;
         /** Editar o desactivar una regla no modifica las tareas ya generadas. */
-        put: operations["update_rule"];
+        put: operations["put_task_recurrences_id"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2524,9 +2524,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_tasks"];
+        get: operations["get_tasks"];
         put?: never;
-        post: operations["create_task"];
+        post: operations["post_tasks"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2543,7 +2543,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Arrastra las pendientes abiertas de días anteriores al día indicado, conservando ID e historial. */
-        post: operations["carry_over"];
+        post: operations["post_tasks_carry_over"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2558,7 +2558,7 @@ export interface paths {
             cookie?: never;
         };
         /** Pendientes del día agrupados por área (Personal/Trabajo/Negocio/Escuela + las que agregue el usuario). */
-        get: operations["tasks_for_day"];
+        get: operations["get_tasks_day_date"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2574,11 +2574,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_task"];
-        put: operations["update_task"];
+        get: operations["get_tasks_id"];
+        put: operations["put_tasks_id"];
         post?: never;
         /** Archiva (no borra). Se recupera con `POST /archive/task/{id}/restore`. */
-        delete: operations["archive_task"];
+        delete: operations["delete_tasks_id"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2593,7 +2593,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["cancel_task"];
+        post: operations["post_tasks_id_cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2610,7 +2610,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Marca como hecha. En tareas de ClickUp solo cambia el estado local (no modifica ClickUp). */
-        post: operations["complete_task"];
+        post: operations["post_tasks_id_complete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2626,7 +2626,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["reopen_task"];
+        post: operations["post_tasks_id_reopen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2641,7 +2641,7 @@ export interface paths {
             cookie?: never;
         };
         /** Vista Proyectos.base: actividad reciente + ADRs. */
-        get: operations["projects_view"];
+        get: operations["get_views_projects"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2657,7 +2657,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_reviews"];
+        get: operations["get_weekly_reviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2673,9 +2673,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_review"];
+        get: operations["get_weekly_reviews_iso_week"];
         /** Guarda la revisión (con snapshot del resumen calculado y sus evidencias). */
-        put: operations["put_review"];
+        put: operations["put_weekly_reviews_iso_week"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2691,7 +2691,7 @@ export interface paths {
             cookie?: never;
         };
         /** Resumen automático (editable en el formulario; no se guarda hasta `PUT`). */
-        get: operations["summary"];
+        get: operations["get_weekly_reviews_iso_week_summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6206,7 +6206,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    recent_activity: {
+    get_activity: {
         parameters: {
             query?: never;
             header?: never;
@@ -6225,7 +6225,7 @@ export interface operations {
             };
         };
     };
-    list_adrs: {
+    get_adrs: {
         parameters: {
             query?: {
                 project_id?: string | null;
@@ -6247,7 +6247,7 @@ export interface operations {
             };
         };
     };
-    create_adr: {
+    post_adrs: {
         parameters: {
             query?: never;
             header?: never;
@@ -6270,7 +6270,7 @@ export interface operations {
             };
         };
     };
-    get_adr: {
+    get_adrs_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6291,7 +6291,7 @@ export interface operations {
             };
         };
     };
-    update_adr: {
+    put_adrs_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6324,7 +6324,7 @@ export interface operations {
             };
         };
     };
-    list_range: {
+    get_agenda: {
         parameters: {
             query: {
                 from: string;
@@ -6346,7 +6346,7 @@ export interface operations {
             };
         };
     };
-    create_event: {
+    post_agenda: {
         parameters: {
             query?: never;
             header?: never;
@@ -6369,7 +6369,7 @@ export interface operations {
             };
         };
     };
-    day_agenda: {
+    get_agenda_day_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -6390,7 +6390,7 @@ export interface operations {
             };
         };
     };
-    update_event: {
+    put_agenda_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6423,7 +6423,7 @@ export interface operations {
             };
         };
     };
-    delete_event: {
+    delete_agenda_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6442,7 +6442,7 @@ export interface operations {
             };
         };
     };
-    list_archived: {
+    get_archive: {
         parameters: {
             query?: never;
             header?: never;
@@ -6461,7 +6461,7 @@ export interface operations {
             };
         };
     };
-    archive_entity: {
+    post_archive_entity_type_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6481,7 +6481,7 @@ export interface operations {
             };
         };
     };
-    restore_entity: {
+    post_archive_entity_type_id_restore: {
         parameters: {
             query?: never;
             header?: never;
@@ -6501,7 +6501,7 @@ export interface operations {
             };
         };
     };
-    list_areas: {
+    get_areas: {
         parameters: {
             query?: {
                 limit?: number | null;
@@ -6527,7 +6527,7 @@ export interface operations {
             };
         };
     };
-    create_area: {
+    post_areas: {
         parameters: {
             query?: never;
             header?: never;
@@ -6550,7 +6550,7 @@ export interface operations {
             };
         };
     };
-    get_area: {
+    get_areas_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6579,7 +6579,7 @@ export interface operations {
             };
         };
     };
-    update_area: {
+    put_areas_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6612,7 +6612,7 @@ export interface operations {
             };
         };
     };
-    auth_config: {
+    get_auth_config: {
         parameters: {
             query?: never;
             header?: never;
@@ -6631,7 +6631,7 @@ export interface operations {
             };
         };
     };
-    dev_login: {
+    post_auth_dev_login: {
         parameters: {
             query?: never;
             header?: never;
@@ -6654,7 +6654,7 @@ export interface operations {
             };
         };
     };
-    logout: {
+    post_auth_logout: {
         parameters: {
             query?: never;
             header?: never;
@@ -6671,7 +6671,7 @@ export interface operations {
             };
         };
     };
-    logout_all: {
+    post_auth_logout_all: {
         parameters: {
             query?: never;
             header?: never;
@@ -6688,7 +6688,7 @@ export interface operations {
             };
         };
     };
-    oidc_callback: {
+    get_auth_oidc_callback: {
         parameters: {
             query?: {
                 code?: string | null;
@@ -6709,7 +6709,7 @@ export interface operations {
             };
         };
     };
-    oidc_start: {
+    get_auth_oidc_start: {
         parameters: {
             query?: {
                 /** @description Ruta interna a la que volver (debe empezar con `/`). */
@@ -6729,7 +6729,7 @@ export interface operations {
             };
         };
     };
-    miniapp_login: {
+    post_auth_telegram_miniapp: {
         parameters: {
             query?: never;
             header?: never;
@@ -6768,7 +6768,7 @@ export interface operations {
             };
         };
     };
-    list_captures: {
+    get_captures: {
         parameters: {
             query?: {
                 status?: string | null;
@@ -6789,7 +6789,7 @@ export interface operations {
             };
         };
     };
-    create_capture: {
+    post_captures: {
         parameters: {
             query?: never;
             header?: never;
@@ -6812,7 +6812,7 @@ export interface operations {
             };
         };
     };
-    suggest: {
+    post_captures_suggest: {
         parameters: {
             query?: never;
             header?: never;
@@ -6843,7 +6843,7 @@ export interface operations {
             };
         };
     };
-    get_capture: {
+    get_captures_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6872,7 +6872,7 @@ export interface operations {
             };
         };
     };
-    update_capture: {
+    put_captures_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -6905,7 +6905,7 @@ export interface operations {
             };
         };
     };
-    apply_capture: {
+    post_captures_id_apply: {
         parameters: {
             query?: never;
             header?: never;
@@ -6946,7 +6946,7 @@ export interface operations {
             };
         };
     };
-    reject_capture: {
+    post_captures_id_reject: {
         parameters: {
             query?: never;
             header?: never;
@@ -6967,7 +6967,7 @@ export interface operations {
             };
         };
     };
-    list_checkins: {
+    get_checkins: {
         parameters: {
             query: {
                 from: string;
@@ -6989,7 +6989,7 @@ export interface operations {
             };
         };
     };
-    get_checkin: {
+    get_checkins_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -7010,7 +7010,7 @@ export interface operations {
             };
         };
     };
-    put_checkin: {
+    put_checkins_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -7051,7 +7051,7 @@ export interface operations {
             };
         };
     };
-    day_view: {
+    get_checkins_date_view: {
         parameters: {
             query?: never;
             header?: never;
@@ -7072,7 +7072,7 @@ export interface operations {
             };
         };
     };
-    list_class_notes: {
+    get_class_notes: {
         parameters: {
             query?: {
                 subject_id?: string | null;
@@ -7095,7 +7095,7 @@ export interface operations {
             };
         };
     };
-    create_class_note: {
+    post_class_notes: {
         parameters: {
             query?: never;
             header?: never;
@@ -7118,7 +7118,7 @@ export interface operations {
             };
         };
     };
-    get_class_note: {
+    get_class_notes_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7139,7 +7139,7 @@ export interface operations {
             };
         };
     };
-    update_class_note: {
+    put_class_notes_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7164,7 +7164,7 @@ export interface operations {
             };
         };
     };
-    add_deliverable: {
+    post_class_notes_id_deliverables: {
         parameters: {
             query?: never;
             header?: never;
@@ -7189,7 +7189,7 @@ export interface operations {
             };
         };
     };
-    list_content: {
+    get_content: {
         parameters: {
             query?: {
                 status?: string | null;
@@ -7212,7 +7212,7 @@ export interface operations {
             };
         };
     };
-    create_content: {
+    post_content: {
         parameters: {
             query?: never;
             header?: never;
@@ -7235,7 +7235,7 @@ export interface operations {
             };
         };
     };
-    content_ai_context: {
+    get_content_ai_context: {
         parameters: {
             query?: never;
             header?: never;
@@ -7254,7 +7254,7 @@ export interface operations {
             };
         };
     };
-    content_board: {
+    get_content_board: {
         parameters: {
             query?: never;
             header?: never;
@@ -7273,7 +7273,7 @@ export interface operations {
             };
         };
     };
-    content_published: {
+    get_content_published: {
         parameters: {
             query?: {
                 /** @description `views` (por defecto) o `retention`. */
@@ -7296,7 +7296,7 @@ export interface operations {
             };
         };
     };
-    get_content: {
+    get_content_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7317,7 +7317,7 @@ export interface operations {
             };
         };
     };
-    update_content: {
+    put_content_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7350,7 +7350,7 @@ export interface operations {
             };
         };
     };
-    dashboard: {
+    get_dashboard: {
         parameters: {
             query?: {
                 /** @description Fecha de referencia (por defecto hoy). */
@@ -7374,7 +7374,7 @@ export interface operations {
             };
         };
     };
-    demo_session: {
+    post_demo_session: {
         parameters: {
             query?: never;
             header?: never;
@@ -7405,7 +7405,7 @@ export interface operations {
             };
         };
     };
-    update_session: {
+    put_devlog_sessions_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7430,7 +7430,7 @@ export interface operations {
             };
         };
     };
-    delete_session: {
+    delete_devlog_sessions_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7449,7 +7449,7 @@ export interface operations {
             };
         };
     };
-    list_devlogs: {
+    get_devlogs: {
         parameters: {
             query?: {
                 from?: string | null;
@@ -7471,7 +7471,7 @@ export interface operations {
             };
         };
     };
-    import_text: {
+    post_devlogs_import: {
         parameters: {
             query?: never;
             header?: never;
@@ -7494,7 +7494,7 @@ export interface operations {
             };
         };
     };
-    preview_import: {
+    post_devlogs_import_preview: {
         parameters: {
             query?: never;
             header?: never;
@@ -7517,7 +7517,7 @@ export interface operations {
             };
         };
     };
-    get_devlog: {
+    get_devlogs_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -7538,7 +7538,7 @@ export interface operations {
             };
         };
     };
-    set_summary: {
+    put_devlogs_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -7563,7 +7563,7 @@ export interface operations {
             };
         };
     };
-    add_session: {
+    post_devlogs_date_sessions: {
         parameters: {
             query?: never;
             header?: never;
@@ -7588,7 +7588,7 @@ export interface operations {
             };
         };
     };
-    list_devotionals: {
+    get_devotionals: {
         parameters: {
             query?: {
                 limit?: number | null;
@@ -7614,7 +7614,7 @@ export interface operations {
             };
         };
     };
-    get_template: {
+    get_devotionals_template: {
         parameters: {
             query?: never;
             header?: never;
@@ -7633,7 +7633,7 @@ export interface operations {
             };
         };
     };
-    get_devotional: {
+    get_devotionals_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -7662,7 +7662,7 @@ export interface operations {
             };
         };
     };
-    put_devotional: {
+    put_devotionals_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -7695,7 +7695,7 @@ export interface operations {
             };
         };
     };
-    delete_devotional: {
+    delete_devotionals_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -7714,7 +7714,7 @@ export interface operations {
             };
         };
     };
-    list_drawings: {
+    get_drawings: {
         parameters: {
             query?: {
                 note_id?: string | null;
@@ -7736,7 +7736,7 @@ export interface operations {
             };
         };
     };
-    create_drawing: {
+    post_drawings: {
         parameters: {
             query?: never;
             header?: never;
@@ -7759,7 +7759,7 @@ export interface operations {
             };
         };
     };
-    get_drawing: {
+    get_drawings_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7780,7 +7780,7 @@ export interface operations {
             };
         };
     };
-    update_drawing: {
+    put_drawings_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7813,7 +7813,7 @@ export interface operations {
             };
         };
     };
-    export_json: {
+    get_exports_json: {
         parameters: {
             query?: never;
             header?: never;
@@ -7832,7 +7832,7 @@ export interface operations {
             };
         };
     };
-    export_zip: {
+    get_exports_zip: {
         parameters: {
             query?: never;
             header?: never;
@@ -7851,7 +7851,7 @@ export interface operations {
             };
         };
     };
-    list_favorites: {
+    get_favorites: {
         parameters: {
             query?: never;
             header?: never;
@@ -7870,7 +7870,7 @@ export interface operations {
             };
         };
     };
-    add_favorite: {
+    put_favorites_entity_type_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7890,7 +7890,7 @@ export interface operations {
             };
         };
     };
-    remove_favorite: {
+    delete_favorites_entity_type_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7910,7 +7910,7 @@ export interface operations {
             };
         };
     };
-    list_accounts: {
+    get_finance_accounts: {
         parameters: {
             query?: {
                 archived?: boolean | null;
@@ -7931,7 +7931,7 @@ export interface operations {
             };
         };
     };
-    create_account: {
+    post_finance_accounts: {
         parameters: {
             query?: never;
             header?: never;
@@ -7954,7 +7954,7 @@ export interface operations {
             };
         };
     };
-    get_account: {
+    get_finance_accounts_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -7975,7 +7975,7 @@ export interface operations {
             };
         };
     };
-    update_account: {
+    put_finance_accounts_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8008,7 +8008,7 @@ export interface operations {
             };
         };
     };
-    list_snapshots: {
+    get_finance_accounts_id_snapshots: {
         parameters: {
             query?: never;
             header?: never;
@@ -8029,7 +8029,7 @@ export interface operations {
             };
         };
     };
-    add_snapshot: {
+    post_finance_accounts_id_snapshots: {
         parameters: {
             query?: never;
             header?: never;
@@ -8054,7 +8054,7 @@ export interface operations {
             };
         };
     };
-    get_budget: {
+    get_finance_budgets_month: {
         parameters: {
             query?: never;
             header?: never;
@@ -8076,7 +8076,7 @@ export interface operations {
             };
         };
     };
-    put_budget: {
+    put_finance_budgets_month: {
         parameters: {
             query?: never;
             header?: never;
@@ -8110,7 +8110,7 @@ export interface operations {
             };
         };
     };
-    card_suggestion: {
+    get_finance_card_suggestion: {
         parameters: {
             query?: {
                 /** @description Fecha local (por defecto, hoy). */
@@ -8134,7 +8134,7 @@ export interface operations {
             };
         };
     };
-    list_categories: {
+    get_finance_categories: {
         parameters: {
             query?: {
                 archived?: boolean | null;
@@ -8155,7 +8155,7 @@ export interface operations {
             };
         };
     };
-    create_category: {
+    post_finance_categories: {
         parameters: {
             query?: never;
             header?: never;
@@ -8178,7 +8178,7 @@ export interface operations {
             };
         };
     };
-    update_category: {
+    put_finance_categories_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8211,7 +8211,7 @@ export interface operations {
             };
         };
     };
-    get_plan: {
+    get_finance_credit_plan: {
         parameters: {
             query?: never;
             header?: never;
@@ -8230,7 +8230,7 @@ export interface operations {
             };
         };
     };
-    put_plan: {
+    put_finance_credit_plan: {
         parameters: {
             query?: never;
             header?: never;
@@ -8261,7 +8261,7 @@ export interface operations {
             };
         };
     };
-    dashboard: {
+    get_finance_dashboard: {
         parameters: {
             query?: {
                 /** @description `YYYY-MM` (por defecto, mes actual). */
@@ -8283,7 +8283,7 @@ export interface operations {
             };
         };
     };
-    list_debts: {
+    get_finance_debts: {
         parameters: {
             query?: never;
             header?: never;
@@ -8302,7 +8302,7 @@ export interface operations {
             };
         };
     };
-    create_debt: {
+    post_finance_debts: {
         parameters: {
             query?: never;
             header?: never;
@@ -8325,7 +8325,7 @@ export interface operations {
             };
         };
     };
-    get_debt: {
+    get_finance_debts_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8346,7 +8346,7 @@ export interface operations {
             };
         };
     };
-    update_debt: {
+    put_finance_debts_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8379,7 +8379,7 @@ export interface operations {
             };
         };
     };
-    project_report: {
+    get_finance_projects_id_report: {
         parameters: {
             query?: {
                 /** @description `YYYY-MM` (por defecto, mes actual). */
@@ -8403,7 +8403,7 @@ export interface operations {
             };
         };
     };
-    list_rules: {
+    get_finance_recurring: {
         parameters: {
             query?: never;
             header?: never;
@@ -8422,7 +8422,7 @@ export interface operations {
             };
         };
     };
-    create_rule: {
+    post_finance_recurring: {
         parameters: {
             query?: never;
             header?: never;
@@ -8445,7 +8445,7 @@ export interface operations {
             };
         };
     };
-    materialize: {
+    post_finance_recurring_materialize: {
         parameters: {
             query?: never;
             header?: never;
@@ -8464,7 +8464,7 @@ export interface operations {
             };
         };
     };
-    occurrences: {
+    get_finance_recurring_occurrences: {
         parameters: {
             query?: {
                 /** @description `YYYY-MM` (por defecto, mes actual). */
@@ -8486,7 +8486,7 @@ export interface operations {
             };
         };
     };
-    get_rule: {
+    get_finance_recurring_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8507,7 +8507,7 @@ export interface operations {
             };
         };
     };
-    update_rule: {
+    put_finance_recurring_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8540,7 +8540,7 @@ export interface operations {
             };
         };
     };
-    list_transactions: {
+    get_finance_transactions: {
         parameters: {
             query?: {
                 from?: string | null;
@@ -8575,7 +8575,7 @@ export interface operations {
             };
         };
     };
-    create_transaction: {
+    post_finance_transactions: {
         parameters: {
             query?: never;
             header?: never;
@@ -8607,7 +8607,7 @@ export interface operations {
             };
         };
     };
-    create_batch: {
+    post_finance_transactions_batch: {
         parameters: {
             query?: never;
             header?: never;
@@ -8638,7 +8638,7 @@ export interface operations {
             };
         };
     };
-    get_transaction: {
+    get_finance_transactions_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8659,7 +8659,7 @@ export interface operations {
             };
         };
     };
-    update_transaction: {
+    put_finance_transactions_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8692,7 +8692,7 @@ export interface operations {
             };
         };
     };
-    confirm_transaction: {
+    post_finance_transactions_id_confirm: {
         parameters: {
             query?: never;
             header?: never;
@@ -8725,7 +8725,7 @@ export interface operations {
             };
         };
     };
-    void_transaction: {
+    post_finance_transactions_id_void: {
         parameters: {
             query?: never;
             header?: never;
@@ -8758,7 +8758,7 @@ export interface operations {
             };
         };
     };
-    list_goals: {
+    get_goals: {
         parameters: {
             query?: {
                 /** @description `month | week` */
@@ -8785,7 +8785,7 @@ export interface operations {
             };
         };
     };
-    create_goal: {
+    post_goals: {
         parameters: {
             query?: never;
             header?: never;
@@ -8808,7 +8808,7 @@ export interface operations {
             };
         };
     };
-    planning: {
+    get_goals_planning: {
         parameters: {
             query?: {
                 /** @description Semana `GGGG-Www`. Por defecto la actual; sábado y domingo, la siguiente. */
@@ -8830,7 +8830,7 @@ export interface operations {
             };
         };
     };
-    get_goal: {
+    get_goals_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8859,7 +8859,7 @@ export interface operations {
             };
         };
     };
-    update_goal: {
+    put_goals_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8892,7 +8892,7 @@ export interface operations {
             };
         };
     };
-    close_goal: {
+    post_goals_id_close: {
         parameters: {
             query?: never;
             header?: never;
@@ -8925,7 +8925,7 @@ export interface operations {
             };
         };
     };
-    add_link: {
+    post_goals_id_links: {
         parameters: {
             query?: never;
             header?: never;
@@ -8950,7 +8950,7 @@ export interface operations {
             };
         };
     };
-    delete_link: {
+    delete_goals_id_links_src_type_src_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -8971,7 +8971,7 @@ export interface operations {
             };
         };
     };
-    add_progress: {
+    post_goals_id_progress: {
         parameters: {
             query?: never;
             header?: never;
@@ -8996,7 +8996,7 @@ export interface operations {
             };
         };
     };
-    delete_progress: {
+    delete_goals_id_progress_event_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -9016,7 +9016,7 @@ export interface operations {
             };
         };
     };
-    list_links: {
+    get_habit_links: {
         parameters: {
             query?: never;
             header?: never;
@@ -9035,7 +9035,7 @@ export interface operations {
             };
         };
     };
-    set_link: {
+    put_habit_links_trigger: {
         parameters: {
             query?: never;
             header?: never;
@@ -9060,7 +9060,7 @@ export interface operations {
             };
         };
     };
-    delete_link: {
+    delete_habit_links_trigger: {
         parameters: {
             query?: never;
             header?: never;
@@ -9079,7 +9079,7 @@ export interface operations {
             };
         };
     };
-    list_habits: {
+    get_habits: {
         parameters: {
             query?: {
                 /** @description Fecha de referencia (por defecto hoy en la zona del usuario). */
@@ -9102,7 +9102,7 @@ export interface operations {
             };
         };
     };
-    create_habit: {
+    post_habits: {
         parameters: {
             query?: never;
             header?: never;
@@ -9125,7 +9125,7 @@ export interface operations {
             };
         };
     };
-    setup_fixed_habits: {
+    post_habits_fixed: {
         parameters: {
             query?: never;
             header?: never;
@@ -9148,7 +9148,7 @@ export interface operations {
             };
         };
     };
-    habit_history: {
+    get_habits_history: {
         parameters: {
             query?: {
                 from?: string | null;
@@ -9170,7 +9170,7 @@ export interface operations {
             };
         };
     };
-    get_habit: {
+    get_habits_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -9199,7 +9199,7 @@ export interface operations {
             };
         };
     };
-    update_habit: {
+    put_habits_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -9232,7 +9232,7 @@ export interface operations {
             };
         };
     };
-    put_entry: {
+    put_habits_id_entries_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -9266,7 +9266,7 @@ export interface operations {
             };
         };
     };
-    delete_entry: {
+    delete_habits_id_entries_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -9286,7 +9286,7 @@ export interface operations {
             };
         };
     };
-    add_pause: {
+    post_habits_id_pauses: {
         parameters: {
             query?: never;
             header?: never;
@@ -9311,7 +9311,7 @@ export interface operations {
             };
         };
     };
-    delete_pause: {
+    delete_habits_id_pauses_pause_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -9331,7 +9331,7 @@ export interface operations {
             };
         };
     };
-    add_version: {
+    post_habits_id_versions: {
         parameters: {
             query?: never;
             header?: never;
@@ -9356,7 +9356,7 @@ export interface operations {
             };
         };
     };
-    list_runs: {
+    get_imports: {
         parameters: {
             query?: never;
             header?: never;
@@ -9375,7 +9375,7 @@ export interface operations {
             };
         };
     };
-    upload_zip: {
+    post_imports: {
         parameters: {
             query?: {
                 /** @description Nombre del archivo para mostrar. */
@@ -9409,7 +9409,7 @@ export interface operations {
             };
         };
     };
-    upload_folder: {
+    post_imports_folder: {
         parameters: {
             query?: never;
             header?: never;
@@ -9440,7 +9440,7 @@ export interface operations {
             };
         };
     };
-    get_run: {
+    get_imports_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -9461,7 +9461,7 @@ export interface operations {
             };
         };
     };
-    apply_run: {
+    post_imports_id_apply: {
         parameters: {
             query?: never;
             header?: never;
@@ -9490,7 +9490,7 @@ export interface operations {
             };
         };
     };
-    list_inbox: {
+    get_inbox: {
         parameters: {
             query?: {
                 /** @description `pending` (por defecto), `processed`, `discarded`, `archived`, `all`. */
@@ -9512,7 +9512,7 @@ export interface operations {
             };
         };
     };
-    capture: {
+    post_inbox: {
         parameters: {
             query?: never;
             header?: never;
@@ -9543,7 +9543,7 @@ export interface operations {
             };
         };
     };
-    edit_item: {
+    put_inbox_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -9576,7 +9576,7 @@ export interface operations {
             };
         };
     };
-    apply: {
+    post_inbox_id_apply: {
         parameters: {
             query?: never;
             header?: never;
@@ -9609,7 +9609,7 @@ export interface operations {
             };
         };
     };
-    propose: {
+    post_inbox_id_propose: {
         parameters: {
             query?: never;
             header?: never;
@@ -9630,7 +9630,7 @@ export interface operations {
             };
         };
     };
-    reopen: {
+    post_inbox_id_reopen: {
         parameters: {
             query?: never;
             header?: never;
@@ -9651,7 +9651,7 @@ export interface operations {
             };
         };
     };
-    overview: {
+    get_integrations: {
         parameters: {
             query?: never;
             header?: never;
@@ -9670,7 +9670,7 @@ export interface operations {
             };
         };
     };
-    clickup_connect: {
+    put_integrations_clickup: {
         parameters: {
             query?: never;
             header?: never;
@@ -9693,7 +9693,7 @@ export interface operations {
             };
         };
     };
-    clickup_disconnect: {
+    delete_integrations_clickup: {
         parameters: {
             query?: never;
             header?: never;
@@ -9710,7 +9710,7 @@ export interface operations {
             };
         };
     };
-    clickup_sync: {
+    post_integrations_clickup_sync: {
         parameters: {
             query?: never;
             header?: never;
@@ -9729,7 +9729,7 @@ export interface operations {
             };
         };
     };
-    clickup_tasks: {
+    get_integrations_clickup_tasks: {
         parameters: {
             query?: never;
             header?: never;
@@ -9748,7 +9748,7 @@ export interface operations {
             };
         };
     };
-    google_disconnect: {
+    delete_integrations_google: {
         parameters: {
             query?: never;
             header?: never;
@@ -9765,7 +9765,7 @@ export interface operations {
             };
         };
     };
-    google_calendars: {
+    get_integrations_google_calendars: {
         parameters: {
             query?: never;
             header?: never;
@@ -9784,7 +9784,7 @@ export interface operations {
             };
         };
     };
-    google_callback: {
+    get_integrations_google_callback: {
         parameters: {
             query?: {
                 code?: string | null;
@@ -9805,7 +9805,7 @@ export interface operations {
             };
         };
     };
-    google_config: {
+    put_integrations_google_config: {
         parameters: {
             query?: never;
             header?: never;
@@ -9836,7 +9836,7 @@ export interface operations {
             };
         };
     };
-    google_connect: {
+    get_integrations_google_connect: {
         parameters: {
             query?: {
                 redirect_to?: string | null;
@@ -9857,7 +9857,7 @@ export interface operations {
             };
         };
     };
-    google_sync: {
+    post_integrations_google_sync: {
         parameters: {
             query?: never;
             header?: never;
@@ -9880,7 +9880,7 @@ export interface operations {
             };
         };
     };
-    suggestions: {
+    get_integrations_suggestions: {
         parameters: {
             query?: never;
             header?: never;
@@ -9899,7 +9899,7 @@ export interface operations {
             };
         };
     };
-    accept_interaction: {
+    post_integrations_suggestions_interactions_id_accept: {
         parameters: {
             query?: never;
             header?: never;
@@ -9924,7 +9924,7 @@ export interface operations {
             };
         };
     };
-    dismiss_interaction: {
+    post_integrations_suggestions_interactions_id_dismiss: {
         parameters: {
             query?: never;
             header?: never;
@@ -9943,7 +9943,7 @@ export interface operations {
             };
         };
     };
-    accept_person: {
+    post_integrations_suggestions_people_id_accept: {
         parameters: {
             query?: never;
             header?: never;
@@ -9966,7 +9966,7 @@ export interface operations {
             };
         };
     };
-    dismiss_person: {
+    post_integrations_suggestions_people_id_dismiss: {
         parameters: {
             query?: never;
             header?: never;
@@ -9985,7 +9985,7 @@ export interface operations {
             };
         };
     };
-    list_interactions: {
+    get_interactions: {
         parameters: {
             query?: {
                 /** @description Fecha (sección "Personas" de la daily). */
@@ -10008,7 +10008,7 @@ export interface operations {
             };
         };
     };
-    delete_interaction: {
+    delete_interactions_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10049,7 +10049,7 @@ export interface operations {
             };
         };
     };
-    add_link: {
+    post_links: {
         parameters: {
             query?: never;
             header?: never;
@@ -10078,7 +10078,7 @@ export interface operations {
             };
         };
     };
-    remove_link: {
+    delete_links: {
         parameters: {
             query?: never;
             header?: never;
@@ -10099,7 +10099,7 @@ export interface operations {
             };
         };
     };
-    me: {
+    get_me: {
         parameters: {
             query?: never;
             header?: never;
@@ -10126,7 +10126,7 @@ export interface operations {
             };
         };
     };
-    list_notes: {
+    get_notes: {
         parameters: {
             query?: {
                 kind?: string | null;
@@ -10155,7 +10155,7 @@ export interface operations {
             };
         };
     };
-    create_note: {
+    post_notes: {
         parameters: {
             query?: never;
             header?: never;
@@ -10178,7 +10178,7 @@ export interface operations {
             };
         };
     };
-    get_note: {
+    get_notes_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10199,7 +10199,7 @@ export interface operations {
             };
         };
     };
-    update_note: {
+    put_notes_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10232,7 +10232,7 @@ export interface operations {
             };
         };
     };
-    list_people: {
+    get_people: {
         parameters: {
             query?: {
                 /** @description Nombre o alias (sin acentos). */
@@ -10256,7 +10256,7 @@ export interface operations {
             };
         };
     };
-    create_person: {
+    post_people: {
         parameters: {
             query?: never;
             header?: never;
@@ -10279,7 +10279,7 @@ export interface operations {
             };
         };
     };
-    upcoming_birthdays: {
+    get_people_birthdays: {
         parameters: {
             query?: {
                 /** @description Ventana en días (por defecto 30). */
@@ -10301,7 +10301,7 @@ export interface operations {
             };
         };
     };
-    people_by_area: {
+    get_people_by_area: {
         parameters: {
             query?: never;
             header?: never;
@@ -10320,7 +10320,7 @@ export interface operations {
             };
         };
     };
-    resolve_people: {
+    get_people_resolve: {
         parameters: {
             query: {
                 /** @description Nombre, nombre de pila o alias exacto (ej. "Juancho"). */
@@ -10342,7 +10342,7 @@ export interface operations {
             };
         };
     };
-    get_person: {
+    get_people_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10363,7 +10363,7 @@ export interface operations {
             };
         };
     };
-    update_person: {
+    put_people_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10396,7 +10396,7 @@ export interface operations {
             };
         };
     };
-    add_interaction: {
+    post_people_id_interactions: {
         parameters: {
             query?: never;
             header?: never;
@@ -10421,7 +10421,7 @@ export interface operations {
             };
         };
     };
-    add_note: {
+    post_people_id_notes: {
         parameters: {
             query?: never;
             header?: never;
@@ -10446,7 +10446,7 @@ export interface operations {
             };
         };
     };
-    delete_note: {
+    delete_people_id_notes_note_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10466,7 +10466,7 @@ export interface operations {
             };
         };
     };
-    list_suggestions: {
+    get_person_suggestions: {
         parameters: {
             query?: {
                 /** @description `pending` (por defecto), `accepted`, `dismissed`. */
@@ -10488,7 +10488,7 @@ export interface operations {
             };
         };
     };
-    create_suggestion: {
+    post_person_suggestions: {
         parameters: {
             query?: never;
             header?: never;
@@ -10511,7 +10511,7 @@ export interface operations {
             };
         };
     };
-    accept_suggestion: {
+    post_person_suggestions_id_accept: {
         parameters: {
             query?: never;
             header?: never;
@@ -10536,7 +10536,7 @@ export interface operations {
             };
         };
     };
-    dismiss_suggestion: {
+    post_person_suggestions_id_dismiss: {
         parameters: {
             query?: never;
             header?: never;
@@ -10555,7 +10555,7 @@ export interface operations {
             };
         };
     };
-    list_projects: {
+    get_projects: {
         parameters: {
             query?: {
                 area_id?: string | null;
@@ -10577,7 +10577,7 @@ export interface operations {
             };
         };
     };
-    create_project: {
+    post_projects: {
         parameters: {
             query?: never;
             header?: never;
@@ -10600,7 +10600,7 @@ export interface operations {
             };
         };
     };
-    get_project: {
+    get_projects_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10621,7 +10621,7 @@ export interface operations {
             };
         };
     };
-    update_project: {
+    put_projects_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10654,7 +10654,7 @@ export interface operations {
             };
         };
     };
-    project_activity: {
+    get_projects_id_activity: {
         parameters: {
             query?: never;
             header?: never;
@@ -10675,7 +10675,7 @@ export interface operations {
             };
         };
     };
-    list_readings: {
+    get_readings: {
         parameters: {
             query?: {
                 /** @description `want | reading | finished | abandoned` */
@@ -10699,7 +10699,7 @@ export interface operations {
             };
         };
     };
-    create_reading: {
+    post_readings: {
         parameters: {
             query?: never;
             header?: never;
@@ -10722,7 +10722,7 @@ export interface operations {
             };
         };
     };
-    get_reading: {
+    get_readings_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10743,7 +10743,7 @@ export interface operations {
             };
         };
     };
-    update_reading: {
+    put_readings_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10776,7 +10776,7 @@ export interface operations {
             };
         };
     };
-    delete_reading: {
+    delete_readings_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -10795,7 +10795,7 @@ export interface operations {
             };
         };
     };
-    status: {
+    get_reminders: {
         parameters: {
             query?: never;
             header?: never;
@@ -10814,7 +10814,7 @@ export interface operations {
             };
         };
     };
-    pause: {
+    post_reminders_pause: {
         parameters: {
             query?: never;
             header?: never;
@@ -10837,7 +10837,7 @@ export interface operations {
             };
         };
     };
-    resume: {
+    post_reminders_resume: {
         parameters: {
             query?: never;
             header?: never;
@@ -10856,7 +10856,7 @@ export interface operations {
             };
         };
     };
-    search: {
+    get_search: {
         parameters: {
             query: {
                 /** @description Texto a buscar (sin importar acentos ni mayúsculas; admite prefijos). */
@@ -10906,7 +10906,7 @@ export interface operations {
             };
         };
     };
-    update_settings: {
+    put_settings: {
         parameters: {
             query?: never;
             header?: never;
@@ -10937,7 +10937,7 @@ export interface operations {
             };
         };
     };
-    list_subjects: {
+    get_subjects: {
         parameters: {
             query?: {
                 archived?: boolean | null;
@@ -10958,7 +10958,7 @@ export interface operations {
             };
         };
     };
-    create_subject: {
+    post_subjects: {
         parameters: {
             query?: never;
             header?: never;
@@ -10981,7 +10981,7 @@ export interface operations {
             };
         };
     };
-    update_subject: {
+    put_subjects_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -11006,7 +11006,7 @@ export interface operations {
             };
         };
     };
-    list_swipe: {
+    get_swipe: {
         parameters: {
             query?: {
                 tag?: string | null;
@@ -11029,7 +11029,7 @@ export interface operations {
             };
         };
     };
-    create_swipe: {
+    post_swipe: {
         parameters: {
             query?: never;
             header?: never;
@@ -11052,7 +11052,7 @@ export interface operations {
             };
         };
     };
-    get_swipe: {
+    get_swipe_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -11073,7 +11073,7 @@ export interface operations {
             };
         };
     };
-    update_swipe: {
+    put_swipe_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -11098,7 +11098,7 @@ export interface operations {
             };
         };
     };
-    list_tags: {
+    get_tags: {
         parameters: {
             query?: never;
             header?: never;
@@ -11117,7 +11117,7 @@ export interface operations {
             };
         };
     };
-    list_rules: {
+    get_task_recurrences: {
         parameters: {
             query?: never;
             header?: never;
@@ -11136,7 +11136,7 @@ export interface operations {
             };
         };
     };
-    create_rule: {
+    post_task_recurrences: {
         parameters: {
             query?: never;
             header?: never;
@@ -11159,7 +11159,7 @@ export interface operations {
             };
         };
     };
-    materialize_rules: {
+    post_task_recurrences_materialize: {
         parameters: {
             query?: never;
             header?: never;
@@ -11178,7 +11178,7 @@ export interface operations {
             };
         };
     };
-    update_rule: {
+    put_task_recurrences_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -11203,7 +11203,7 @@ export interface operations {
             };
         };
     };
-    list_tasks: {
+    get_tasks: {
         parameters: {
             query?: {
                 /** @description `open | done | cancelled` */
@@ -11236,7 +11236,7 @@ export interface operations {
             };
         };
     };
-    create_task: {
+    post_tasks: {
         parameters: {
             query?: never;
             header?: never;
@@ -11259,7 +11259,7 @@ export interface operations {
             };
         };
     };
-    carry_over: {
+    post_tasks_carry_over: {
         parameters: {
             query?: never;
             header?: never;
@@ -11282,7 +11282,7 @@ export interface operations {
             };
         };
     };
-    tasks_for_day: {
+    get_tasks_day_date: {
         parameters: {
             query?: never;
             header?: never;
@@ -11303,7 +11303,7 @@ export interface operations {
             };
         };
     };
-    get_task: {
+    get_tasks_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -11332,7 +11332,7 @@ export interface operations {
             };
         };
     };
-    update_task: {
+    put_tasks_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -11365,7 +11365,7 @@ export interface operations {
             };
         };
     };
-    archive_task: {
+    delete_tasks_id: {
         parameters: {
             query?: never;
             header?: never;
@@ -11384,7 +11384,7 @@ export interface operations {
             };
         };
     };
-    cancel_task: {
+    post_tasks_id_cancel: {
         parameters: {
             query?: never;
             header?: never;
@@ -11409,7 +11409,7 @@ export interface operations {
             };
         };
     };
-    complete_task: {
+    post_tasks_id_complete: {
         parameters: {
             query?: never;
             header?: never;
@@ -11434,7 +11434,7 @@ export interface operations {
             };
         };
     };
-    reopen_task: {
+    post_tasks_id_reopen: {
         parameters: {
             query?: never;
             header?: never;
@@ -11459,7 +11459,7 @@ export interface operations {
             };
         };
     };
-    projects_view: {
+    get_views_projects: {
         parameters: {
             query?: never;
             header?: never;
@@ -11478,7 +11478,7 @@ export interface operations {
             };
         };
     };
-    list_reviews: {
+    get_weekly_reviews: {
         parameters: {
             query?: never;
             header?: never;
@@ -11497,7 +11497,7 @@ export interface operations {
             };
         };
     };
-    get_review: {
+    get_weekly_reviews_iso_week: {
         parameters: {
             query?: never;
             header?: never;
@@ -11518,7 +11518,7 @@ export interface operations {
             };
         };
     };
-    put_review: {
+    put_weekly_reviews_iso_week: {
         parameters: {
             query?: never;
             header?: never;
@@ -11551,7 +11551,7 @@ export interface operations {
             };
         };
     };
-    summary: {
+    get_weekly_reviews_iso_week_summary: {
         parameters: {
             query?: never;
             header?: never;
