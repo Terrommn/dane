@@ -264,7 +264,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Arrastre conserva ID; recurrentes 29–31/último/penúltimo",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T25",
@@ -275,7 +275,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Propuesta y confirmación antes de mover",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T26",
@@ -298,7 +298,7 @@
       ],
       "status": "in_progress",
       "acceptance": "CRUD, días sin hablar, sugerencias sin crear",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T28",
@@ -331,7 +331,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Pipeline, tabla/kanban/publicados",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T31",
@@ -342,7 +342,7 @@
       ],
       "status": "in_progress",
       "acceptance": "CRUD con URL validada",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T32",
@@ -353,7 +353,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Materias, clases y entregas como tareas",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T33",
@@ -364,7 +364,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Devlog con sesiones, ADR numerado, importar texto",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T34",
@@ -375,7 +375,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Búsqueda sin acentos, backlinks, favoritos, archivados, vistas Bases",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T35",
@@ -386,7 +386,7 @@
       ],
       "status": "in_progress",
       "acceptance": "Excalidraw lazy, guardado y enlace a nota",
-      "evidence": ""
+      "evidence": "Agente B (backend): tests modules_tasks(6), modules_people_inbox(3), modules_knowledge(6), modules_content_dev_school(5); UI en fase 2 web"
     },
     {
       "id": "T36",
