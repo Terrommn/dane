@@ -1,0 +1,51 @@
+filters:
+  and:
+    - file.inFolder("Contenido")
+    - file.ext == "md"
+formulas:
+  dias_para_publicar: if(fecha_pub, (date(fecha_pub) - today()).days, "")
+properties:
+  estado:
+    displayName: Estado
+  fecha_pub:
+    displayName: Publicación
+  formula.dias_para_publicar:
+    displayName: Días
+views:
+  - type: table
+    name: Pipeline
+    groupBy:
+      property: estado
+      direction: ASC
+    order:
+      - file.name
+      - estado
+      - formato
+      - plataforma
+      - hook
+      - fecha_pub
+      - formula.dias_para_publicar
+    sort:
+      - property: fecha_pub
+        direction: ASC
+  - type: cards
+    name: Tarjetas
+    groupBy:
+      property: estado
+      direction: ASC
+    order:
+      - file.name
+      - hook
+      - fecha_pub
+  - type: table
+    name: Publicados y métricas
+    filters: estado == "publicado"
+    order:
+      - file.name
+      - fecha_pub
+      - plataforma
+      - views
+      - retencion
+    sort:
+      - property: views
+        direction: DESC

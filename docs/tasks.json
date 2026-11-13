@@ -1,0 +1,745 @@
+{
+  "tasks": [
+    {
+      "id": "T01",
+      "title": "Inspeccionar repositorio, instrucciones y ZIP completo",
+      "owner": "lead",
+      "deps": [],
+      "status": "completed",
+      "acceptance": "Inventario en VAULT_REQUIREMENTS.md",
+      "evidence": "Lectura completa del ZIP (ver VAULT_REQUIREMENTS.md §Inventario)"
+    },
+    {
+      "id": "T02",
+      "title": "Construir matriz de requisitos y diferencias/correcciones frente al vault",
+      "owner": "lead",
+      "deps": [
+        "T01"
+      ],
+      "status": "completed",
+      "acceptance": "Matriz fuente→comportamiento→entidad/API/pantalla→tarea→prueba y correcciones C1–C14",
+      "evidence": "docs/VAULT_REQUIREMENTS.md"
+    },
+    {
+      "id": "T03",
+      "title": "Registrar arquitectura, decisiones, fases, dependencias y DoD",
+      "owner": "lead",
+      "deps": [
+        "T02"
+      ],
+      "status": "completed",
+      "acceptance": "ARCHITECTURE.md, DATA_MODEL.md, DECISIONS.md",
+      "evidence": "docs/ARCHITECTURE.md, docs/DATA_MODEL.md, docs/DECISIONS.md (D-001..D-024)"
+    },
+    {
+      "id": "T04",
+      "title": "Crear lista de tareas y espejo TASKS.md; responsables",
+      "owner": "lead",
+      "deps": [
+        "T03"
+      ],
+      "status": "completed",
+      "acceptance": "66 tareas en TaskCreate y TASKS.md generado",
+      "evidence": "TaskCreate #1–#66 (=T01–T66); docs/TASKS.md generado por scripts/tasks.mjs"
+    },
+    {
+      "id": "T05",
+      "title": "Crear Cargo/pnpm workspaces y estructura del monorepo",
+      "owner": "lead",
+      "deps": [
+        "T04"
+      ],
+      "status": "pending",
+      "acceptance": "cargo build --workspace y pnpm install OK",
+      "evidence": ""
+    },
+    {
+      "id": "T06",
+      "title": "Configurar toolchains, dependencias, lockfiles, formato y lints",
+      "owner": "lead",
+      "deps": [
+        "T05"
+      ],
+      "status": "pending",
+      "acceptance": "rustfmt, clippy -D warnings, Biome, tsc strict pasan; lockfiles versionados",
+      "evidence": ""
+    },
+    {
+      "id": "T07",
+      "title": "Preparar Compose, PostgreSQL, variables y comando de arranque local",
+      "owner": "lead",
+      "deps": [
+        "T05"
+      ],
+      "status": "pending",
+      "acceptance": "pnpm dev levanta BD, server, bot y web; .env.example documentado; validación al arrancar",
+      "evidence": ""
+    },
+    {
+      "id": "T08",
+      "title": "Diseñar entidades, constraints, ownership, índices y migraciones",
+      "owner": "lead",
+      "deps": [
+        "T03",
+        "T07"
+      ],
+      "status": "completed",
+      "acceptance": "Migraciones aplican en BD limpia; FKs compuestas de ownership probadas",
+      "evidence": "6 migraciones (62 tablas) aplicadas en BD limpia; FK compuesta rechaza cruce de dueños y búsqueda unaccent verificada (psql); pruebas sqlx en T59"
+    },
+    {
+      "id": "T09",
+      "title": "Implementar API base, validación, errores y OpenAPI/cliente generado",
+      "owner": "lead",
+      "deps": [
+        "T08"
+      ],
+      "status": "pending",
+      "acceptance": "/api/v1 con errores consistentes; openapi.json y packages/api-client generados y verificados",
+      "evidence": ""
+    },
+    {
+      "id": "T10",
+      "title": "Implementar zona horaria, fechas civiles, periodos ISO y reloj de pruebas",
+      "owner": "lead",
+      "deps": [
+        "T05"
+      ],
+      "status": "pending",
+      "acceptance": "Tests ISO cruzando año, DST, medianoche y cambio de zona",
+      "evidence": ""
+    },
+    {
+      "id": "T11",
+      "title": "Implementar auth Mini App y sesiones",
+      "owner": "lead",
+      "deps": [
+        "T09"
+      ],
+      "status": "pending",
+      "acceptance": "Tests firma inválida, initData vencido, sesión revocable",
+      "evidence": ""
+    },
+    {
+      "id": "T12",
+      "title": "Implementar Telegram Login OIDC y vinculación de identidad PWA",
+      "owner": "lead",
+      "deps": [
+        "T11"
+      ],
+      "status": "pending",
+      "acceptance": "Tests state/nonce/iss/aud/exp/firma inválidos; misma identidad en ambas superficies",
+      "evidence": ""
+    },
+    {
+      "id": "T13",
+      "title": "Implementar allowlist, autorización, CSRF y aislamiento de usuarios",
+      "owner": "lead",
+      "deps": [
+        "T11"
+      ],
+      "status": "pending",
+      "acceptance": "Tests allowlist, CSRF y acceso cruzado entre dos usuarios",
+      "evidence": ""
+    },
+    {
+      "id": "T14",
+      "title": "Crear shell frontend, componentes base y adaptación Telegram",
+      "owner": "frontend",
+      "deps": [
+        "T09"
+      ],
+      "status": "pending",
+      "acceptance": "Shell navegable, componentes accesibles, adaptador Telegram con detección",
+      "evidence": ""
+    },
+    {
+      "id": "T15",
+      "title": "Implementar onboarding y preferencias",
+      "owner": "frontend",
+      "deps": [
+        "T14",
+        "T19"
+      ],
+      "status": "pending",
+      "acceptance": "Onboarding completo con ejemplos editables; ajustes persistidos",
+      "evidence": ""
+    },
+    {
+      "id": "T16",
+      "title": "Implementar áreas/proyectos y relaciones",
+      "owner": "backend",
+      "deps": [
+        "T09"
+      ],
+      "status": "pending",
+      "acceptance": "CRUD API+UI, actividad reciente, renombrar conserva IDs",
+      "evidence": ""
+    },
+    {
+      "id": "T17",
+      "title": "Implementar objetivos mensuales/semanales y planificación",
+      "owner": "backend",
+      "deps": [
+        "T16"
+      ],
+      "status": "pending",
+      "acceptance": "CRUD, relación semana→mes, avisos de carga, cierre",
+      "evidence": ""
+    },
+    {
+      "id": "T18",
+      "title": "Implementar progreso cuantitativo, unidades, eventos y fuentes",
+      "owner": "backend",
+      "deps": [
+        "T17"
+      ],
+      "status": "pending",
+      "acceptance": "Acumulativo/valor actual/hito; sin doble conteo",
+      "evidence": ""
+    },
+    {
+      "id": "T19",
+      "title": "Implementar hábitos, frecuencias, ocurrencias e historial",
+      "owner": "backend",
+      "deps": [
+        "T10",
+        "T17"
+      ],
+      "status": "pending",
+      "acceptance": "Versiones, frecuencias, estados y pausas probados",
+      "evidence": ""
+    },
+    {
+      "id": "T20",
+      "title": "Implementar daily completa, guardado parcial y edición histórica",
+      "owner": "backend+frontend",
+      "deps": [
+        "T19"
+      ],
+      "status": "pending",
+      "acceptance": "Check-in único por fecha; todas las secciones; vínculos explícitos",
+      "evidence": ""
+    },
+    {
+      "id": "T21",
+      "title": "Implementar control de concurrencia e idempotencia de mutaciones",
+      "owner": "backend",
+      "deps": [
+        "T09"
+      ],
+      "status": "pending",
+      "acceptance": "409 por versión; Idempotency-Key repetida devuelve misma respuesta",
+      "evidence": ""
+    },
+    {
+      "id": "T22",
+      "title": "Implementar cumplimiento, rachas, ritmo y proyecciones",
+      "owner": "backend",
+      "deps": [
+        "T19"
+      ],
+      "status": "pending",
+      "acceptance": "Funciones de dominio documentadas y probadas",
+      "evidence": ""
+    },
+    {
+      "id": "T23",
+      "title": "Implementar dashboard general y comparaciones temporales",
+      "owner": "backend+frontend",
+      "deps": [
+        "T22",
+        "T43"
+      ],
+      "status": "pending",
+      "acceptance": "Dashboard con todas las métricas y enlaces a fuentes",
+      "evidence": ""
+    },
+    {
+      "id": "T24",
+      "title": "Implementar tareas, arrastre y recurrencias",
+      "owner": "backend",
+      "deps": [
+        "T16"
+      ],
+      "status": "pending",
+      "acceptance": "Arrastre conserva ID; recurrentes 29–31/último/penúltimo",
+      "evidence": ""
+    },
+    {
+      "id": "T25",
+      "title": "Implementar Inbox, clasificación y procesamiento revisable",
+      "owner": "backend",
+      "deps": [
+        "T24"
+      ],
+      "status": "pending",
+      "acceptance": "Propuesta y confirmación antes de mover",
+      "evidence": ""
+    },
+    {
+      "id": "T26",
+      "title": "Implementar weekly review, paz, prioridades y cierre de objetivos",
+      "owner": "backend+frontend",
+      "deps": [
+        "T17",
+        "T20"
+      ],
+      "status": "pending",
+      "acceptance": "Resumen automático editable, paz 1–5, cierre separado",
+      "evidence": ""
+    },
+    {
+      "id": "T27",
+      "title": "Implementar personas, alias, cumpleaños e interacciones",
+      "owner": "backend",
+      "deps": [
+        "T16"
+      ],
+      "status": "pending",
+      "acceptance": "CRUD, días sin hablar, sugerencias sin crear",
+      "evidence": ""
+    },
+    {
+      "id": "T28",
+      "title": "Implementar devocionales/reflexión y vínculos con hábitos",
+      "owner": "backend",
+      "deps": [
+        "T19"
+      ],
+      "status": "pending",
+      "acceptance": "Contenido real completa hábito; módulo desactivable",
+      "evidence": ""
+    },
+    {
+      "id": "T29",
+      "title": "Implementar lecturas y relación con objetivos",
+      "owner": "backend",
+      "deps": [
+        "T18"
+      ],
+      "status": "pending",
+      "acceptance": "Terminar lectura aporta una vez a meta de libros",
+      "evidence": ""
+    },
+    {
+      "id": "T30",
+      "title": "Implementar contenido, hooks, guion, shot list, pipeline y métricas",
+      "owner": "backend",
+      "deps": [
+        "T16"
+      ],
+      "status": "pending",
+      "acceptance": "Pipeline, tabla/kanban/publicados",
+      "evidence": ""
+    },
+    {
+      "id": "T31",
+      "title": "Implementar Swipe y enlaces a medios",
+      "owner": "backend",
+      "deps": [
+        "T30"
+      ],
+      "status": "pending",
+      "acceptance": "CRUD con URL validada",
+      "evidence": ""
+    },
+    {
+      "id": "T32",
+      "title": "Implementar materias, notas de clase y entregas",
+      "owner": "backend",
+      "deps": [
+        "T24"
+      ],
+      "status": "pending",
+      "acceptance": "Materias, clases y entregas como tareas",
+      "evidence": ""
+    },
+    {
+      "id": "T33",
+      "title": "Implementar devlogs/sesiones, ADRs, runbooks, TILs y snippets",
+      "owner": "backend",
+      "deps": [
+        "T16"
+      ],
+      "status": "pending",
+      "acceptance": "Devlog con sesiones, ADR numerado, importar texto",
+      "evidence": ""
+    },
+    {
+      "id": "T34",
+      "title": "Implementar editor Markdown, búsqueda, tags, backlinks y favoritos",
+      "owner": "backend+frontend",
+      "deps": [
+        "T16"
+      ],
+      "status": "pending",
+      "acceptance": "Búsqueda sin acentos, backlinks, favoritos, archivados, vistas Bases",
+      "evidence": ""
+    },
+    {
+      "id": "T35",
+      "title": "Implementar notas visuales básicas y su persistencia",
+      "owner": "frontend",
+      "deps": [
+        "T34"
+      ],
+      "status": "pending",
+      "acceptance": "Excalidraw lazy, guardado y enlace a nota",
+      "evidence": ""
+    },
+    {
+      "id": "T36",
+      "title": "Implementar catálogo financiero y movimientos con dinero exacto",
+      "owner": "finance",
+      "deps": [
+        "T08"
+      ],
+      "status": "pending",
+      "acceptance": "Centavos, categorías editables, idempotencia",
+      "evidence": ""
+    },
+    {
+      "id": "T37",
+      "title": "Implementar cuentas, tarjetas, snapshots y conciliación",
+      "owner": "finance",
+      "deps": [
+        "T36"
+      ],
+      "status": "pending",
+      "acceptance": "Saldo estimado con reglas y semántica legacy probadas",
+      "evidence": ""
+    },
+    {
+      "id": "T38",
+      "title": "Implementar gastos, ingresos y vistas históricas",
+      "owner": "finance",
+      "deps": [
+        "T36"
+      ],
+      "status": "pending",
+      "acceptance": "Captura individual/múltiple, filtros, FX explícito",
+      "evidence": ""
+    },
+    {
+      "id": "T39",
+      "title": "Implementar presupuestos por mes/categoría/proyecto/rubro",
+      "owner": "finance",
+      "deps": [
+        "T38"
+      ],
+      "status": "pending",
+      "acceptance": "Snapshot mensual y rubros",
+      "evidence": ""
+    },
+    {
+      "id": "T40",
+      "title": "Implementar suscripciones, ingresos fijos y ocurrencias idempotentes",
+      "owner": "finance",
+      "deps": [
+        "T38"
+      ],
+      "status": "pending",
+      "acceptance": "UNIQUE por periodo, conciliación, catch-up",
+      "evidence": ""
+    },
+    {
+      "id": "T41",
+      "title": "Implementar deudas, pagos, transferencias y vínculos con metas",
+      "owner": "finance",
+      "deps": [
+        "T37"
+      ],
+      "status": "pending",
+      "acceptance": "Sin doble conteo; hito al saldar",
+      "evidence": ""
+    },
+    {
+      "id": "T42",
+      "title": "Implementar plan de crédito y sugerencia explicable de tarjeta",
+      "owner": "finance",
+      "deps": [
+        "T41"
+      ],
+      "status": "pending",
+      "acceptance": "Reglas D-022 probadas",
+      "evidence": ""
+    },
+    {
+      "id": "T43",
+      "title": "Implementar dashboard financiero, proyecciones e histórico",
+      "owner": "finance",
+      "deps": [
+        "T39",
+        "T40",
+        "T41"
+      ],
+      "status": "pending",
+      "acceptance": "Métricas separadas y corrección del neto",
+      "evidence": ""
+    },
+    {
+      "id": "T44",
+      "title": "Crear servicio bot Rust y cliente de API interna",
+      "owner": "bot",
+      "deps": [
+        "T09"
+      ],
+      "status": "pending",
+      "acceptance": "Bot compila y se comunica solo por API interna",
+      "evidence": ""
+    },
+    {
+      "id": "T45",
+      "title": "Implementar /start, comandos, menús y enlaces a Mini App",
+      "owner": "bot",
+      "deps": [
+        "T44"
+      ],
+      "status": "pending",
+      "acceptance": "14 comandos y botones web_app con fecha",
+      "evidence": ""
+    },
+    {
+      "id": "T46",
+      "title": "Implementar polling/webhook seguro e ingestión durable de updates",
+      "owner": "bot+backend",
+      "deps": [
+        "T44"
+      ],
+      "status": "pending",
+      "acceptance": "Durabilidad y dedupe probados",
+      "evidence": ""
+    },
+    {
+      "id": "T47",
+      "title": "Implementar scheduler/outbox, claims, leases, ack y recuperación",
+      "owner": "backend",
+      "deps": [
+        "T08"
+      ],
+      "status": "pending",
+      "acceptance": "Dos workers, lease vencido, ack obsoleto, 429",
+      "evidence": ""
+    },
+    {
+      "id": "T48",
+      "title": "Implementar recordatorios, pausa, preferencias y estados de entrega",
+      "owner": "backend",
+      "deps": [
+        "T47"
+      ],
+      "status": "pending",
+      "acceptance": "Horario local/DST, cancelación, pausa",
+      "evidence": ""
+    },
+    {
+      "id": "T49",
+      "title": "Implementar adaptador Calendar de lectura y pruebas",
+      "owner": "integrations",
+      "deps": [
+        "T09"
+      ],
+      "status": "pending",
+      "acceptance": "Pruebas con servidor HTTP simulado",
+      "evidence": ""
+    },
+    {
+      "id": "T50",
+      "title": "Implementar adaptador Gmail de lectura y pruebas",
+      "owner": "integrations",
+      "deps": [
+        "T49"
+      ],
+      "status": "pending",
+      "acceptance": "Filtra automáticos; propone interacciones",
+      "evidence": ""
+    },
+    {
+      "id": "T51",
+      "title": "Implementar adaptador ClickUp por vista y pruebas",
+      "owner": "integrations",
+      "deps": [
+        "T24"
+      ],
+      "status": "pending",
+      "acceptance": "Orden fáciles/resto/need info; solo lectura",
+      "evidence": ""
+    },
+    {
+      "id": "T52",
+      "title": "Implementar captura libre/LLM, propuestas tipadas y confirmación",
+      "owner": "integrations",
+      "deps": [
+        "T38",
+        "T24"
+      ],
+      "status": "pending",
+      "acceptance": "Validación de esquema, preview, confirmación, modo manual",
+      "evidence": ""
+    },
+    {
+      "id": "T53",
+      "title": "Implementar importación del vault, dry-run, conflictos y trazabilidad",
+      "owner": "integrations",
+      "deps": [
+        "T38",
+        "T27"
+      ],
+      "status": "pending",
+      "acceptance": "Dry-run, idempotente, ZIP peligroso rechazado",
+      "evidence": ""
+    },
+    {
+      "id": "T54",
+      "title": "Implementar exportación JSON/CSV/Markdown y round-trip representativo",
+      "owner": "integrations",
+      "deps": [
+        "T53"
+      ],
+      "status": "pending",
+      "acceptance": "Round-trip conserva vínculos; sin secretos",
+      "evidence": ""
+    },
+    {
+      "id": "T55",
+      "title": "Implementar manifest, iconos, service worker e instalación PWA",
+      "owner": "frontend",
+      "deps": [
+        "T14"
+      ],
+      "status": "pending",
+      "acceptance": "Manifest válido, SW, instrucciones",
+      "evidence": ""
+    },
+    {
+      "id": "T56",
+      "title": "Implementar borradores offline, cola, sincronización y conflictos",
+      "owner": "frontend",
+      "deps": [
+        "T20",
+        "T21"
+      ],
+      "status": "pending",
+      "acceptance": "Borrador offline sincroniza; conflicto explícito",
+      "evidence": ""
+    },
+    {
+      "id": "T57",
+      "title": "Verificar caché, logout, actualizaciones y aislamiento de datos locales",
+      "owner": "frontend",
+      "deps": [
+        "T56"
+      ],
+      "status": "pending",
+      "acceptance": "SW sin /api; logout limpia; update preserva borradores",
+      "evidence": ""
+    },
+    {
+      "id": "T58",
+      "title": "Completar estados vacíos/carga/error, accesibilidad y responsive",
+      "owner": "frontend",
+      "deps": [
+        "T14"
+      ],
+      "status": "pending",
+      "acceptance": "Sin scroll horizontal; a11y básica verificada",
+      "evidence": ""
+    },
+    {
+      "id": "T59",
+      "title": "Ejecutar pruebas de dominio, finanzas, permisos y concurrencia",
+      "owner": "qa",
+      "deps": [
+        "T43",
+        "T22",
+        "T13"
+      ],
+      "status": "pending",
+      "acceptance": "Suite verde en pnpm verify",
+      "evidence": ""
+    },
+    {
+      "id": "T60",
+      "title": "Ejecutar pruebas de bot, scheduler y adaptadores externos",
+      "owner": "qa",
+      "deps": [
+        "T48",
+        "T51"
+      ],
+      "status": "pending",
+      "acceptance": "Suite verde",
+      "evidence": ""
+    },
+    {
+      "id": "T61",
+      "title": "Ejecutar flujos E2E y revisión visual de módulos y ambas superficies",
+      "owner": "qa",
+      "deps": [
+        "T57",
+        "T23"
+      ],
+      "status": "pending",
+      "acceptance": "Playwright verde + capturas responsive",
+      "evidence": ""
+    },
+    {
+      "id": "T62",
+      "title": "Preparar contenedores de producción, healthchecks, CI y despliegue",
+      "owner": "lead",
+      "deps": [
+        "T05"
+      ],
+      "status": "pending",
+      "acceptance": "Dockerfiles, compose prod, CI, runbook",
+      "evidence": ""
+    },
+    {
+      "id": "T63",
+      "title": "Preparar backup/restore y comprobar restauración en base temporal",
+      "owner": "lead",
+      "deps": [
+        "T08"
+      ],
+      "status": "pending",
+      "acceptance": "Script probado sobre BD temporal",
+      "evidence": ""
+    },
+    {
+      "id": "T64",
+      "title": "Completar README, TEST_REPORT, USER_SETUP y matriz de cobertura",
+      "owner": "lead",
+      "deps": [
+        "T59",
+        "T60",
+        "T61"
+      ],
+      "status": "pending",
+      "acceptance": "Docs con resultados reales",
+      "evidence": ""
+    },
+    {
+      "id": "T65",
+      "title": "Auditar requisitos contra implementación; resolver omisiones y bugs",
+      "owner": "lead",
+      "deps": [
+        "T64"
+      ],
+      "status": "pending",
+      "acceptance": "Matriz recorrida sin huecos",
+      "evidence": ""
+    },
+    {
+      "id": "T66",
+      "title": "Reconciliar TodoWrite con evidencia y entregar estado final honesto",
+      "owner": "lead",
+      "deps": [
+        "T65"
+      ],
+      "status": "pending",
+      "acceptance": "Lista y TASKS.md coinciden",
+      "evidence": ""
+    }
+  ],
+  "external": []
+}

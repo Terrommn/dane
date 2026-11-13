@@ -1,0 +1,21 @@
+filters:
+  and:
+    - file.inFolder("Proyectos/personal/Objetivos")
+properties:
+  periodo:
+    displayName: Periodo
+views:
+  - type: table
+    name: Objetivos
+    groupBy:
+      property: tipo
+      direction: ASC
+    order:
+      - file.name
+      - periodo
+      - inicio
+      - fin
+      - estado
+    sort:
+      - property: inicio
+        direction: DESC

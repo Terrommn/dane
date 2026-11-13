@@ -1,0 +1,77 @@
+# Tareas
+
+Espejo persistente de la lista de tareas del entorno (TaskCreate/TaskUpdate, equivalente a TodoWrite; ver D-002).
+Generado por `node scripts/tasks.mjs` desde `docs/tasks.json`. No editar a mano.
+
+Estados: ✅ completed · 🔄 in_progress · ⏳ pending · ⛔ blocked_external (en la herramienta queda `pending`).
+
+Resumen: 5 completadas · 0 en curso · 61 pendientes · 0 bloqueadas externamente · 66 total.
+
+| ID | Tarea | Responsable | Depende de | Estado | Criterio de aceptación | Evidencia |
+|---|---|---|---|---|---|---|
+| T01 | Inspeccionar repositorio, instrucciones y ZIP completo | lead | — | ✅ completed | Inventario en VAULT_REQUIREMENTS.md | Lectura completa del ZIP (ver VAULT_REQUIREMENTS.md §Inventario) |
+| T02 | Construir matriz de requisitos y diferencias/correcciones frente al vault | lead | T01 | ✅ completed | Matriz fuente→comportamiento→entidad/API/pantalla→tarea→prueba y correcciones C1–C14 | docs/VAULT_REQUIREMENTS.md |
+| T03 | Registrar arquitectura, decisiones, fases, dependencias y DoD | lead | T02 | ✅ completed | ARCHITECTURE.md, DATA_MODEL.md, DECISIONS.md | docs/ARCHITECTURE.md, docs/DATA_MODEL.md, docs/DECISIONS.md (D-001..D-024) |
+| T04 | Crear lista de tareas y espejo TASKS.md; responsables | lead | T03 | ✅ completed | 66 tareas en TaskCreate y TASKS.md generado | TaskCreate #1–#66 (=T01–T66); docs/TASKS.md generado por scripts/tasks.mjs |
+| T05 | Crear Cargo/pnpm workspaces y estructura del monorepo | lead | T04 | ⏳ pending | cargo build --workspace y pnpm install OK | — |
+| T06 | Configurar toolchains, dependencias, lockfiles, formato y lints | lead | T05 | ⏳ pending | rustfmt, clippy -D warnings, Biome, tsc strict pasan; lockfiles versionados | — |
+| T07 | Preparar Compose, PostgreSQL, variables y comando de arranque local | lead | T05 | ⏳ pending | pnpm dev levanta BD, server, bot y web; .env.example documentado; validación al arrancar | — |
+| T08 | Diseñar entidades, constraints, ownership, índices y migraciones | lead | T03, T07 | ✅ completed | Migraciones aplican en BD limpia; FKs compuestas de ownership probadas | 6 migraciones (62 tablas) aplicadas en BD limpia; FK compuesta rechaza cruce de dueños y búsqueda unaccent verificada (psql); pruebas sqlx en T59 |
+| T09 | Implementar API base, validación, errores y OpenAPI/cliente generado | lead | T08 | ⏳ pending | /api/v1 con errores consistentes; openapi.json y packages/api-client generados y verificados | — |
+| T10 | Implementar zona horaria, fechas civiles, periodos ISO y reloj de pruebas | lead | T05 | ⏳ pending | Tests ISO cruzando año, DST, medianoche y cambio de zona | — |
+| T11 | Implementar auth Mini App y sesiones | lead | T09 | ⏳ pending | Tests firma inválida, initData vencido, sesión revocable | — |
+| T12 | Implementar Telegram Login OIDC y vinculación de identidad PWA | lead | T11 | ⏳ pending | Tests state/nonce/iss/aud/exp/firma inválidos; misma identidad en ambas superficies | — |
+| T13 | Implementar allowlist, autorización, CSRF y aislamiento de usuarios | lead | T11 | ⏳ pending | Tests allowlist, CSRF y acceso cruzado entre dos usuarios | — |
+| T14 | Crear shell frontend, componentes base y adaptación Telegram | frontend | T09 | ⏳ pending | Shell navegable, componentes accesibles, adaptador Telegram con detección | — |
+| T15 | Implementar onboarding y preferencias | frontend | T14, T19 | ⏳ pending | Onboarding completo con ejemplos editables; ajustes persistidos | — |
+| T16 | Implementar áreas/proyectos y relaciones | backend | T09 | ⏳ pending | CRUD API+UI, actividad reciente, renombrar conserva IDs | — |
+| T17 | Implementar objetivos mensuales/semanales y planificación | backend | T16 | ⏳ pending | CRUD, relación semana→mes, avisos de carga, cierre | — |
+| T18 | Implementar progreso cuantitativo, unidades, eventos y fuentes | backend | T17 | ⏳ pending | Acumulativo/valor actual/hito; sin doble conteo | — |
+| T19 | Implementar hábitos, frecuencias, ocurrencias e historial | backend | T10, T17 | ⏳ pending | Versiones, frecuencias, estados y pausas probados | — |
+| T20 | Implementar daily completa, guardado parcial y edición histórica | backend+frontend | T19 | ⏳ pending | Check-in único por fecha; todas las secciones; vínculos explícitos | — |
+| T21 | Implementar control de concurrencia e idempotencia de mutaciones | backend | T09 | ⏳ pending | 409 por versión; Idempotency-Key repetida devuelve misma respuesta | — |
+| T22 | Implementar cumplimiento, rachas, ritmo y proyecciones | backend | T19 | ⏳ pending | Funciones de dominio documentadas y probadas | — |
+| T23 | Implementar dashboard general y comparaciones temporales | backend+frontend | T22, T43 | ⏳ pending | Dashboard con todas las métricas y enlaces a fuentes | — |
+| T24 | Implementar tareas, arrastre y recurrencias | backend | T16 | ⏳ pending | Arrastre conserva ID; recurrentes 29–31/último/penúltimo | — |
+| T25 | Implementar Inbox, clasificación y procesamiento revisable | backend | T24 | ⏳ pending | Propuesta y confirmación antes de mover | — |
+| T26 | Implementar weekly review, paz, prioridades y cierre de objetivos | backend+frontend | T17, T20 | ⏳ pending | Resumen automático editable, paz 1–5, cierre separado | — |
+| T27 | Implementar personas, alias, cumpleaños e interacciones | backend | T16 | ⏳ pending | CRUD, días sin hablar, sugerencias sin crear | — |
+| T28 | Implementar devocionales/reflexión y vínculos con hábitos | backend | T19 | ⏳ pending | Contenido real completa hábito; módulo desactivable | — |
+| T29 | Implementar lecturas y relación con objetivos | backend | T18 | ⏳ pending | Terminar lectura aporta una vez a meta de libros | — |
+| T30 | Implementar contenido, hooks, guion, shot list, pipeline y métricas | backend | T16 | ⏳ pending | Pipeline, tabla/kanban/publicados | — |
+| T31 | Implementar Swipe y enlaces a medios | backend | T30 | ⏳ pending | CRUD con URL validada | — |
+| T32 | Implementar materias, notas de clase y entregas | backend | T24 | ⏳ pending | Materias, clases y entregas como tareas | — |
+| T33 | Implementar devlogs/sesiones, ADRs, runbooks, TILs y snippets | backend | T16 | ⏳ pending | Devlog con sesiones, ADR numerado, importar texto | — |
+| T34 | Implementar editor Markdown, búsqueda, tags, backlinks y favoritos | backend+frontend | T16 | ⏳ pending | Búsqueda sin acentos, backlinks, favoritos, archivados, vistas Bases | — |
+| T35 | Implementar notas visuales básicas y su persistencia | frontend | T34 | ⏳ pending | Excalidraw lazy, guardado y enlace a nota | — |
+| T36 | Implementar catálogo financiero y movimientos con dinero exacto | finance | T08 | ⏳ pending | Centavos, categorías editables, idempotencia | — |
+| T37 | Implementar cuentas, tarjetas, snapshots y conciliación | finance | T36 | ⏳ pending | Saldo estimado con reglas y semántica legacy probadas | — |
+| T38 | Implementar gastos, ingresos y vistas históricas | finance | T36 | ⏳ pending | Captura individual/múltiple, filtros, FX explícito | — |
+| T39 | Implementar presupuestos por mes/categoría/proyecto/rubro | finance | T38 | ⏳ pending | Snapshot mensual y rubros | — |
+| T40 | Implementar suscripciones, ingresos fijos y ocurrencias idempotentes | finance | T38 | ⏳ pending | UNIQUE por periodo, conciliación, catch-up | — |
+| T41 | Implementar deudas, pagos, transferencias y vínculos con metas | finance | T37 | ⏳ pending | Sin doble conteo; hito al saldar | — |
+| T42 | Implementar plan de crédito y sugerencia explicable de tarjeta | finance | T41 | ⏳ pending | Reglas D-022 probadas | — |
+| T43 | Implementar dashboard financiero, proyecciones e histórico | finance | T39, T40, T41 | ⏳ pending | Métricas separadas y corrección del neto | — |
+| T44 | Crear servicio bot Rust y cliente de API interna | bot | T09 | ⏳ pending | Bot compila y se comunica solo por API interna | — |
+| T45 | Implementar /start, comandos, menús y enlaces a Mini App | bot | T44 | ⏳ pending | 14 comandos y botones web_app con fecha | — |
+| T46 | Implementar polling/webhook seguro e ingestión durable de updates | bot+backend | T44 | ⏳ pending | Durabilidad y dedupe probados | — |
+| T47 | Implementar scheduler/outbox, claims, leases, ack y recuperación | backend | T08 | ⏳ pending | Dos workers, lease vencido, ack obsoleto, 429 | — |
+| T48 | Implementar recordatorios, pausa, preferencias y estados de entrega | backend | T47 | ⏳ pending | Horario local/DST, cancelación, pausa | — |
+| T49 | Implementar adaptador Calendar de lectura y pruebas | integrations | T09 | ⏳ pending | Pruebas con servidor HTTP simulado | — |
+| T50 | Implementar adaptador Gmail de lectura y pruebas | integrations | T49 | ⏳ pending | Filtra automáticos; propone interacciones | — |
+| T51 | Implementar adaptador ClickUp por vista y pruebas | integrations | T24 | ⏳ pending | Orden fáciles/resto/need info; solo lectura | — |
+| T52 | Implementar captura libre/LLM, propuestas tipadas y confirmación | integrations | T38, T24 | ⏳ pending | Validación de esquema, preview, confirmación, modo manual | — |
+| T53 | Implementar importación del vault, dry-run, conflictos y trazabilidad | integrations | T38, T27 | ⏳ pending | Dry-run, idempotente, ZIP peligroso rechazado | — |
+| T54 | Implementar exportación JSON/CSV/Markdown y round-trip representativo | integrations | T53 | ⏳ pending | Round-trip conserva vínculos; sin secretos | — |
+| T55 | Implementar manifest, iconos, service worker e instalación PWA | frontend | T14 | ⏳ pending | Manifest válido, SW, instrucciones | — |
+| T56 | Implementar borradores offline, cola, sincronización y conflictos | frontend | T20, T21 | ⏳ pending | Borrador offline sincroniza; conflicto explícito | — |
+| T57 | Verificar caché, logout, actualizaciones y aislamiento de datos locales | frontend | T56 | ⏳ pending | SW sin /api; logout limpia; update preserva borradores | — |
+| T58 | Completar estados vacíos/carga/error, accesibilidad y responsive | frontend | T14 | ⏳ pending | Sin scroll horizontal; a11y básica verificada | — |
+| T59 | Ejecutar pruebas de dominio, finanzas, permisos y concurrencia | qa | T43, T22, T13 | ⏳ pending | Suite verde en pnpm verify | — |
+| T60 | Ejecutar pruebas de bot, scheduler y adaptadores externos | qa | T48, T51 | ⏳ pending | Suite verde | — |
+| T61 | Ejecutar flujos E2E y revisión visual de módulos y ambas superficies | qa | T57, T23 | ⏳ pending | Playwright verde + capturas responsive | — |
+| T62 | Preparar contenedores de producción, healthchecks, CI y despliegue | lead | T05 | ⏳ pending | Dockerfiles, compose prod, CI, runbook | — |
+| T63 | Preparar backup/restore y comprobar restauración en base temporal | lead | T08 | ⏳ pending | Script probado sobre BD temporal | — |
+| T64 | Completar README, TEST_REPORT, USER_SETUP y matriz de cobertura | lead | T59, T60, T61 | ⏳ pending | Docs con resultados reales | — |
+| T65 | Auditar requisitos contra implementación; resolver omisiones y bugs | lead | T64 | ⏳ pending | Matriz recorrida sin huecos | — |
+| T66 | Reconciliar TodoWrite con evidencia y entregar estado final honesto | lead | T65 | ⏳ pending | Lista y TASKS.md coinciden | — |

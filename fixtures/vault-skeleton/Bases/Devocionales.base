@@ -1,0 +1,16 @@
+filters:
+  and:
+    - file.inFolder("Proyectos/personal/Devocionales")
+properties:
+  pasaje:
+    displayName: Pasaje
+views:
+  - type: table
+    name: Devocionales
+    order:
+      - file.name
+      - fecha
+      - pasaje
+    sort:
+      - property: fecha
+        direction: DESC

@@ -1,0 +1,26 @@
+filters:
+  and:
+    - file.inFolder("Lecturas")
+views:
+  - type: cards
+    name: Lecturas
+    groupBy:
+      property: estado
+      direction: ASC
+    order:
+      - file.name
+      - autor
+      - tipo
+      - rating
+  - type: table
+    name: Tabla
+    order:
+      - file.name
+      - autor
+      - tipo
+      - estado
+      - rating
+      - fin
+    sort:
+      - property: rating
+        direction: DESC

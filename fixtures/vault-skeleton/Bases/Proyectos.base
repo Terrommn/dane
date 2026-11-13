@@ -1,0 +1,30 @@
+filters:
+  or:
+    - file.inFolder("Proyectos")
+    - file.inFolder("Dev")
+views:
+  - type: table
+    name: Dev reciente
+    filters:
+      and:
+        - '!file.path.contains("/Devocionales/")'
+        - '!file.path.contains("/Clases/")'
+        - '!file.path.contains("/Objetivos/")'
+        - '!file.path.contains("/Finanzas/")'
+    order:
+      - file.name
+      - file.folder
+      - categories
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC
+    limit: 50
+  - type: table
+    name: ADRs
+    filters: file.path.contains("/adr/")
+    order:
+      - file.name
+      - proyecto
+      - estado
+      - fecha

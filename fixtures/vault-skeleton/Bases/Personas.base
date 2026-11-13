@@ -1,0 +1,29 @@
+filters:
+  and:
+    - file.inFolder("Personas")
+formulas:
+  dias_sin_hablar: if(ultimo_contacto, (today() - date(ultimo_contacto)).days, "")
+properties:
+  formula.dias_sin_hablar:
+    displayName: Días sin hablar
+  area:
+    displayName: Área
+  relacion:
+    displayName: Relación
+views:
+  - type: table
+    name: Personas
+    groupBy:
+      property: area
+      direction: ASC
+    order:
+      - file.name
+      - relacion
+      - org
+      - rol
+      - ultimo_contacto
+      - formula.dias_sin_hablar
+      - cumpleaños
+    sort:
+      - property: file.name
+        direction: ASC

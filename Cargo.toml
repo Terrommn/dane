@@ -1,0 +1,65 @@
+[workspace]
+resolver = "3"
+members = ["apps/server", "apps/telegram-bot", "crates/domain", "crates/persistence", "crates/contracts"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.94"
+license = "UNLICENSED"
+publish = false
+
+[workspace.dependencies]
+domain = { path = "crates/domain" }
+persistence = { path = "crates/persistence" }
+contracts = { path = "crates/contracts" }
+
+anyhow = "1.0"
+thiserror = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4.45", default-features = false, features = ["std", "clock", "serde"] }
+chrono-tz = { version = "0.10.4", features = ["serde"] }
+uuid = { version = "1.29", features = ["v4", "v7", "serde"] }
+rust_decimal = { version = "1.43", features = ["serde-with-str"] }
+tokio = { version = "1.54", features = ["macros", "rt-multi-thread", "signal", "time", "sync"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "fmt"] }
+sqlx = { version = "0.9.0", default-features = false, features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "uuid", "chrono", "json", "macros", "migrate", "rust_decimal"] }
+axum = { version = "0.8.9", features = ["macros"] }
+axum-extra = { version = "0.12.6", features = ["cookie", "typed-header"] }
+tower = "0.5.3"
+tower-http = { version = "0.7.1", features = ["trace", "limit", "cors", "request-id", "timeout", "fs", "set-header", "util"] }
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls", "form", "query"] }
+utoipa = { version = "6.0.0", features = ["axum_extras", "chrono", "uuid", "preserve_order"] }
+utoipa-axum = "0.3.0"
+teloxide = { version = "0.17.0", default-features = false, features = ["macros", "rustls", "ctrlc_handler"] }
+openidconnect = { version = "4.1.0", default-features = false, features = ["reqwest", "rustls-tls"] }
+hmac = "0.13"
+sha2 = "0.11"
+hex = "0.4"
+base64 = "0.23"
+getrandom = "0.4"
+aes-gcm = "0.11"
+url = "2.5"
+zip = { version = "9.5", default-features = false, features = ["deflate"] }
+regex = "1.11"
+unicode-normalization = "0.1"
+serde_norway = "0.9"
+governor = "0.10"
+ammonia = "4"
+csv = "1.3"
+wiremock = "0.6"
+async-trait = "0.1"
+cookie = "0.18"
+
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+opt-level = 1
+
+[profile.release]
+lto = "thin"
+codegen-units = 4
+strip = "symbols"

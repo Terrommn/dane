@@ -1,0 +1,1547 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Vida API",
+    "description": "API de la app personal de hábitos, objetivos y organización de vida.",
+    "license": {
+      "name": ""
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "paths": {
+    "/activity": {
+      "get": {
+        "tags": [
+          "areas"
+        ],
+        "summary": "\"Dev reciente\" (Proyectos.base): actividad de todos los proyectos.",
+        "operationId": "recent_activity",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/areas": {
+      "get": {
+        "tags": [
+          "areas"
+        ],
+        "summary": "Lista de áreas.",
+        "operationId": "list_areas",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Búsqueda de texto (tolerante a acentos donde aplique).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "Incluir archivados.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Area"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "areas"
+        ],
+        "operationId": "create_area",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Area"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/areas/{id}": {
+      "get": {
+        "tags": [
+          "areas"
+        ],
+        "operationId": "get_area",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Area"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "areas"
+        ],
+        "summary": "Renombrar o archivar un área conserva su ID y sus relaciones.",
+        "operationId": "update_area",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Area"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/config": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Métodos de inicio de sesión disponibles (público).",
+        "operationId": "auth_config",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/dev-login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Solo desarrollo/pruebas (bloqueado en producción por configuración). Respeta la allowlist.",
+        "operationId": "dev_login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevLoginResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Cierra la sesión actual.",
+        "operationId": "logout",
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/auth/logout-all": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Revoca todas las sesiones del usuario (todos los dispositivos).",
+        "operationId": "logout_all",
+        "responses": {
+          "204": {}
+        }
+      }
+    },
+    "/auth/oidc/callback": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Callback OIDC: valida state, intercambia el código con PKCE, verifica el ID token y crea la sesión con cookie.",
+        "operationId": "oidc_callback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "302": {}
+        }
+      }
+    },
+    "/auth/oidc/start": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Redirige a Telegram Login (OIDC + PKCE).",
+        "operationId": "oidc_start",
+        "parameters": [
+          {
+            "name": "redirect_to",
+            "in": "query",
+            "description": "Ruta interna a la que volver (debe empezar con `/`).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "302": {}
+        }
+      }
+    },
+    "/auth/telegram/miniapp": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Inicia sesión desde la Mini App validando `initData` (firma y antigüedad) en el servidor.",
+        "operationId": "miniapp_login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MiniAppLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BearerSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Perfil del usuario autenticado.",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects": {
+      "get": {
+        "tags": [
+          "areas"
+        ],
+        "operationId": "list_projects",
+        "parameters": [
+          {
+            "name": "area_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Project"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "areas"
+        ],
+        "operationId": "create_project",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{id}": {
+      "get": {
+        "tags": [
+          "areas"
+        ],
+        "operationId": "get_project",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "areas"
+        ],
+        "operationId": "update_project",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{id}/activity": {
+      "get": {
+        "tags": [
+          "areas"
+        ],
+        "summary": "Actividad reciente relacionada con un proyecto (tareas, notas, ADRs, devlog, contenido).",
+        "operationId": "project_activity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "operationId": "get_settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettings"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Actualiza preferencias. Cambiar la zona afecta cálculos futuros; las fechas guardadas no se reclasifican.",
+        "operationId": "update_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettings"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActivityItem": {
+        "type": "object",
+        "description": "Elemento de actividad reciente (vista \"Dev reciente\" de Proyectos.base, sin devocionales/clases/objetivos/finanzas).",
+        "required": [
+          "entity_type",
+          "entity_id",
+          "title",
+          "updated_at"
+        ],
+        "properties": {
+          "entity_type": {
+            "type": "string"
+          },
+          "entity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "on_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Area": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "description",
+          "position",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AreaBody": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Opcional: se deriva del nombre si falta."
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Obligatorio al actualizar."
+          }
+        }
+      },
+      "AuthConfig": {
+        "type": "object",
+        "required": [
+          "miniapp_enabled",
+          "oidc_enabled",
+          "dev_login_enabled"
+        ],
+        "properties": {
+          "miniapp_enabled": {
+            "type": "boolean"
+          },
+          "oidc_enabled": {
+            "type": "boolean"
+          },
+          "dev_login_enabled": {
+            "type": "boolean"
+          },
+          "bot_username": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "BearerSession": {
+        "type": "object",
+        "required": [
+          "token",
+          "expires_at",
+          "user_id"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token Bearer: guárdalo solo en memoria."
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "start_param": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`start_param` del enlace de la Mini App (ej. `checkin_2026-11-12`)."
+          }
+        }
+      },
+      "DevLogin": {
+        "type": "object",
+        "required": [
+          "telegram_id"
+        ],
+        "properties": {
+          "telegram_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "transport": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`cookie` (por defecto) o `bearer`."
+          }
+        }
+      },
+      "DevLoginResult": {
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "token": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "csrf": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ErrorBody": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        }
+      },
+      "ErrorDetail": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Código estable: `bad_request`, `unauthorized`, `forbidden`, `not_found`, `conflict`, `validation`,\n`idempotency_mismatch`, `rate_limited`, `payload_too_large`, `unavailable`, `internal`."
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje en español para mostrar al usuario."
+          },
+          "field": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "current": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "En `conflict`: estado actual del recurso para resolver explícitamente."
+          }
+        }
+      },
+      "Identity": {
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "provider",
+          "subject"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "telegram_user_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "username": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Me": {
+        "type": "object",
+        "required": [
+          "user",
+          "identities",
+          "settings",
+          "telegram",
+          "session_transport"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Identity"
+            }
+          },
+          "settings": {
+            "$ref": "#/components/schemas/UserSettings"
+          },
+          "telegram": {
+            "$ref": "#/components/schemas/TelegramStatus"
+          },
+          "session_transport": {
+            "type": "string"
+          }
+        }
+      },
+      "MiniAppLogin": {
+        "type": "object",
+        "required": [
+          "init_data"
+        ],
+        "properties": {
+          "init_data": {
+            "type": "string",
+            "description": "`Telegram.WebApp.initData` sin modificar."
+          }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "description",
+          "status",
+          "links",
+          "notes_md",
+          "version",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "repo_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "notes_md": {
+            "type": "string"
+          },
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProjectBody": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "area_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "`active | paused | done | archived`"
+          },
+          "repo_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Lista de `{ \"label\": \"...\", \"url\": \"https://...\" }`."
+          },
+          "notes_md": {
+            "type": "string"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "SettingsPatch": {
+        "type": "object",
+        "description": "Campos ausentes no cambian. Para borrar un opcional envía `null` explícito en los campos `Option<Option<_>>`.",
+        "required": [
+          "version"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "locale": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "timezone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "week_start": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "modules": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "devotional_mode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "devotional_template": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object"
+            }
+          },
+          "max_devotional_failures": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "weight_goal_kg": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "weight_direction": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "habit_warn_month": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "habit_warn_total": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "track_family_loans": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "daily_enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "daily_time": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "21:00"
+          },
+          "weekly_enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "weekly_weekday": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "weekly_time": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "monthly_enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "monthly_time": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reminders_paused": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "paused_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "onboarding_completed": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "TelegramStatus": {
+        "type": "object",
+        "required": [
+          "chat_known",
+          "can_message"
+        ],
+        "properties": {
+          "chat_known": {
+            "type": "boolean",
+            "description": "El bot conoce el chat privado (el usuario envió /start)."
+          },
+          "can_message": {
+            "type": "boolean"
+          },
+          "bot_username": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "is_demo",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "is_demo": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserSettings": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "locale",
+          "timezone",
+          "currency",
+          "week_start",
+          "modules",
+          "devotional_mode",
+          "devotional_template",
+          "habit_warn_month",
+          "habit_warn_total",
+          "track_family_loans",
+          "daily_enabled",
+          "daily_time",
+          "weekly_enabled",
+          "weekly_weekday",
+          "weekly_time",
+          "monthly_enabled",
+          "monthly_time",
+          "reminders_paused",
+          "version"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "locale": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "week_start": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "modules": {
+            "type": "object"
+          },
+          "devotional_mode": {
+            "type": "string"
+          },
+          "devotional_template": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "max_devotional_failures": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "weight_goal_kg": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "weight_direction": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "habit_warn_month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "habit_warn_total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "track_family_loans": {
+            "type": "boolean"
+          },
+          "daily_enabled": {
+            "type": "boolean"
+          },
+          "daily_time": {
+            "type": "string",
+            "example": "21:00:00"
+          },
+          "weekly_enabled": {
+            "type": "boolean"
+          },
+          "weekly_weekday": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "weekly_time": {
+            "type": "string"
+          },
+          "monthly_enabled": {
+            "type": "boolean"
+          },
+          "monthly_time": {
+            "type": "string"
+          },
+          "reminders_paused": {
+            "type": "boolean"
+          },
+          "paused_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "onboarding_completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "vida_session"
+      }
+    }
+  }
+}

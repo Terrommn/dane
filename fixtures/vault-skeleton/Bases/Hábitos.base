@@ -1,0 +1,16 @@
+filters:
+  and:
+    - file.inFolder("Daily")
+    - date(file.basename) >= today() - "30d"
+views:
+  - type: table
+    name: Últimos 30 días
+    order:
+      - file.name
+      - devocional
+      - ejercicio
+      - lectura
+      - energia
+    sort:
+      - property: file.name
+        direction: DESC
