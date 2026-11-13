@@ -86,7 +86,7 @@ function SideNav({ items }: { items: NavItem[] }) {
 
 export function AppShell() {
   useTelegramBackButton();
-  const { me, notice, isTelegram } = useAuth();
+  const { me, notice, isTelegram, offline } = useAuth();
   const toast = useToast();
   const modules = (me?.settings.modules ?? null) as Record<string, unknown> | null;
   const all = [...PRIMARY_NAV, ...visibleItems(MORE_NAV, modules)];
@@ -127,6 +127,12 @@ export function AppShell() {
             </div>
           </header>
           <main id="contenido" className="px-4 pb-28 pt-3 md:px-6 md:pb-10">
+            {offline && (
+              <p role="status" className="mb-3 rounded-xl border border-warn bg-surface p-3 text-sm">
+                Sin conexión: trabajas con los datos guardados en este dispositivo. Se sincronizará al
+                reconectar.
+              </p>
+            )}
             <Suspense fallback={<LoadingState />}>
               <Outlet />
             </Suspense>

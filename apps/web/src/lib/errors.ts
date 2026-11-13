@@ -55,3 +55,8 @@ export function unwrap<T>(r: { data?: T; error?: unknown; response: Response }):
   if (r.error !== undefined || !r.response.ok) throw toApiError(r.response.status, r.error);
   return r.data as Exclude<T, undefined>;
 }
+
+/** Falla de red (sin conexión o server inalcanzable), sea un TypeError de fetch o un ApiError de estado 0. */
+export function isNetworkError(e: unknown): boolean {
+  return e instanceof TypeError || (e instanceof ApiError && e.isNetwork);
+}

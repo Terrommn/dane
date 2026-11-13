@@ -5,7 +5,9 @@ test("check-in: guardar, recargar y ver el mismo dato en el servidor y el dashbo
   await devLogin(page, 111);
   await page.goto(`/hoy?date=${todayLocal()}`);
   await page.locator("fieldset", { hasText: "Energía (1–5)" }).getByText("4", { exact: true }).click();
-  await page.getByLabel("Lo que hice bien hoy 1").fill("Salí a caminar");
+  await page.getByLabel("Agregar a Lo que hice bien hoy").fill("Salí a caminar");
+  await page.getByLabel("Agregar a Lo que hice bien hoy").press("Enter");
+  await expect(page.getByLabel("Lo que hice bien hoy 1")).toHaveValue("Salí a caminar");
   await page.getByRole("button", { name: "Guardar", exact: true }).click();
   await expect(page.getByText("Guardado", { exact: true }).first()).toBeVisible();
 
@@ -35,7 +37,7 @@ test("check-in sin conexión queda pendiente y se sincroniza al reconectar", asy
   await page.locator("fieldset", { hasText: "Energía (1–5)" }).getByText("2", { exact: true }).click();
   await page.getByRole("button", { name: "Guardar", exact: true }).click();
   await expect(page.getByText("Pendiente de sincronizar").first()).toBeVisible();
-  await expect(page.getByText("Guardado", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("status").filter({ hasText: /^\W*Guardado$/ })).toHaveCount(0);
 
   // Reabrir sin red: el shell carga desde el service worker y el borrador sigue ahí.
   await page.reload();
@@ -43,7 +45,8 @@ test("check-in sin conexión queda pendiente y se sincroniza al reconectar", asy
 
   await context.setOffline(false);
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
-  await expect(page.getByText("Guardado", { exact: true }).first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole("status").filter({ hasText: /^\W*Guardado$/ }).first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(/^Sin conexión: trabajas/)).toHaveCount(0);
   const body = await (await page.request.get(`/api/v1/checkins/${date}`)).json();
   expect(body.checkin.energy).toBe(2);
 });

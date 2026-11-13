@@ -12,9 +12,11 @@ import { SaveStatus } from "../../components/ui/SaveStatus";
 import { ErrorState, LoadingState } from "../../components/ui/States";
 import { useToast } from "../../components/ui/Toast";
 import { api, type Schemas } from "../../lib/api";
-import { unwrap } from "../../lib/errors";
+import { isNetworkError, unwrap } from "../../lib/errors";
 import { formatLongDate, formatMoney, todayIso } from "../../lib/format";
+import { loadSnapshot, saveSnapshot } from "../../lib/offline/db";
 import { useDraft, useSyncQueue } from "../../lib/offline/hooks";
+import { getSession } from "../../lib/session";
 import { isValidIsoDate } from "../../lib/telegram";
 import { useAuth } from "../auth/AuthProvider";
 import { HabitStatusControl } from "../habits/HabitStatusControl";
@@ -64,7 +66,23 @@ export function displayStatus(
 export function useDayView(date: string) {
   return useQuery({
     queryKey: ["day", date],
-    queryFn: async () => unwrap(await api.GET("/checkins/{date}/view", { params: { path: { date } } })),
+    // Se ejecuta aun sin red: el queryFn cae a la última vista guardada en este dispositivo.
+    networkMode: "always",
+    queryFn: async () => {
+      const userId = getSession().userId;
+      try {
+        const data = unwrap(await api.GET("/checkins/{date}/view", { params: { path: { date } } }));
+        if (userId) void saveSnapshot(userId, `day:${date}`, data).catch(() => {});
+        return data;
+      } catch (e) {
+        // Sin red: usar la última vista conocida de ese día (los cambios siguen en el borrador/cola local).
+        if (isNetworkError(e) && userId) {
+          const snap = await loadSnapshot<DayView>(userId, `day:${date}`).catch(() => null);
+          if (snap) return snap.data;
+        }
+        throw e;
+      }
+    },
   });
 }
 

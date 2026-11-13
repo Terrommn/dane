@@ -12,3 +12,5 @@ dist/
 playwright-report/
 test-results/
 .claude/worktrees/
+apps/web/playwright-report/
+apps/web/test-results/
