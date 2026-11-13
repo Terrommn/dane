@@ -1,0 +1,83 @@
+# Producción portable en un VPS con Docker (sin servicios pagados específicos).
+# Uso: cp .env.example .env.prod  (completar)  →  docker compose -f infra/compose.prod.yml --env-file .env.prod up -d --build
+name: vida
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vida
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD}
+      POSTGRES_DB: vida
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vida -d vida"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks: [internal]
+
+  server:
+    build: { context: .., dockerfile: infra/Dockerfile.server }
+    restart: unless-stopped
+    depends_on: { db: { condition: service_healthy } }
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgres://vida:${POSTGRES_PASSWORD}@db:5432/vida
+      BIND_ADDR: 0.0.0.0:8080
+      PUBLIC_BASE_URL: https://${DOMAIN:?define DOMAIN}
+      ALLOWED_TELEGRAM_IDS: ${ALLOWED_TELEGRAM_IDS:?define ALLOWED_TELEGRAM_IDS}
+      COOKIE_SECURE: "true"
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?}
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-claude-haiku-4-5-20251001}
+      DEV_LOGIN_ENABLED: "false"
+      DEMO_ENABLED: "false"
+      LOG_FORMAT: json
+    networks: [internal]
+
+  bot:
+    build: { context: .., dockerfile: infra/Dockerfile.bot }
+    restart: unless-stopped
+    depends_on: { server: { condition: service_healthy } }
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?}
+      SERVER_INTERNAL_URL: http://server:8080
+      TELEGRAM_MODE: webhook
+      WEBHOOK_PUBLIC_URL: https://${DOMAIN}/telegram/webhook
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:?define WEBHOOK_SECRET}
+      PUBLIC_BASE_URL: https://${DOMAIN}
+      BOT_BIND_ADDR: 0.0.0.0:8090
+      LOG_FORMAT: json
+    networks: [internal]
+
+  web:
+    build: { context: .., dockerfile: infra/Dockerfile.web }
+    restart: unless-stopped
+    depends_on: [server, bot]
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?define ACME_EMAIL}
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:

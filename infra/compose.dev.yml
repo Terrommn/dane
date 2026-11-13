@@ -1,0 +1,33 @@
+# Desarrollo con Docker (alternativa a scripts/dev-db.sh). Uso: USE_DOCKER_DB=1 pnpm dev
+# o todo en contenedores: docker compose -f infra/compose.dev.yml --profile app up --build
+name: vida-dev
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: vida
+      POSTGRES_PASSWORD: vida
+      POSTGRES_DB: vida
+    ports: ["127.0.0.1:5433:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vida -d vida"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  server:
+    profiles: [app]
+    build: { context: .., dockerfile: infra/Dockerfile.server }
+    env_file: ../.env
+    environment:
+      DATABASE_URL: postgres://vida:vida@db:5432/vida
+      BIND_ADDR: 0.0.0.0:8080
+      DEV_LOGIN_ENABLED: "false"
+    depends_on: { db: { condition: service_healthy } }
+    ports: ["127.0.0.1:8080:8080"]
+
+volumes:
+  pgdata:

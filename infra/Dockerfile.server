@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1.7
+# Imagen del servidor principal. Contexto: raíz del repo.
+FROM rust:1.94-bookworm AS build
+WORKDIR /src
+COPY Cargo.toml Cargo.lock rust-toolchain.toml rustfmt.toml ./
+COPY apps/server apps/server
+COPY apps/telegram-bot apps/telegram-bot
+COPY crates crates
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/src/target \
+    cargo build --release -p server --locked && cp target/release/vida-server /vida-server
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl tzdata && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10001 vida
+COPY --from=build /vida-server /usr/local/bin/vida-server
+USER vida
+ENV BIND_ADDR=0.0.0.0:8080 LOG_FORMAT=json
+EXPOSE 8080
+HEALTHCHECK --interval=15s --timeout=3s --start-period=20s --retries=5 CMD curl -fsS http://127.0.0.1:8080/readyz || exit 1
+STOPSIGNAL SIGTERM
+ENTRYPOINT ["vida-server"]
+CMD ["serve"]

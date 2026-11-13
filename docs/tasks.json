@@ -49,9 +49,9 @@
       "deps": [
         "T04"
       ],
-      "status": "pending",
+      "status": "completed",
       "acceptance": "cargo build --workspace y pnpm install OK",
-      "evidence": ""
+      "evidence": "Cargo workspace (5 crates) + pnpm workspace; cargo build --workspace y pnpm install OK"
     },
     {
       "id": "T06",
@@ -60,7 +60,7 @@
       "deps": [
         "T05"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "rustfmt, clippy -D warnings, Biome, tsc strict pasan; lockfiles versionados",
       "evidence": ""
     },
@@ -71,7 +71,7 @@
       "deps": [
         "T05"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "pnpm dev levanta BD, server, bot y web; .env.example documentado; validación al arrancar",
       "evidence": ""
     },
@@ -94,9 +94,9 @@
       "deps": [
         "T08"
       ],
-      "status": "pending",
+      "status": "completed",
       "acceptance": "/api/v1 con errores consistentes; openapi.json y packages/api-client generados y verificados",
-      "evidence": ""
+      "evidence": "api/mod.rs (/api/v1, errores ErrorBody, límites, request-id, timeout), OpenAPI utoipa → packages/api-client (scripts/gen-api.sh, --check)"
     },
     {
       "id": "T10",
@@ -105,9 +105,9 @@
       "deps": [
         "T05"
       ],
-      "status": "pending",
+      "status": "completed",
       "acceptance": "Tests ISO cruzando año, DST, medianoche y cambio de zona",
-      "evidence": ""
+      "evidence": "crates/domain/src/time.rs: 9 pruebas (ISO W53/W01, DST hueco/ambiguo, 23h, medianoche, cambio de zona, días 29–31/último/penúltimo, FixedClock)"
     },
     {
       "id": "T11",
@@ -116,9 +116,9 @@
       "deps": [
         "T09"
       ],
-      "status": "pending",
+      "status": "completed",
       "acceptance": "Tests firma inválida, initData vencido, sesión revocable",
-      "evidence": ""
+      "evidence": "auth/miniapp.rs (5 unit) + tests/auth_isolation.rs miniapp_login_validates_signature_freshness_and_allowlist, unauthenticated_and_revoked_sessions_are_rejected"
     },
     {
       "id": "T12",
@@ -127,9 +127,9 @@
       "deps": [
         "T11"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Tests state/nonce/iss/aud/exp/firma inválidos; misma identidad en ambas superficies",
-      "evidence": ""
+      "evidence": "auth/oidc.rs implementado (openidconnect, PKCE, claim id≠sub); falta prueba con IdP simulado"
     },
     {
       "id": "T13",
@@ -138,9 +138,9 @@
       "deps": [
         "T11"
       ],
-      "status": "pending",
+      "status": "completed",
       "acceptance": "Tests allowlist, CSRF y acceso cruzado entre dos usuarios",
-      "evidence": ""
+      "evidence": "tests/auth_isolation.rs: cookie_sessions_require_matching_csrf, users_cannot_read_or_link_each_others_data, allowlist 403; config.rs dev_login_is_impossible_in_production"
     },
     {
       "id": "T14",
@@ -149,7 +149,7 @@
       "deps": [
         "T09"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Shell navegable, componentes accesibles, adaptador Telegram con detección",
       "evidence": ""
     },
@@ -161,7 +161,7 @@
         "T14",
         "T19"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Onboarding completo con ejemplos editables; ajustes persistidos",
       "evidence": ""
     },
@@ -172,9 +172,9 @@
       "deps": [
         "T09"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "CRUD API+UI, actividad reciente, renombrar conserva IDs",
-      "evidence": ""
+      "evidence": "API y repos áreas/proyectos + actividad; falta UI"
     },
     {
       "id": "T17",
@@ -183,7 +183,7 @@
       "deps": [
         "T16"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "CRUD, relación semana→mes, avisos de carga, cierre",
       "evidence": ""
     },
@@ -194,7 +194,7 @@
       "deps": [
         "T17"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Acumulativo/valor actual/hito; sin doble conteo",
       "evidence": ""
     },
@@ -206,7 +206,7 @@
         "T10",
         "T17"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Versiones, frecuencias, estados y pausas probados",
       "evidence": ""
     },
@@ -217,7 +217,7 @@
       "deps": [
         "T19"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Check-in único por fecha; todas las secciones; vínculos explícitos",
       "evidence": ""
     },
@@ -228,9 +228,9 @@
       "deps": [
         "T09"
       ],
-      "status": "pending",
+      "status": "completed",
       "acceptance": "409 por versión; Idempotency-Key repetida devuelve misma respuesta",
-      "evidence": ""
+      "evidence": "http/idempotency.rs + version/409: tests idempotency_key_replays_and_detects_mismatch, rename_keeps_id_and_stale_version_conflicts (cola offline en T56)"
     },
     {
       "id": "T22",
@@ -239,7 +239,7 @@
       "deps": [
         "T19"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Funciones de dominio documentadas y probadas",
       "evidence": ""
     },
@@ -251,7 +251,7 @@
         "T22",
         "T43"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Dashboard con todas las métricas y enlaces a fuentes",
       "evidence": ""
     },
@@ -262,7 +262,7 @@
       "deps": [
         "T16"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Arrastre conserva ID; recurrentes 29–31/último/penúltimo",
       "evidence": ""
     },
@@ -273,7 +273,7 @@
       "deps": [
         "T24"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Propuesta y confirmación antes de mover",
       "evidence": ""
     },
@@ -285,7 +285,7 @@
         "T17",
         "T20"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Resumen automático editable, paz 1–5, cierre separado",
       "evidence": ""
     },
@@ -296,7 +296,7 @@
       "deps": [
         "T16"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "CRUD, días sin hablar, sugerencias sin crear",
       "evidence": ""
     },
@@ -307,7 +307,7 @@
       "deps": [
         "T19"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Contenido real completa hábito; módulo desactivable",
       "evidence": ""
     },
@@ -318,7 +318,7 @@
       "deps": [
         "T18"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Terminar lectura aporta una vez a meta de libros",
       "evidence": ""
     },
@@ -329,7 +329,7 @@
       "deps": [
         "T16"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Pipeline, tabla/kanban/publicados",
       "evidence": ""
     },
@@ -340,7 +340,7 @@
       "deps": [
         "T30"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "CRUD con URL validada",
       "evidence": ""
     },
@@ -351,7 +351,7 @@
       "deps": [
         "T24"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Materias, clases y entregas como tareas",
       "evidence": ""
     },
@@ -362,7 +362,7 @@
       "deps": [
         "T16"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Devlog con sesiones, ADR numerado, importar texto",
       "evidence": ""
     },
@@ -373,7 +373,7 @@
       "deps": [
         "T16"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Búsqueda sin acentos, backlinks, favoritos, archivados, vistas Bases",
       "evidence": ""
     },
@@ -384,7 +384,7 @@
       "deps": [
         "T34"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Excalidraw lazy, guardado y enlace a nota",
       "evidence": ""
     },
@@ -395,7 +395,7 @@
       "deps": [
         "T08"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Centavos, categorías editables, idempotencia",
       "evidence": ""
     },
@@ -406,7 +406,7 @@
       "deps": [
         "T36"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Saldo estimado con reglas y semántica legacy probadas",
       "evidence": ""
     },
@@ -417,7 +417,7 @@
       "deps": [
         "T36"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Captura individual/múltiple, filtros, FX explícito",
       "evidence": ""
     },
@@ -428,7 +428,7 @@
       "deps": [
         "T38"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Snapshot mensual y rubros",
       "evidence": ""
     },
@@ -439,7 +439,7 @@
       "deps": [
         "T38"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "UNIQUE por periodo, conciliación, catch-up",
       "evidence": ""
     },
@@ -450,7 +450,7 @@
       "deps": [
         "T37"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Sin doble conteo; hito al saldar",
       "evidence": ""
     },
@@ -461,7 +461,7 @@
       "deps": [
         "T41"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Reglas D-022 probadas",
       "evidence": ""
     },
@@ -474,7 +474,7 @@
         "T40",
         "T41"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Métricas separadas y corrección del neto",
       "evidence": ""
     },
@@ -485,7 +485,7 @@
       "deps": [
         "T09"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Bot compila y se comunica solo por API interna",
       "evidence": ""
     },
@@ -496,7 +496,7 @@
       "deps": [
         "T44"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "14 comandos y botones web_app con fecha",
       "evidence": ""
     },
@@ -507,7 +507,7 @@
       "deps": [
         "T44"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Durabilidad y dedupe probados",
       "evidence": ""
     },
@@ -518,7 +518,7 @@
       "deps": [
         "T08"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Dos workers, lease vencido, ack obsoleto, 429",
       "evidence": ""
     },
@@ -529,7 +529,7 @@
       "deps": [
         "T47"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Horario local/DST, cancelación, pausa",
       "evidence": ""
     },
@@ -540,7 +540,7 @@
       "deps": [
         "T09"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Pruebas con servidor HTTP simulado",
       "evidence": ""
     },
@@ -551,7 +551,7 @@
       "deps": [
         "T49"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Filtra automáticos; propone interacciones",
       "evidence": ""
     },
@@ -562,7 +562,7 @@
       "deps": [
         "T24"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Orden fáciles/resto/need info; solo lectura",
       "evidence": ""
     },
@@ -574,7 +574,7 @@
         "T38",
         "T24"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Validación de esquema, preview, confirmación, modo manual",
       "evidence": ""
     },
@@ -586,7 +586,7 @@
         "T38",
         "T27"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Dry-run, idempotente, ZIP peligroso rechazado",
       "evidence": ""
     },
@@ -597,7 +597,7 @@
       "deps": [
         "T53"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Round-trip conserva vínculos; sin secretos",
       "evidence": ""
     },
@@ -608,7 +608,7 @@
       "deps": [
         "T14"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Manifest válido, SW, instrucciones",
       "evidence": ""
     },
@@ -620,7 +620,7 @@
         "T20",
         "T21"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Borrador offline sincroniza; conflicto explícito",
       "evidence": ""
     },
@@ -631,7 +631,7 @@
       "deps": [
         "T56"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "SW sin /api; logout limpia; update preserva borradores",
       "evidence": ""
     },
@@ -642,7 +642,7 @@
       "deps": [
         "T14"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Sin scroll horizontal; a11y básica verificada",
       "evidence": ""
     },
@@ -690,7 +690,7 @@
       "deps": [
         "T05"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Dockerfiles, compose prod, CI, runbook",
       "evidence": ""
     },
@@ -701,7 +701,7 @@
       "deps": [
         "T08"
       ],
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "Script probado sobre BD temporal",
       "evidence": ""
     },

@@ -1,0 +1,43 @@
+{
+	email {$ACME_EMAIL}
+}
+
+# Mismo origen para web y API (cookies de sesión y CSRF sin CORS).
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		# Telegram embebe la Mini App: no se bloquea el framing desde web.telegram.org.
+		Content-Security-Policy "default-src 'self'; script-src 'self' https://telegram.org; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; font-src 'self' data:; frame-ancestors 'self' https://web.telegram.org https://*.telegram.org; base-uri 'self'; form-action 'self' https://oauth.telegram.org"
+		-Server
+	}
+
+	# La API interna del bot nunca se expone públicamente.
+	respond /internal/* 404
+
+	handle /api/* {
+		reverse_proxy server:8080
+	}
+	handle /healthz {
+		reverse_proxy server:8080
+	}
+
+	# Webhook de Telegram → bot (el bot valida X-Telegram-Bot-Api-Secret-Token).
+	handle /telegram/webhook {
+		reverse_proxy bot:8090
+	}
+
+	handle {
+		root * /srv/web
+		@sw path /sw.js /registerSW.js /manifest.webmanifest
+		header @sw Cache-Control "no-cache"
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		try_files {path} /index.html
+		file_server
+	}
+}
