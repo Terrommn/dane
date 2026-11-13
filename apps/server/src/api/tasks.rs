@@ -482,7 +482,10 @@ pub struct TaskMaterializeResult {
 
 /// Genera las ocurrencias pendientes hasta hoy (idempotente; también lo hace el worker periódicamente).
 #[utoipa::path(post, path = "/task-recurrences/materialize", tag = "tasks", responses((status = 200, body = TaskMaterializeResult)))]
-async fn materialize_rules(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<TaskMaterializeResult>> {
+async fn materialize_rules(
+    State(s): State<AppState>,
+    auth: AuthUser,
+) -> ApiResult<Json<TaskMaterializeResult>> {
     Ok(Json(TaskMaterializeResult {
         created: materialize_user(&s, auth.user_id).await?,
     }))

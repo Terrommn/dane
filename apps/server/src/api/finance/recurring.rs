@@ -61,7 +61,12 @@ fn active() -> String {
     "active".into()
 }
 
-async fn validate(s: &AppState, user_id: Uuid, b: &FinanceRuleBody, base: &str) -> ApiResult<(String, String)> {
+async fn validate(
+    s: &AppState,
+    user_id: Uuid,
+    b: &FinanceRuleBody,
+    base: &str,
+) -> ApiResult<(String, String)> {
     if !["subscription", "fixed_income"].contains(&b.kind.as_str()) {
         return Err(ApiError::validation("kind", "subscription o fixed_income"));
     }
