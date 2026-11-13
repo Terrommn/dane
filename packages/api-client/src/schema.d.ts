@@ -3116,6 +3116,8 @@ export interface components {
             llm_configured: boolean;
             llm_model?: string | null;
             allowed_fields: string[];
+            /** @description Datos auxiliares de la propuesta (p. ej. `habits` sugeridos para un objetivo, pendientes de confirmar). */
+            meta: Record<string, never>;
             /** Format: int32 */
             version: number;
         };

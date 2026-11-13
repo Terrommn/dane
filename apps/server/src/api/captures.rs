@@ -53,6 +53,9 @@ pub struct CaptureView {
     pub llm_configured: bool,
     pub llm_model: Option<String>,
     pub allowed_fields: Vec<String>,
+    /// Datos auxiliares de la propuesta (p. ej. `habits` sugeridos para un objetivo, pendientes de confirmar).
+    #[schema(value_type = Object)]
+    pub meta: Value,
     pub version: i32,
 }
 
@@ -75,6 +78,7 @@ fn view(s: &AppState, r: CaptureRow) -> CaptureView {
         applied: r.applied,
         llm_configured: llm::configured(s),
         llm_model: r.llm_model,
+        meta: r.meta.clone(),
         version: r.version,
     }
 }

@@ -9404,6 +9404,7 @@
           "errors",
           "llm_configured",
           "allowed_fields",
+          "meta",
           "version"
         ],
         "properties": {
@@ -9469,6 +9470,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "meta": {
+            "type": "object",
+            "description": "Datos auxiliares de la propuesta (p. ej. `habits` sugeridos para un objetivo, pendientes de confirmar)."
           },
           "version": {
             "type": "integer",

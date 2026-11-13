@@ -6,6 +6,7 @@ import { GROUP_LABEL, MORE_NAV, type NavItem, PRIMARY_NAV, visibleItems } from "
 import { LoadingState } from "../components/ui/States";
 import { useToast } from "../components/ui/Toast";
 import { useAuth } from "../features/auth/AuthProvider";
+import { DemoBanner } from "../features/demo/Demo";
 import { useSyncQueue } from "../lib/offline/hooks";
 import { supports } from "../lib/telegram";
 import { UpdatePrompt } from "./UpdatePrompt";
@@ -106,6 +107,7 @@ export function AppShell() {
       <a href="#contenido" className="sr-only-focusable fixed left-2 top-2 z-50 rounded bg-surface p-2">
         Saltar al contenido
       </a>
+      <DemoBanner />
       <div className="mx-auto flex max-w-7xl">
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 overflow-y-auto border-r border-line p-3 md:block">
           <Link to="/hoy" className="mb-4 block px-3 text-xl font-bold text-fg no-underline">

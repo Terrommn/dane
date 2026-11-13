@@ -107,20 +107,24 @@ const ReadingsPage = lazy(() =>
 const ReadingEditorPage = lazy(() =>
   import("../features/readings/ReadingsPage").then((m) => ({ default: m.ReadingEditorPage })),
 );
+const CapturePage = lazy(() =>
+  import("../features/capture/CapturePage").then((m) => ({ default: m.CapturePage })),
+);
+const NewCapturePage = lazy(() =>
+  import("../features/capture/NewCapturePage").then((m) => ({ default: m.NewCapturePage })),
+);
+const ImportPage = lazy(() =>
+  import("../features/imports/ImportPage").then((m) => ({ default: m.ImportPage })),
+);
+const ExportPage = lazy(() =>
+  import("../features/imports/ImportPage").then((m) => ({ default: m.ExportPage })),
+);
+const IntegrationsPage = lazy(() =>
+  import("../features/integrations/IntegrationsPage").then((m) => ({ default: m.IntegrationsPage })),
+);
 
 /** Pantallas registradas cuyo módulo se completa en la fase 2 (ver ModulePending). */
-const PENDING: { path: string; title: string; includes: string[] }[] = [
-  {
-    path: "/captura/:id",
-    title: "Revisar captura",
-    includes: ["Vista previa de lo extraído y confirmación antes de aplicar"],
-  },
-  {
-    path: "/importar",
-    title: "Importar / exportar",
-    includes: ["Importación del vault con simulación previa", "Exportación JSON/CSV/Markdown"],
-  },
-];
+const PENDING: { path: string; title: string; includes: string[] }[] = [];
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { status, error } = useAuth();
@@ -218,6 +222,11 @@ export function App() {
                 <Route path="/dibujos/:id" element={<DrawingPage />} />
                 <Route path="/agenda" element={<AgendaPage />} />
                 <Route path="/vistas" element={<ViewsPage />} />
+                <Route path="/captura/nueva" element={<NewCapturePage />} />
+                <Route path="/captura/:id" element={<CapturePage />} />
+                <Route path="/importar" element={<ImportPage />} />
+                <Route path="/exportar" element={<ExportPage />} />
+                <Route path="/ajustes/integraciones" element={<IntegrationsPage />} />
                 {PENDING.map((p) => (
                   <Route
                     key={p.path}

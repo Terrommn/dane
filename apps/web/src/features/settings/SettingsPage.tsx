@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, Navigate, useSearchParams } from "react-router";
 import { ConflictDialog } from "../../components/ui/ConflictDialog";
 import { Card, PageHeader } from "../../components/ui/Display";
 import { QueryState } from "../../components/ui/States";
@@ -18,6 +18,10 @@ export function SettingsPage() {
   const settings = useSettings();
   const { save, saving, conflict, resolve, dismissConflict } = useSaveSettings();
   const { me } = useAuth();
+  const [params] = useSearchParams();
+  // El callback de Google vuelve a /ajustes?google=… cuando no hay otra ruta: se muestra en Integraciones.
+  const google = params.get("google");
+  if (google) return <Navigate to={`/ajustes/integraciones?google=${encodeURIComponent(google)}`} replace />;
   return (
     <div className="space-y-4">
       <PageHeader
@@ -39,6 +43,22 @@ export function SettingsPage() {
               </p>
             </Card>
             <TelegramStatusCard />
+            <Card title="Integraciones y datos">
+              <ul className="space-y-1 text-sm">
+                <li>
+                  <Link to="/ajustes/integraciones">Google Calendar, Gmail, ClickUp e IA →</Link>
+                </li>
+                <li>
+                  <Link to="/captura/nueva">Captura libre (como en el bot) →</Link>
+                </li>
+                <li>
+                  <Link to="/importar">Importar el vault de Obsidian →</Link>
+                </li>
+                <li>
+                  <Link to="/exportar">Exportar mis datos →</Link>
+                </li>
+              </ul>
+            </Card>
             <Card title="Sesión y datos de este dispositivo">
               <p className="mb-3 text-sm text-muted">
                 Sesión {me?.session_transport === "bearer" ? "de Telegram (Mini App)" : "del navegador"}. Al
