@@ -31,7 +31,12 @@ pub struct Limits {
 
 impl Default for Limits {
     fn default() -> Self {
-        Self { max_files: 20_000, max_file_bytes: 10 * 1024 * 1024, max_total_bytes: 200 * 1024 * 1024, max_ratio: 200 }
+        Self {
+            max_files: 20_000,
+            max_file_bytes: 10 * 1024 * 1024,
+            max_total_bytes: 200 * 1024 * 1024,
+            max_ratio: 200,
+        }
     }
 }
 
@@ -109,7 +114,10 @@ pub fn read_zip(bytes: &[u8], limits: Limits) -> Result<Vec<VaultFile>, ImportEr
         }
         // Se lee con límite real: el tamaño declarado en el ZIP puede mentir.
         let mut buf = Vec::new();
-        (&mut f).take(limits.max_file_bytes + 1).read_to_end(&mut buf).map_err(|_| ImportError::NotZip)?;
+        (&mut f)
+            .take(limits.max_file_bytes + 1)
+            .read_to_end(&mut buf)
+            .map_err(|_| ImportError::NotZip)?;
         if buf.len() as u64 > limits.max_file_bytes {
             return Err(ImportError::FileTooLarge(path));
         }
@@ -131,24 +139,50 @@ pub enum Payload {
     Person(vault::PersonImport),
     Card(vault::CardImport),
     Account(vault::AccountImport),
-    Recurring { subscription: bool, item: vault::RecurringImport },
+    Recurring {
+        subscription: bool,
+        item: vault::RecurringImport,
+    },
     RecurringTask(vault::RecurringTaskImport),
     CreditPlan(vault::CreditPlanImport),
     Reading(vault::ReadingImport),
     Content(vault::ContentImport),
     Swipe(vault::SwipeImport),
-    Note { kind: String, title: String, body: String, tags: Vec<String>, aliases: Vec<String>, project: Option<String>, metadata: Value },
+    Note {
+        kind: String,
+        title: String,
+        body: String,
+        tags: Vec<String>,
+        aliases: Vec<String>,
+        project: Option<String>,
+        metadata: Value,
+    },
     Adr(vault::AdrImport),
     Devlog(vault::DevlogImport),
     Class(vault::ClassImport),
-    Goal { kind: String, period: String, starts_on: NaiveDate, ends_on: NaiveDate, closing: String, goal: vault::GoalImport },
+    Goal {
+        kind: String,
+        period: String,
+        starts_on: NaiveDate,
+        ends_on: NaiveDate,
+        closing: String,
+        goal: vault::GoalImport,
+    },
     Devotional(vault::DevotionalImport),
     Daily(vault::DailyImport),
     Task(vault::TaskImport),
     Weekly(vault::WeeklyImport),
-    Transaction { income: bool, row: vault::TxRow },
-    Budget { month: String, lines: Vec<(String, i64)> },
-    Inbox { text: String },
+    Transaction {
+        income: bool,
+        row: vault::TxRow,
+    },
+    Budget {
+        month: String,
+        lines: Vec<(String, i64)>,
+    },
+    Inbox {
+        text: String,
+    },
 }
 
 impl Payload {
@@ -159,8 +193,20 @@ impl Payload {
             Payload::Person(_) => 1,
             Payload::Card(_) | Payload::Account(_) => 2,
             Payload::Recurring { .. } | Payload::RecurringTask(_) | Payload::CreditPlan(_) => 3,
-            Payload::Reading(_) | Payload::Content(_) | Payload::Swipe(_) | Payload::Note { .. } | Payload::Adr(_) | Payload::Devlog(_) | Payload::Class(_) => 4,
-            Payload::Goal { kind, .. } => if kind == "month" { 5 } else { 6 },
+            Payload::Reading(_)
+            | Payload::Content(_)
+            | Payload::Swipe(_)
+            | Payload::Note { .. }
+            | Payload::Adr(_)
+            | Payload::Devlog(_)
+            | Payload::Class(_) => 4,
+            Payload::Goal { kind, .. } => {
+                if kind == "month" {
+                    5
+                } else {
+                    6
+                }
+            }
             Payload::Devotional(_) => 7,
             Payload::Daily(_) => 8,
             Payload::Task(_) => 9,
@@ -255,7 +301,10 @@ impl Plan {
     pub fn summary(&self) -> Value {
         let mut by: BTreeMap<String, BTreeMap<String, usize>> = BTreeMap::new();
         for i in &self.items {
-            *by.entry(i.entity_type.clone()).or_default().entry(i.action.clone()).or_default() += 1;
+            *by.entry(i.entity_type.clone())
+                .or_default()
+                .entry(i.action.clone())
+                .or_default() += 1;
         }
         json!({
             "by_entity": by,
@@ -277,14 +326,55 @@ fn hash(p: &Payload) -> String {
 
 fn known_keys(kind: &FileKind) -> &'static [&'static str] {
     match kind {
-        FileKind::Daily { .. } => &["fecha", "categories", "devocional", "ejercicio", "lectura", "energia", "peso"],
+        FileKind::Daily { .. } => &[
+            "fecha",
+            "categories",
+            "devocional",
+            "ejercicio",
+            "lectura",
+            "energia",
+            "peso",
+        ],
         FileKind::Devotional { .. } => &["fecha", "categories", "pasaje"],
-        FileKind::GoalMonth { .. } | FileKind::GoalWeek { .. } => &["categories", "tipo", "periodo", "inicio", "fin", "estado", "mes"],
+        FileKind::GoalMonth { .. } | FileKind::GoalWeek { .. } => {
+            &["categories", "tipo", "periodo", "inicio", "fin", "estado", "mes"]
+        }
         FileKind::Weekly { .. } => &["semana", "paz", "categories"],
-        FileKind::Person => &["categories", "area", "relacion", "org", "rol", "ultimo_contacto", "cumpleaños", "contacto", "aliases"],
+        FileKind::Person => &[
+            "categories",
+            "area",
+            "relacion",
+            "org",
+            "rol",
+            "ultimo_contacto",
+            "cumpleaños",
+            "contacto",
+            "aliases",
+        ],
         FileKind::Reading => &["categories", "tipo", "autor", "estado", "rating", "inicio", "fin"],
-        FileKind::Content => &["categories", "estado", "formato", "plataforma", "hook", "pilar", "fecha_pub", "raw_path", "render_path", "views", "retencion"],
-        FileKind::Card => &["categories", "banco", "limite", "disponible", "actualizado", "dia_corte", "dia_pago", "estado"],
+        FileKind::Content => &[
+            "categories",
+            "estado",
+            "formato",
+            "plataforma",
+            "hook",
+            "pilar",
+            "fecha_pub",
+            "raw_path",
+            "render_path",
+            "views",
+            "retencion",
+        ],
+        FileKind::Card => &[
+            "categories",
+            "banco",
+            "limite",
+            "disponible",
+            "actualizado",
+            "dia_corte",
+            "dia_pago",
+            "estado",
+        ],
         FileKind::Account => &["categories", "banco", "saldo", "actualizado", "estado"],
         FileKind::Adr { .. } => &["categories", "proyecto", "estado", "fecha"],
         FileKind::Devlog { .. } => &["categories", "fecha", "proyectos"],
@@ -297,12 +387,22 @@ fn known_keys(kind: &FileKind) -> &'static [&'static str] {
 
 fn unknown(note: &Note, kind: &FileKind) -> Value {
     let known = known_keys(kind);
-    Value::Object(note.frontmatter.iter().filter(|(k, _)| !known.contains(&k.as_str())).map(|(k, v)| (k.clone(), v.clone())).collect())
+    Value::Object(
+        note.frontmatter
+            .iter()
+            .filter(|(k, _)| !known.contains(&k.as_str()))
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect(),
+    )
 }
 
 fn item(path: &str, key_suffix: &str, title: String, payload: Payload, unknown_fields: Value) -> PlanItem {
     PlanItem {
-        source_key: if key_suffix.is_empty() { path.to_string() } else { format!("{path}#{key_suffix}") },
+        source_key: if key_suffix.is_empty() {
+            path.to_string()
+        } else {
+            format!("{path}#{key_suffix}")
+        },
         path: path.to_string(),
         title,
         entity_type: payload.entity_type().to_string(),
@@ -324,14 +424,22 @@ fn is_example_credit_plan(p: &vault::CreditPlanImport) -> bool {
     p.goal.is_empty()
         && p.steps.is_empty()
         && p.rules.iter().map(|r| fold(r)).collect::<Vec<_>>()
-            == ["pagar siempre el total, nunca el minimo.", "uso de cada tarjeta < 30% de su linea.", "nada de tarjetas nuevas fuera de este plan."]
+            == [
+                "pagar siempre el total, nunca el minimo.",
+                "uso de cada tarjeta < 30% de su linea.",
+                "nada de tarjetas nuevas fuera de este plan.",
+            ]
 }
 
 fn inline_tags(body: &str) -> Vec<String> {
     let mut tags: Vec<String> = body
         .split_whitespace()
         .filter_map(|w| w.strip_prefix('#'))
-        .filter(|t| !t.is_empty() && t.chars().next().is_some_and(|c| c.is_alphabetic()) && t.chars().all(|c| c.is_alphanumeric() || "/_-".contains(c)))
+        .filter(|t| {
+            !t.is_empty()
+                && t.chars().next().is_some_and(|c| c.is_alphabetic())
+                && t.chars().all(|c| c.is_alphanumeric() || "/_-".contains(c))
+        })
         .map(str::to_string)
         .collect();
     tags.sort();
@@ -347,11 +455,17 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
         let kind = vault::classify(&f.path);
         match &kind {
             FileKind::Ignored { reason } => {
-                plan.ignored.push(FileRef { path: f.path.clone(), reason: reason.clone() });
+                plan.ignored.push(FileRef {
+                    path: f.path.clone(),
+                    reason: reason.clone(),
+                });
                 continue;
             }
             FileKind::Unsupported { reason } => {
-                plan.references.push(FileRef { path: f.path.clone(), reason: reason.clone() });
+                plan.references.push(FileRef {
+                    path: f.path.clone(),
+                    reason: reason.clone(),
+                });
                 continue;
             }
             _ => {}
@@ -362,11 +476,15 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
             Err(_) => f.bytes.iter().map(|b| *b as char).collect(),
         };
         if raw.contains("<%") || raw.contains("{{date") {
-            plan.ignored.push(FileRef { path: f.path.clone(), reason: "contiene sintaxis de plantilla".into() });
+            plan.ignored.push(FileRef {
+                path: f.path.clone(),
+                reason: "contiene sintaxis de plantilla".into(),
+            });
             continue;
         }
         let (note, warns) = vault::parse_note(&f.path, &raw);
-        plan.warnings.extend(warns.into_iter().map(|w| format!("{}: {w}", f.path)));
+        plan.warnings
+            .extend(warns.into_iter().map(|w| format!("{}: {w}", f.path)));
         let unk = unknown(&note, &kind);
         let p = f.path.as_str();
         match kind {
@@ -374,21 +492,40 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
             FileKind::Devotional { date } => {
                 let d = vault::devotional(&note, date);
                 if d.has_content() {
-                    plan.items.push(item(p, "", format!("Devocional {date}"), Payload::Devotional(d), unk));
+                    plan.items.push(item(
+                        p,
+                        "",
+                        format!("Devocional {date}"),
+                        Payload::Devotional(d),
+                        unk,
+                    ));
                 } else {
-                    plan.ignored.push(FileRef { path: p.into(), reason: "devocional vacío".into() });
+                    plan.ignored.push(FileRef {
+                        path: p.into(),
+                        reason: "devocional vacío".into(),
+                    });
                 }
             }
             FileKind::GoalMonth { period } | FileKind::GoalWeek { period } => {
-                let is_month = vault::classify(p) == FileKind::GoalMonth { period: period.clone() };
+                let is_month = vault::classify(p)
+                    == FileKind::GoalMonth {
+                        period: period.clone(),
+                    };
                 let g = vault::goals_note(&note, if is_month { "month" } else { "week" }, &period);
-                let range = if is_month { domain::time::parse_month(&period) } else { domain::time::parse_iso_week(&period) };
+                let range = if is_month {
+                    domain::time::parse_month(&period)
+                } else {
+                    domain::time::parse_iso_week(&period)
+                };
                 let Ok(range) = range else {
                     plan.warnings.push(format!("{p}: periodo inválido '{period}'"));
                     continue;
                 };
                 if g.goals.is_empty() {
-                    plan.ignored.push(FileRef { path: p.into(), reason: "nota de objetivos sin objetivos".into() });
+                    plan.ignored.push(FileRef {
+                        path: p.into(),
+                        reason: "nota de objetivos sin objetivos".into(),
+                    });
                 }
                 for (i, goal) in g.goals.iter().enumerate() {
                     plan.items.push(item(
@@ -410,30 +547,50 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
             FileKind::Weekly { week } => {
                 let w = vault::weekly(&note, &week);
                 if domain::time::parse_iso_week(&w.week).is_ok() {
-                    plan.items.push(item(p, "", format!("Semana {}", w.week), Payload::Weekly(w), unk));
+                    plan.items
+                        .push(item(p, "", format!("Semana {}", w.week), Payload::Weekly(w), unk));
                 } else {
                     plan.warnings.push(format!("{p}: semana inválida"));
                 }
             }
             FileKind::Person => {
                 let x = vault::person(&note);
-                plan.items.push(item(p, "", x.name.clone(), Payload::Person(x), unk));
+                plan.items
+                    .push(item(p, "", x.name.clone(), Payload::Person(x), unk));
             }
             FileKind::Reading => {
                 let x = vault::reading(&note);
-                plan.items.push(item(p, "", x.title.clone(), Payload::Reading(x), unk));
+                plan.items
+                    .push(item(p, "", x.title.clone(), Payload::Reading(x), unk));
             }
             FileKind::Content => {
                 let x = vault::content(&note);
-                plan.items.push(item(p, "", x.title.clone(), Payload::Content(x), unk));
+                plan.items
+                    .push(item(p, "", x.title.clone(), Payload::Content(x), unk));
             }
             FileKind::Swipe => {
                 let x = vault::swipe(&note);
                 if x.url.is_some() {
-                    plan.items.push(item(p, "", x.title.clone(), Payload::Swipe(x), unk));
+                    plan.items
+                        .push(item(p, "", x.title.clone(), Payload::Swipe(x), unk));
                 } else {
-                    plan.warnings.push(format!("{p}: referencia Swipe sin URL; se importa como nota"));
-                    plan.items.push(item(p, "", note.stem(), Payload::Note { kind: "note".into(), title: note.stem(), body: note.body.clone(), tags: vec!["swipe".into()], aliases: vec![], project: None, metadata: unk.clone() }, unk));
+                    plan.warnings
+                        .push(format!("{p}: referencia Swipe sin URL; se importa como nota"));
+                    plan.items.push(item(
+                        p,
+                        "",
+                        note.stem(),
+                        Payload::Note {
+                            kind: "note".into(),
+                            title: note.stem(),
+                            body: note.body.clone(),
+                            tags: vec!["swipe".into()],
+                            aliases: vec![],
+                            project: None,
+                            metadata: unk.clone(),
+                        },
+                        unk,
+                    ));
                 }
             }
             FileKind::ClassNote { subject } => {
@@ -442,71 +599,126 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
                     plan.warnings.push(format!("{p}: clase sin fecha"));
                     continue;
                 }
-                plan.items.push(item(p, "", x.topic.clone(), Payload::Class(x), unk));
+                plan.items
+                    .push(item(p, "", x.topic.clone(), Payload::Class(x), unk));
             }
             FileKind::Devlog { date } => {
                 let x = vault::devlog(&note, date);
                 if !x.sessions.is_empty() {
-                    plan.items.push(item(p, "", format!("Devlog {date}"), Payload::Devlog(x), unk));
+                    plan.items
+                        .push(item(p, "", format!("Devlog {date}"), Payload::Devlog(x), unk));
                 }
             }
             FileKind::Adr { project } => {
                 let x = vault::adr(&note, &project);
-                plan.items.push(item(p, "", x.title.clone(), Payload::Adr(x), unk));
+                plan.items
+                    .push(item(p, "", x.title.clone(), Payload::Adr(x), unk));
             }
             FileKind::Expenses { month } | FileKind::Income { month } => {
                 let income = matches!(vault::classify(p), FileKind::Income { .. });
                 let m = vault::money_note(&note, &month, if income { "Cuenta" } else { "Pago" });
                 plan.warnings.extend(m.warnings.iter().cloned());
                 for row in m.rows {
-                    let key = format!("{}|{}|{}|{}", row.date, fold(&row.concept), row.amount_cents, row.occurrence);
-                    plan.items.push(item(p, &key, format!("{} {}", row.date, row.concept), Payload::Transaction { income, row }, Value::Object(Default::default())));
+                    let key = format!(
+                        "{}|{}|{}|{}",
+                        row.date,
+                        fold(&row.concept),
+                        row.amount_cents,
+                        row.occurrence
+                    );
+                    plan.items.push(item(
+                        p,
+                        &key,
+                        format!("{} {}", row.date, row.concept),
+                        Payload::Transaction { income, row },
+                        Value::Object(Default::default()),
+                    ));
                 }
                 if !m.budget.is_empty() {
-                    plan.items.push(item(p, "budget", format!("Presupuesto {month}"), Payload::Budget { month, lines: m.budget }, Value::Object(Default::default())));
+                    plan.items.push(item(
+                        p,
+                        "budget",
+                        format!("Presupuesto {month}"),
+                        Payload::Budget {
+                            month,
+                            lines: m.budget,
+                        },
+                        Value::Object(Default::default()),
+                    ));
                 }
             }
             FileKind::Card => {
                 let x = vault::card(&note);
-                plan.items.push(item(p, "", x.name.clone(), Payload::Card(x), unk));
+                plan.items
+                    .push(item(p, "", x.name.clone(), Payload::Card(x), unk));
             }
             FileKind::Account => {
                 let x = vault::account(&note);
-                plan.items.push(item(p, "", x.name.clone(), Payload::Account(x), unk));
+                plan.items
+                    .push(item(p, "", x.name.clone(), Payload::Account(x), unk));
             }
             FileKind::Subscriptions | FileKind::FixedIncome => {
                 let subscription = matches!(vault::classify(p), FileKind::Subscriptions);
                 let (rules, warns) = vault::recurring_list(&note, subscription);
-                plan.warnings.extend(warns.into_iter().map(|w| format!("{p}: {w}")));
+                plan.warnings
+                    .extend(warns.into_iter().map(|w| format!("{p}: {w}")));
                 for r in rules {
-                    plan.items.push(item(p, &fold(&r.name), r.name.clone(), Payload::Recurring { subscription, item: r }, Value::Object(Default::default())));
+                    plan.items.push(item(
+                        p,
+                        &fold(&r.name),
+                        r.name.clone(),
+                        Payload::Recurring {
+                            subscription,
+                            item: r,
+                        },
+                        Value::Object(Default::default()),
+                    ));
                 }
             }
             FileKind::RecurringTasks => {
                 for r in vault::recurring_tasks(&note) {
-                    plan.items.push(item(p, &fold(&r.title), r.title.clone(), Payload::RecurringTask(r), Value::Object(Default::default())));
+                    plan.items.push(item(
+                        p,
+                        &fold(&r.title),
+                        r.title.clone(),
+                        Payload::RecurringTask(r),
+                        Value::Object(Default::default()),
+                    ));
                 }
             }
             FileKind::CreditPlan => {
                 let x = vault::credit_plan(&note);
                 if is_example_credit_plan(&x) {
-                    plan.ignored.push(FileRef { path: p.into(), reason: "plan de crédito de ejemplo (sin cambios del usuario)".into() });
+                    plan.ignored.push(FileRef {
+                        path: p.into(),
+                        reason: "plan de crédito de ejemplo (sin cambios del usuario)".into(),
+                    });
                 } else {
-                    plan.items.push(item(p, "", "Plan de crédito".into(), Payload::CreditPlan(x), unk));
+                    plan.items
+                        .push(item(p, "", "Plan de crédito".into(), Payload::CreditPlan(x), unk));
                 }
             }
             FileKind::Inbox => {
                 for (i, t) in vault::inbox(&note).into_iter().enumerate() {
-                    plan.items.push(item(p, &format!("{i}|{}", fold(&t)), t.clone(), Payload::Inbox { text: t }, Value::Object(Default::default())));
+                    plan.items.push(item(
+                        p,
+                        &format!("{i}|{}", fold(&t)),
+                        t.clone(),
+                        Payload::Inbox { text: t },
+                        Value::Object(Default::default()),
+                    ));
                 }
             }
             FileKind::Project { slug } => {
                 let mut x = vault::project(&note, &slug);
                 if is_example_budget(&x.budget_items) {
-                    plan.warnings.push(format!("{p}: presupuesto por rubro de ejemplo omitido (configúralo en Finanzas)"));
+                    plan.warnings.push(format!(
+                        "{p}: presupuesto por rubro de ejemplo omitido (configúralo en Finanzas)"
+                    ));
                     x.budget_items.clear();
                 }
-                plan.items.push(item(p, "", slug.clone(), Payload::Project(x), unk));
+                plan.items
+                    .push(item(p, "", slug.clone(), Payload::Project(x), unk));
             }
             FileKind::Note { note_kind } => {
                 let project = match p.split('/').collect::<Vec<_>>().as_slice() {
@@ -519,14 +731,25 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
                 tags.dedup();
                 let body = note.body.trim().to_string();
                 if body.is_empty() && note.frontmatter.is_empty() {
-                    plan.ignored.push(FileRef { path: p.into(), reason: "nota vacía".into() });
+                    plan.ignored.push(FileRef {
+                        path: p.into(),
+                        reason: "nota vacía".into(),
+                    });
                     continue;
                 }
                 plan.items.push(item(
                     p,
                     "",
                     note.stem(),
-                    Payload::Note { kind: note_kind, title: note.stem(), body, tags, aliases: note.fm_list("aliases"), project, metadata: unk.clone() },
+                    Payload::Note {
+                        kind: note_kind,
+                        title: note.stem(),
+                        body,
+                        tags,
+                        aliases: note.fm_list("aliases"),
+                        project,
+                        metadata: unk.clone(),
+                    },
                     unk,
                 ));
             }
@@ -536,7 +759,13 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
     // Pendientes consolidados a través de las dailies (el arrastre del vault los copiaba cada día).
     let only: Vec<vault::DailyImport> = dailies.iter().map(|d| d.1.clone()).collect();
     for t in vault::consolidate_tasks(&only) {
-        plan.items.push(item("Daily/*", &format!("task:{}", t.key), t.title.clone(), Payload::Task(t), Value::Object(Default::default())));
+        plan.items.push(item(
+            "Daily/*",
+            &format!("task:{}", t.key),
+            t.title.clone(),
+            Payload::Task(t),
+            Value::Object(Default::default()),
+        ));
     }
     for (path, mut d) in dailies {
         if d.fixed_false_ignored > 0 {
@@ -544,7 +773,13 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
         }
         d.tasks.clear(); // ya consolidados
         let date = d.date;
-        plan.items.push(item(&path, "", format!("Daily {date}"), Payload::Daily(d), Value::Object(Default::default())));
+        plan.items.push(item(
+            &path,
+            "",
+            format!("Daily {date}"),
+            Payload::Daily(d),
+            Value::Object(Default::default()),
+        ));
     }
     plan.items.sort_by_key(|i| i.payload.rank());
     plan
@@ -557,7 +792,10 @@ pub async fn resolve_actions(state: &AppState, user_id: Uuid, plan: &mut Plan) -
             .bind(user_id)
             .fetch_all(&state.pool)
             .await?;
-    let map: HashMap<(String, String), (Uuid, String, chrono::DateTime<chrono::Utc>)> = records.into_iter().map(|(k, t, id, h, at)| ((k, t), (id, h, at))).collect();
+    let map: HashMap<(String, String), (Uuid, String, chrono::DateTime<chrono::Utc>)> = records
+        .into_iter()
+        .map(|(k, t, id, h, at)| ((k, t), (id, h, at)))
+        .collect();
     for it in &mut plan.items {
         if let Some((id, h, at)) = map.get(&(it.source_key.clone(), it.entity_type.clone())) {
             if *h == it.hash {
@@ -565,14 +803,16 @@ pub async fn resolve_actions(state: &AppState, user_id: Uuid, plan: &mut Plan) -
                 continue;
             }
             let modified: Option<bool> = match table_of(&it.entity_type) {
-                Some(t) => sqlx::query_scalar(persistence::sqlf!("SELECT updated_at > $3 FROM {t} WHERE user_id = $1 AND id = $2"))
-                    .bind(user_id)
-                    .bind(id)
-                    .bind(*at)
-                    .fetch_optional(&state.pool)
-                    .await
-                    .ok()
-                    .flatten(),
+                Some(t) => sqlx::query_scalar(persistence::sqlf!(
+                    "SELECT updated_at > $3 FROM {t} WHERE user_id = $1 AND id = $2"
+                ))
+                .bind(user_id)
+                .bind(id)
+                .bind(*at)
+                .fetch_optional(&state.pool)
+                .await
+                .ok()
+                .flatten(),
                 None => None,
             };
             it.action = match modified {
@@ -581,11 +821,15 @@ pub async fn resolve_actions(state: &AppState, user_id: Uuid, plan: &mut Plan) -
                     "unchanged".into()
                 }
                 Some(true) => {
-                    it.reason = Some("cambió en el archivo y también en la app; revisa y edita en la app".into());
+                    it.reason =
+                        Some("cambió en el archivo y también en la app; revisa y edita en la app".into());
                     "conflict".into()
                 }
                 Some(false) => {
-                    it.reason = Some("el archivo cambió desde la última importación; no se sobrescribe automáticamente".into());
+                    it.reason = Some(
+                        "el archivo cambió desde la última importación; no se sobrescribe automáticamente"
+                            .into(),
+                    );
                     "conflict".into()
                 }
             };
@@ -593,14 +837,30 @@ pub async fn resolve_actions(state: &AppState, user_id: Uuid, plan: &mut Plan) -
         }
         // Colisiones por clave natural con datos creados en la app.
         let (sql, arg): (Option<&str>, String) = match &it.payload {
-            Payload::Daily(d) => (Some("SELECT 1 FROM daily_checkins WHERE user_id = $1 AND on_date = $2::date"), d.date.to_string()),
-            Payload::Devotional(d) => (Some("SELECT 1 FROM devotionals WHERE user_id = $1 AND on_date = $2::date"), d.date.to_string()),
-            Payload::Weekly(w) => (Some("SELECT 1 FROM weekly_reviews WHERE user_id = $1 AND iso_week = $2"), w.week.clone()),
-            Payload::Devlog(d) => (Some("SELECT 1 FROM devlogs WHERE user_id = $1 AND on_date = $2::date"), d.date.to_string()),
+            Payload::Daily(d) => (
+                Some("SELECT 1 FROM daily_checkins WHERE user_id = $1 AND on_date = $2::date"),
+                d.date.to_string(),
+            ),
+            Payload::Devotional(d) => (
+                Some("SELECT 1 FROM devotionals WHERE user_id = $1 AND on_date = $2::date"),
+                d.date.to_string(),
+            ),
+            Payload::Weekly(w) => (
+                Some("SELECT 1 FROM weekly_reviews WHERE user_id = $1 AND iso_week = $2"),
+                w.week.clone(),
+            ),
+            Payload::Devlog(d) => (
+                Some("SELECT 1 FROM devlogs WHERE user_id = $1 AND on_date = $2::date"),
+                d.date.to_string(),
+            ),
             _ => (None, String::new()),
         };
         if let Some(sql) = sql {
-            let exists: Option<i32> = sqlx::query_scalar(sqlx::AssertSqlSafe(sql)).bind(user_id).bind(&arg).fetch_optional(&state.pool).await?;
+            let exists: Option<i32> = sqlx::query_scalar(sqlx::AssertSqlSafe(sql))
+                .bind(user_id)
+                .bind(&arg)
+                .fetch_optional(&state.pool)
+                .await?;
             if exists.is_some() {
                 it.action = "conflict".into();
                 it.reason = Some("ya existe un registro en la app para esa fecha; no se sobrescribe".into());
@@ -649,12 +909,25 @@ struct Ctx {
 }
 
 /// Aplica en una sola transacción todo lo que el plan marca como `create`/`link`.
-pub async fn apply_plan(state: &AppState, user_id: Uuid, run_id: Uuid, plan: &Plan) -> Result<ApplyReport, String> {
+pub async fn apply_plan(
+    state: &AppState,
+    user_id: Uuid,
+    run_id: Uuid,
+    plan: &Plan,
+) -> Result<ApplyReport, String> {
     let db = |e: sqlx::Error| format!("error de base de datos: {e}");
     let mut tx = state.pool.begin().await.map_err(db)?;
     let tz = super::user_tz(state, user_id).await;
     let today = domain::time::local_date(state.now(), tz);
-    let mut ctx = Ctx { r: Resolver::load(&mut tx, user_id).await.map_err(db)?, tz, today, run_id, warnings: vec![], month_goals: HashMap::new(), imported_debt: None };
+    let mut ctx = Ctx {
+        r: Resolver::load(&mut tx, user_id).await.map_err(db)?,
+        tz,
+        today,
+        run_id,
+        warnings: vec![],
+        month_goals: HashMap::new(),
+        imported_debt: None,
+    };
     let mut rep = ApplyReport::default();
     for it in &plan.items {
         match it.action.as_str() {
@@ -669,7 +942,9 @@ pub async fn apply_plan(state: &AppState, user_id: Uuid, run_id: Uuid, plan: &Pl
             _ => {}
         }
         let linked = it.action == "link";
-        let entity = apply_item(&mut tx, user_id, &mut ctx, it).await.map_err(|e| format!("{}: {e}", it.path))?;
+        let entity = apply_item(&mut tx, user_id, &mut ctx, it)
+            .await
+            .map_err(|e| format!("{}: {e}", it.path))?;
         if let Some(id) = entity {
             sqlx::query(
                 "INSERT INTO import_records (user_id, source_key, entity_type, entity_id, content_hash, unknown_fields, provenance, run_id)
@@ -705,7 +980,12 @@ fn noon_utc(d: NaiveDate, tz: chrono_tz::Tz) -> chrono::DateTime<chrono::Utc> {
     domain::time::local_to_utc(d, chrono::NaiveTime::from_hms_opt(12, 0, 0).unwrap(), tz)
 }
 
-async fn ensure_area(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, name: &str) -> sqlx::Result<Option<Uuid>> {
+async fn ensure_area(
+    tx: &mut Tx<'_>,
+    ctx: &mut Ctx,
+    user_id: Uuid,
+    name: &str,
+) -> sqlx::Result<Option<Uuid>> {
     if let Some(a) = ctx.r.area(Some(name)) {
         return Ok(Some(a));
     }
@@ -715,19 +995,30 @@ async fn ensure_area(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, name: &str) 
     }
     let slug = domain::text::slugify(n);
     let display = vault::plain(n);
-    let display = display.chars().next().map(|c| c.to_uppercase().collect::<String>() + &display[c.len_utf8()..]).unwrap_or(display);
+    let display = display
+        .chars()
+        .next()
+        .map(|c| c.to_uppercase().collect::<String>() + &display[c.len_utf8()..])
+        .unwrap_or(display);
     let id: Uuid = sqlx::query_scalar("INSERT INTO areas (user_id, name, slug) VALUES ($1, $2, $3) ON CONFLICT (user_id, slug) DO UPDATE SET name = areas.name RETURNING id")
         .bind(user_id)
         .bind(&display)
         .bind(&slug)
         .fetch_one(&mut **tx)
         .await?;
-    ctx.warnings.push(format!("Se creó el área «{display}» encontrada en el vault"));
+    ctx.warnings
+        .push(format!("Se creó el área «{display}» encontrada en el vault"));
     ctx.r.reload(tx).await?;
     Ok(Some(id))
 }
 
-async fn resolve_payment(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, p: &PaymentRef, path: &str) -> sqlx::Result<(Option<Uuid>, Option<String>, Option<Uuid>)> {
+async fn resolve_payment(
+    tx: &mut Tx<'_>,
+    ctx: &mut Ctx,
+    user_id: Uuid,
+    p: &PaymentRef,
+    path: &str,
+) -> sqlx::Result<(Option<Uuid>, Option<String>, Option<Uuid>)> {
     // (account_id, account_kind, financed_by_person)
     Ok(match p {
         PaymentRef::None => (None, None, None),
@@ -739,14 +1030,19 @@ async fn resolve_payment(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, p: &Paym
                     .bind(name)
                     .fetch_one(&mut **tx)
                     .await?;
-                ctx.r.push_account(id, name.clone(), String::new(), "credit_card".into());
-                ctx.warnings.push(format!("{path}: se creó la tarjeta «{name}» sin límite ni corte; complétala en Finanzas"));
+                ctx.r
+                    .push_account(id, name.clone(), String::new(), "credit_card".into());
+                ctx.warnings.push(format!(
+                    "{path}: se creó la tarjeta «{name}» sin límite ni corte; complétala en Finanzas"
+                ));
                 (Some(id), Some("credit_card".into()), None)
             }
         },
         PaymentRef::Bank { bank, .. } => match ctx.r.account(bank) {
             Some((id, k)) => {
-                ctx.warnings.push(format!("{path}: medio «{bank}» asociado a una cuenta por nombre (revisa C4)"));
+                ctx.warnings.push(format!(
+                    "{path}: medio «{bank}» asociado a una cuenta por nombre (revisa C4)"
+                ));
                 (Some(id), Some(k), None)
             }
             None => {
@@ -758,7 +1054,9 @@ async fn resolve_payment(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, p: &Paym
                     .fetch_one(&mut **tx)
                     .await?;
                 ctx.r.push_account(id, name.clone(), bank.clone(), "debit".into());
-                ctx.warnings.push(format!("{path}: se creó la cuenta «{name}» a partir del texto de pago"));
+                ctx.warnings.push(format!(
+                    "{path}: se creó la cuenta «{name}» a partir del texto de pago"
+                ));
                 (Some(id), Some("debit".into()), None)
             }
         },
@@ -766,21 +1064,25 @@ async fn resolve_payment(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, p: &Paym
             Some((id, k)) => (Some(id), Some(k), None),
             None => {
                 let id: Uuid = sqlx::query_scalar("INSERT INTO fin_accounts (user_id, name, kind) VALUES ($1, 'Efectivo', 'cash') RETURNING id").bind(user_id).fetch_one(&mut **tx).await?;
-                ctx.r.push_account(id, "Efectivo".into(), String::new(), "cash".into());
+                ctx.r
+                    .push_account(id, "Efectivo".into(), String::new(), "cash".into());
                 (Some(id), Some("cash".into()), None)
             }
         },
         PaymentRef::Borrowed { person } => {
             let pid = ctx.r.person(person);
             if pid.is_none() {
-                ctx.warnings.push(format!("{path}: «{person}» (préstamo) no tiene nota de persona"));
+                ctx.warnings
+                    .push(format!("{path}: «{person}» (préstamo) no tiene nota de persona"));
             }
             (None, None, pid)
         }
         PaymentRef::Other { text } => match ctx.r.account(text) {
             Some((id, k)) => (Some(id), Some(k), None),
             None => {
-                ctx.warnings.push(format!("{path}: medio de pago «{text}» no reconocido; queda sin cuenta"));
+                ctx.warnings.push(format!(
+                    "{path}: medio de pago «{text}» no reconocido; queda sin cuenta"
+                ));
                 (None, None, None)
             }
         },
@@ -788,13 +1090,31 @@ async fn resolve_payment(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, p: &Paym
 }
 
 #[allow(clippy::too_many_lines)]
-async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem) -> sqlx::Result<Option<Uuid>> {
+async fn apply_item(
+    tx: &mut Tx<'_>,
+    user_id: Uuid,
+    ctx: &mut Ctx,
+    it: &PlanItem,
+) -> sqlx::Result<Option<Uuid>> {
     let tz = ctx.tz;
     match &it.payload {
         Payload::Project(p) => {
             let slug = domain::text::slugify(&p.slug);
-            let links: Vec<Value> = p.links.iter().filter_map(|(l, u)| validate_external_url("links", u).ok().map(|u| json!({ "label": l, "url": u }))).collect();
-            let existing: Option<Uuid> = sqlx::query_scalar("SELECT id FROM projects WHERE user_id = $1 AND slug = $2").bind(user_id).bind(&slug).fetch_optional(&mut **tx).await?;
+            let links: Vec<Value> = p
+                .links
+                .iter()
+                .filter_map(|(l, u)| {
+                    validate_external_url("links", u)
+                        .ok()
+                        .map(|u| json!({ "label": l, "url": u }))
+                })
+                .collect();
+            let existing: Option<Uuid> =
+                sqlx::query_scalar("SELECT id FROM projects WHERE user_id = $1 AND slug = $2")
+                    .bind(user_id)
+                    .bind(&slug)
+                    .fetch_optional(&mut **tx)
+                    .await?;
             let id = match existing {
                 Some(id) => {
                     sqlx::query(
@@ -828,7 +1148,10 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             ctx.r.reload(tx).await?;
             if !p.budget_items.is_empty() {
                 let month = domain::time::month_key(ctx.today);
-                let cat = ctx.r.category("expense", &p.slug).or_else(|| ctx.r.category("expense", "Negocio"));
+                let cat = ctx
+                    .r
+                    .category("expense", &p.slug)
+                    .or_else(|| ctx.r.category("expense", "Negocio"));
                 if let Some((cat, _)) = cat {
                     let bm = budget_month(tx, user_id, &month).await?;
                     let mut total = 0i64;
@@ -868,7 +1191,10 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                 Some(a) => ctx.r.area(Some(a)),
                 None => None,
             };
-            let (bm, bd, by) = p.birthday.map(|(m, d, y)| (Some(m as i16), Some(d as i16), y.map(|y| y as i16))).unwrap_or((None, None, None));
+            let (bm, bd, by) = p
+                .birthday
+                .map(|(m, d, y)| (Some(m as i16), Some(d as i16), y.map(|y| y as i16)))
+                .unwrap_or((None, None, None));
             let id: Uuid = sqlx::query_scalar(
                 "INSERT INTO people (user_id, name, aliases, area_id, relationship, org, role, contact, email, context_md, birthday_month, birthday_day, birthday_year, last_contact_on)
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id",
@@ -890,13 +1216,15 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             .fetch_one(&mut **tx)
             .await?;
             for (date, text) in &p.notes {
-                sqlx::query("INSERT INTO person_notes (user_id, person_id, on_date, text) VALUES ($1, $2, $3, $4)")
-                    .bind(user_id)
-                    .bind(id)
-                    .bind(date.unwrap_or(ctx.today))
-                    .bind(text)
-                    .execute(&mut **tx)
-                    .await?;
+                sqlx::query(
+                    "INSERT INTO person_notes (user_id, person_id, on_date, text) VALUES ($1, $2, $3, $4)",
+                )
+                .bind(user_id)
+                .bind(id)
+                .bind(date.unwrap_or(ctx.today))
+                .bind(text)
+                .execute(&mut **tx)
+                .await?;
             }
             ctx.r.push_person(id, p.name.clone(), p.aliases.clone());
             Ok(Some(id))
@@ -919,7 +1247,8 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                     .bind(&c.notes)
                     .fetch_one(&mut **tx)
                     .await?;
-                    ctx.r.push_account(id, c.name.clone(), c.bank.clone(), "credit_card".into());
+                    ctx.r
+                        .push_account(id, c.name.clone(), c.bank.clone(), "credit_card".into());
                     id
                 }
             };
@@ -951,7 +1280,8 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                         .bind(&a.notes)
                         .fetch_one(&mut **tx)
                         .await?;
-                    ctx.r.push_account(id, a.name.clone(), a.bank.clone(), "debit".into());
+                    ctx.r
+                        .push_account(id, a.name.clone(), a.bank.clone(), "debit".into());
                     id
                 }
             };
@@ -971,13 +1301,26 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             }
             Ok(Some(id))
         }
-        Payload::Recurring { subscription, item: r } => {
+        Payload::Recurring {
+            subscription,
+            item: r,
+        } => {
             let kind = if *subscription { "expense" } else { "income" };
-            let cat = ctx.r.category(kind, &r.category).or_else(|| ctx.r.category(kind, "Otro")).map(|c| c.0);
+            let cat = ctx
+                .r
+                .category(kind, &r.category)
+                .or_else(|| ctx.r.category(kind, "Otro"))
+                .map(|c| c.0);
             let (account, _, _) = resolve_payment(tx, ctx, user_id, &r.account, &it.path).await?;
             let area = r.area.as_deref().and_then(|a| ctx.r.area(Some(a)));
             let (dk, day) = r.day.parts();
-            let status = if r.active { "active" } else if *subscription { "cancelled" } else { "ended" };
+            let status = if r.active {
+                "active"
+            } else if *subscription {
+                "cancelled"
+            } else {
+                "ended"
+            };
             // Las ocurrencias anteriores ya están registradas en el vault: la regla empieza el mes siguiente.
             let next_month = domain::time::month_period(ctx.today).end + Duration::days(1);
             let id: Uuid = sqlx::query_scalar(
@@ -1021,7 +1364,11 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             ))
         }
         Payload::CreditPlan(c) => {
-            let steps: Vec<Value> = c.steps.iter().map(|s| json!({ "text": vault::plain(&s.text), "done": s.checked })).collect();
+            let steps: Vec<Value> = c
+                .steps
+                .iter()
+                .map(|s| json!({ "text": vault::plain(&s.text), "done": s.checked }))
+                .collect();
             let rules: Vec<Value> = c.rules.iter().map(|r| json!({ "text": r })).collect();
             sqlx::query(
                 "INSERT INTO credit_plans (user_id, goal_text, steps, rules) VALUES ($1, $2, $3, $4)
@@ -1038,7 +1385,10 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
         Payload::Reading(r) => {
             let (status, finished) = match (r.status.as_str(), r.finished_on) {
                 ("finished", None) => {
-                    ctx.warnings.push(format!("{}: lectura terminada sin fecha `fin`; se importa como «leyendo»", it.path));
+                    ctx.warnings.push(format!(
+                        "{}: lectura terminada sin fecha `fin`; se importa como «leyendo»",
+                        it.path
+                    ));
                     ("reading", None)
                 }
                 (s, f) => (s, f),
@@ -1077,7 +1427,11 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             };
             let raw = url(&c.raw_path, "raw");
             let render = url(&c.render_path, "render");
-            let published_on = if c.status == "published" { c.publish_on } else { None };
+            let published_on = if c.status == "published" {
+                c.publish_on
+            } else {
+                None
+            };
             Ok(Some(
                 sqlx::query_scalar(
                     "INSERT INTO content_pieces (user_id, title, idea, status, format, platforms, pillar, hooks, chosen_hook, script_hook, script_body, script_cta,
@@ -1105,13 +1459,17 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                 .bind(raw)
                 .bind(render)
                 .bind(c.views)
-                .bind(c.retention_pct.and_then(|r| rust_decimal::Decimal::from_f64_retain(r)).map(|d| d.round_dp(2)))
+                .bind(c.retention_pct.and_then(rust_decimal::Decimal::from_f64_retain).map(|d| d.round_dp(2)))
                 .fetch_one(&mut **tx)
                 .await?,
             ))
         }
         Payload::Swipe(s) => {
-            let Some(url) = s.url.as_deref().and_then(|u| validate_external_url("url", u).ok()) else {
+            let Some(url) = s
+                .url
+                .as_deref()
+                .and_then(|u| validate_external_url("url", u).ok())
+            else {
                 ctx.warnings.push(format!("{}: URL inválida", it.path));
                 return Ok(None);
             };
@@ -1127,7 +1485,15 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                     .await?,
             ))
         }
-        Payload::Note { kind, title, body, tags, aliases, project, metadata } => {
+        Payload::Note {
+            kind,
+            title,
+            body,
+            tags,
+            aliases,
+            project,
+            metadata,
+        } => {
             let project_id = project.as_deref().and_then(|p| ctx.r.project(p));
             Ok(Some(
                 sqlx::query_scalar("INSERT INTO notes (user_id, kind, title, body_md, tags, aliases, project_id, metadata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id")
@@ -1145,19 +1511,27 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
         }
         Payload::Adr(a) => {
             let Some(project) = ctx.r.project(&a.project) else {
-                ctx.warnings.push(format!("{}: proyecto «{}» no existe; ADR omitido", it.path, a.project));
+                ctx.warnings.push(format!(
+                    "{}: proyecto «{}» no existe; ADR omitido",
+                    it.path, a.project
+                ));
                 return Ok(None);
             };
             let number = match a.number {
                 Some(n) => {
-                    let taken: Option<i32> = sqlx::query_scalar("SELECT 1 FROM adrs WHERE user_id = $1 AND project_id = $2 AND number = $3")
-                        .bind(user_id)
-                        .bind(project)
-                        .bind(n)
-                        .fetch_optional(&mut **tx)
-                        .await?;
+                    let taken: Option<i32> = sqlx::query_scalar(
+                        "SELECT 1 FROM adrs WHERE user_id = $1 AND project_id = $2 AND number = $3",
+                    )
+                    .bind(user_id)
+                    .bind(project)
+                    .bind(n)
+                    .fetch_optional(&mut **tx)
+                    .await?;
                     if taken.is_some() {
-                        ctx.warnings.push(format!("{}: el número ADR-{n:04} ya existe; se asignó el siguiente libre", it.path));
+                        ctx.warnings.push(format!(
+                            "{}: el número ADR-{n:04} ya existe; se asignó el siguiente libre",
+                            it.path
+                        ));
                         None
                     } else {
                         Some(n)
@@ -1167,10 +1541,19 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             };
             let number = match number {
                 Some(n) => n,
-                None => sqlx::query_scalar("SELECT coalesce(max(number), 0) + 1 FROM adrs WHERE user_id = $1 AND project_id = $2").bind(user_id).bind(project).fetch_one(&mut **tx).await?,
+                None => sqlx::query_scalar(
+                    "SELECT coalesce(max(number), 0) + 1 FROM adrs WHERE user_id = $1 AND project_id = $2",
+                )
+                .bind(user_id)
+                .bind(project)
+                .fetch_one(&mut **tx)
+                .await?,
             };
             let status = if a.status == "superseded" {
-                ctx.warnings.push(format!("{}: ADR reemplazado sin referencia al reemplazo; se importa como aceptado", it.path));
+                ctx.warnings.push(format!(
+                    "{}: ADR reemplazado sin referencia al reemplazo; se importa como aceptado",
+                    it.path
+                ));
                 "accepted"
             } else {
                 a.status.as_str()
@@ -1195,9 +1578,17 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             ))
         }
         Payload::Devlog(d) => {
-            let id: Uuid = sqlx::query_scalar("INSERT INTO devlogs (user_id, on_date) VALUES ($1, $2) RETURNING id").bind(user_id).bind(d.date).fetch_one(&mut **tx).await?;
+            let id: Uuid =
+                sqlx::query_scalar("INSERT INTO devlogs (user_id, on_date) VALUES ($1, $2) RETURNING id")
+                    .bind(user_id)
+                    .bind(d.date)
+                    .fetch_one(&mut **tx)
+                    .await?;
             for (i, s) in d.sessions.iter().enumerate() {
-                let at = s.at_time.as_deref().and_then(|t| chrono::NaiveTime::parse_from_str(t, "%H:%M").ok());
+                let at = s
+                    .at_time
+                    .as_deref()
+                    .and_then(|t| chrono::NaiveTime::parse_from_str(t, "%H:%M").ok());
                 let sid: Uuid = sqlx::query_scalar(
                     "INSERT INTO devlog_sessions (user_id, devlog_id, repo, at_time, changes_md, bugs_md, decisions_md, next_steps_md, position)
                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
@@ -1260,7 +1651,14 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             }
             Ok(Some(id))
         }
-        Payload::Goal { kind, period, starts_on, ends_on, closing, goal } => {
+        Payload::Goal {
+            kind,
+            period,
+            starts_on,
+            ends_on,
+            closing,
+            goal,
+        } => {
             let area = match &goal.area {
                 Some(a) => ensure_area(tx, ctx, user_id, a).await?,
                 None => None,
@@ -1268,12 +1666,20 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             let parent = if kind == "week" {
                 goal.supports.as_ref().and_then(|s| {
                     let key = fold(s.split_once(". ").map(|x| x.1).unwrap_or(s));
-                    ctx.month_goals.iter().find(|((m, t), _)| (*m == domain::time::month_key(*starts_on) || *m == domain::time::month_key(*ends_on)) && (t.contains(&key) || key.contains(t.as_str()))).map(|(_, id)| *id)
+                    ctx.month_goals
+                        .iter()
+                        .find(|((m, t), _)| {
+                            (*m == domain::time::month_key(*starts_on)
+                                || *m == domain::time::month_key(*ends_on))
+                                && (t.contains(&key) || key.contains(t.as_str()))
+                        })
+                        .map(|(_, id)| *id)
                 })
             } else {
                 None
             };
-            let closing_json = (!closing.is_empty() && goal.status != "active").then(|| json!({ "notes": closing }));
+            let closing_json =
+                (!closing.is_empty() && goal.status != "active").then(|| json!({ "notes": closing }));
             let id: Uuid = sqlx::query_scalar(
                 "INSERT INTO goals (user_id, kind, period_key, starts_on, ends_on, title, area_id, motivation, success_criteria, status, parent_goal_id, closing, closed_at)
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CASE WHEN $10 <> 'active' THEN now() END) RETURNING id",
@@ -1301,7 +1707,11 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             Ok(Some(id))
         }
         Payload::Devotional(d) => {
-            let va: Vec<Value> = d.verse_actions.iter().map(|(v, a)| json!({ "verse": v, "action": a })).collect();
+            let va: Vec<Value> = d
+                .verse_actions
+                .iter()
+                .map(|(v, a)| json!({ "verse": v, "action": a }))
+                .collect();
             let id: Uuid = sqlx::query_scalar(
                 "INSERT INTO devotionals (user_id, on_date, passage, verse_actions, learned, teaching, prayer, song) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
             )
@@ -1315,11 +1725,16 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             .bind(&d.song)
             .fetch_one(&mut **tx)
             .await?;
-            hooks::mark_linked_habit(tx, user_id, HabitTrigger::DevotionalContent, d.date).await.map_err(repo_to_sqlx)?;
+            hooks::mark_linked_habit(tx, user_id, HabitTrigger::DevotionalContent, d.date)
+                .await
+                .map_err(repo_to_sqlx)?;
             Ok(Some(id))
         }
         Payload::Daily(d) => {
-            let weight = d.weight_kg.and_then(rust_decimal::Decimal::from_f64_retain).map(|w| w.round_dp(2));
+            let weight = d
+                .weight_kg
+                .and_then(rust_decimal::Decimal::from_f64_retain)
+                .map(|w| w.round_dp(2));
             let id: Uuid = sqlx::query_scalar(
                 "INSERT INTO daily_checkins (user_id, on_date, weight_kg, energy, planned_spend_text, evening_done_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
             )
@@ -1332,7 +1747,9 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             .fetch_one(&mut **tx)
             .await?;
             if weight.is_some() {
-                hooks::mark_linked_habit(tx, user_id, HabitTrigger::WeightLogged, d.date).await.map_err(repo_to_sqlx)?;
+                hooks::mark_linked_habit(tx, user_id, HabitTrigger::WeightLogged, d.date)
+                    .await
+                    .map_err(repo_to_sqlx)?;
             }
             for key in &d.fixed_done {
                 let hid = fixed_habit(tx, ctx, user_id, key).await?;
@@ -1352,9 +1769,21 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                 .await?;
                 match hid {
                     // Casilla copiada a la daily: marcada = cumplido; sin marcar en día cerrado = no cumplido (semántica del vault).
-                    Some(h) if cb.checked || d.date < ctx.today => upsert_entry(tx, user_id, h, d.date, if cb.checked { "done" } else { "not_done" }).await?,
+                    Some(h) if cb.checked || d.date < ctx.today => {
+                        upsert_entry(
+                            tx,
+                            user_id,
+                            h,
+                            d.date,
+                            if cb.checked { "done" } else { "not_done" },
+                        )
+                        .await?
+                    }
                     Some(_) => {}
-                    None => ctx.warnings.push(format!("{}: hábito «{name}» sin objetivo vigente; registro omitido", it.path)),
+                    None => ctx.warnings.push(format!(
+                        "{}: hábito «{name}» sin objetivo vigente; registro omitido",
+                        it.path
+                    )),
                 }
             }
             for (i, line) in d.log.iter().enumerate() {
@@ -1381,7 +1810,12 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             for (i, line) in d.people.iter().enumerate() {
                 let link = vault::wikilinks(line).into_iter().next();
                 let (name, topic) = match &link {
-                    Some(l) => (l.basename(), line.split_once("]]").map(|x| x.1.trim_start_matches([':', ' ']).to_string()).unwrap_or_default()),
+                    Some(l) => (
+                        l.basename(),
+                        line.split_once("]]")
+                            .map(|x| x.1.trim_start_matches([':', ' ']).to_string())
+                            .unwrap_or_default(),
+                    ),
                     None => match line.split_once(':') {
                         Some((n, t)) => (n.trim().to_string(), t.trim().to_string()),
                         None => (line.trim().to_string(), String::new()),
@@ -1419,7 +1853,11 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
             }
             for (i, a) in d.agenda.iter().enumerate() {
                 if let Some((start, end, title)) = vault::agenda_line(a) {
-                    let t = |s: &str| chrono::NaiveTime::parse_from_str(s, "%H:%M").ok().map(|t| domain::time::local_to_utc(d.date, t, tz));
+                    let t = |s: &str| {
+                        chrono::NaiveTime::parse_from_str(s, "%H:%M")
+                            .ok()
+                            .map(|t| domain::time::local_to_utc(d.date, t, tz))
+                    };
                     sqlx::query(
                         "INSERT INTO calendar_events (user_id, source, calendar_id, provider_event_id, on_date, starts_at, ends_at, title)
                          VALUES ($1, 'manual', 'import', $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING",
@@ -1450,10 +1888,18 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                 let _ = url;
             }
             let (ext_source, ext_id, ext_url) = match &t.external {
-                Some((id, url)) => (Some("clickup"), Some(id.clone()), validate_external_url("url", url).ok()),
+                Some((id, url)) => (
+                    Some("clickup"),
+                    Some(id.clone()),
+                    validate_external_url("url", url).ok(),
+                ),
                 None => (None, None, None),
             };
-            let notes = if t.clickup_flag { "Marcado #clickup en el vault" } else { "" };
+            let notes = if t.clickup_flag {
+                "Marcado #clickup en el vault"
+            } else {
+                ""
+            };
             let id: Uuid = sqlx::query_scalar(
                 "INSERT INTO tasks (user_id, title, notes_md, area_id, status, planned_on, done_at, external_source, external_id, external_url)
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id",
@@ -1491,18 +1937,26 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                 prev = *c;
             }
             if let Some(d) = t.done_on {
-                sqlx::query("INSERT INTO task_events (user_id, task_id, at, kind) VALUES ($1, $2, $3, 'completed')")
-                    .bind(user_id)
-                    .bind(id)
-                    .bind(noon_utc(d, tz))
-                    .execute(&mut **tx)
-                    .await?;
+                sqlx::query(
+                    "INSERT INTO task_events (user_id, task_id, at, kind) VALUES ($1, $2, $3, 'completed')",
+                )
+                .bind(user_id)
+                .bind(id)
+                .bind(noon_utc(d, tz))
+                .execute(&mut **tx)
+                .await?;
             }
             Ok(Some(id))
         }
         Payload::Weekly(w) => {
-            let start = domain::time::parse_iso_week(&w.week).map(|p| p.start).unwrap_or(ctx.today);
-            let pri: Vec<Value> = w.priorities.iter().map(|p| json!({ "text": vault::plain(p) })).collect();
+            let start = domain::time::parse_iso_week(&w.week)
+                .map(|p| p.start)
+                .unwrap_or(ctx.today);
+            let pri: Vec<Value> = w
+                .priorities
+                .iter()
+                .map(|p| json!({ "text": vault::plain(p) }))
+                .collect();
             Ok(Some(
                 sqlx::query_scalar(
                     "INSERT INTO weekly_reviews (user_id, iso_week, week_start, peace, what_happened, what_didnt, content_md, habits_md, goals_md, areas_md, people_md, priorities, completed_at)
@@ -1531,25 +1985,44 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                 Some(c) => c,
                 None => {
                     if !row.category.is_empty() {
-                        ctx.warnings.push(format!("{}: categoría «{}» desconocida → Otro", it.path, row.category));
+                        ctx.warnings.push(format!(
+                            "{}: categoría «{}» desconocida → Otro",
+                            it.path, row.category
+                        ));
                     }
-                    ctx.r.category(kind_cat, "Otro").unwrap_or((Uuid::nil(), "consumption".into()))
+                    ctx.r
+                        .category(kind_cat, "Otro")
+                        .unwrap_or((Uuid::nil(), "consumption".into()))
                 }
             };
             let cat = (!cat.is_nil()).then_some(cat);
-            let (account, account_kind, financed_by) = resolve_payment(tx, ctx, user_id, &row.payment, &it.path).await?;
-            let project = vault::wikilinks(&row.concept_raw).iter().find_map(|l| ctx.r.project(&l.basename()));
+            let (account, account_kind, financed_by) =
+                resolve_payment(tx, ctx, user_id, &row.payment, &it.path).await?;
+            let project = vault::wikilinks(&row.concept_raw)
+                .iter()
+                .find_map(|l| ctx.r.project(&l.basename()));
             let card_in_concept = vault::wikilinks(&row.concept_raw)
                 .iter()
                 .find(|l| fold(&l.basename()).starts_with("tarjeta"))
                 .and_then(|l| ctx.r.account(&l.basename()).filter(|a| a.1 == "credit_card"))
                 .map(|a| a.0);
             let (kind, account_id, counter, debt) = if *income {
-                (if role == "financing" { "loan_received" } else { "income" }, account, None, None)
+                (
+                    if role == "financing" {
+                        "loan_received"
+                    } else {
+                        "income"
+                    },
+                    account,
+                    None,
+                    None,
+                )
             } else if role == "debt_payment" {
                 match card_in_concept {
                     // Pago a tarjeta: debita la cuenta origen y libera crédito; no es consumo.
-                    Some(card) if account.is_some() && account_kind.as_deref() != Some("credit_card") => ("card_payment", account, Some(card), None),
+                    Some(card) if account.is_some() && account_kind.as_deref() != Some("credit_card") => {
+                        ("card_payment", account, Some(card), None)
+                    }
                     Some(card) => ("debt_payment", None, Some(card), None),
                     None => {
                         let debt = match ctx.imported_debt {
@@ -1565,7 +2038,12 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                                 d
                             }
                         };
-                        ("debt_payment", account.filter(|_| account_kind.as_deref() != Some("credit_card")), None, Some(debt))
+                        (
+                            "debt_payment",
+                            account.filter(|_| account_kind.as_deref() != Some("credit_card")),
+                            None,
+                            Some(debt),
+                        )
                     }
                 }
             } else {
@@ -1606,17 +2084,22 @@ async fn apply_item(tx: &mut Tx<'_>, user_id: Uuid, ctx: &mut Ctx, it: &PlanItem
                             .execute(&mut **tx)
                             .await?;
                     }
-                    None => ctx.warnings.push(format!("{}: categoría de presupuesto «{cat}» desconocida", it.path)),
+                    None => ctx.warnings.push(format!(
+                        "{}: categoría de presupuesto «{cat}» desconocida",
+                        it.path
+                    )),
                 }
             }
             Ok(Some(bm))
         }
         Payload::Inbox { text } => Ok(Some(
-            sqlx::query_scalar("INSERT INTO inbox_items (user_id, text, source) VALUES ($1, $2, 'import') RETURNING id")
-                .bind(user_id)
-                .bind(vault::plain(text))
-                .fetch_one(&mut **tx)
-                .await?,
+            sqlx::query_scalar(
+                "INSERT INTO inbox_items (user_id, text, source) VALUES ($1, $2, 'import') RETURNING id",
+            )
+            .bind(user_id)
+            .bind(vault::plain(text))
+            .fetch_one(&mut **tx)
+            .await?,
         )),
     }
 }
@@ -1638,7 +2121,12 @@ async fn budget_month(tx: &mut Tx<'_>, user_id: Uuid, month: &str) -> sqlx::Resu
 
 /// Hábito fijo; si el vault trae registros y no existe, se crea con su frecuencia por defecto (editable) y se avisa.
 async fn fixed_habit(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, key: &str) -> sqlx::Result<Uuid> {
-    if let Some(id) = sqlx::query_scalar("SELECT id FROM habits WHERE user_id = $1 AND fixed_key = $2").bind(user_id).bind(key).fetch_optional(&mut **tx).await? {
+    if let Some(id) = sqlx::query_scalar("SELECT id FROM habits WHERE user_id = $1 AND fixed_key = $2")
+        .bind(user_id)
+        .bind(key)
+        .fetch_optional(&mut **tx)
+        .await?
+    {
         return Ok(id);
     }
     let (name, freq, per_week) = match key {
@@ -1662,11 +2150,19 @@ async fn fixed_habit(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, key: &str) -
         .bind(per_week)
         .execute(&mut **tx)
         .await?;
-    ctx.warnings.push(format!("Se creó el hábito fijo «{name}» porque el vault tiene registros; revisa su frecuencia en Hábitos"));
+    ctx.warnings.push(format!(
+        "Se creó el hábito fijo «{name}» porque el vault tiene registros; revisa su frecuencia en Hábitos"
+    ));
     Ok(id)
 }
 
-async fn upsert_entry(tx: &mut Tx<'_>, user_id: Uuid, habit: Uuid, date: NaiveDate, status: &str) -> sqlx::Result<()> {
+async fn upsert_entry(
+    tx: &mut Tx<'_>,
+    user_id: Uuid,
+    habit: Uuid,
+    date: NaiveDate,
+    status: &str,
+) -> sqlx::Result<()> {
     sqlx::query(
         "INSERT INTO habit_entries (user_id, habit_id, on_date, status, source) VALUES ($1, $2, $3, $4, 'import')
          ON CONFLICT (habit_id, on_date) DO NOTHING",
@@ -1689,7 +2185,10 @@ mod tests {
         for p in ["../etc/passwd", "/abs/x.md", "a/../../x", "C:/x.md", "a/\u{0}b"] {
             assert!(safe_path(p).is_err(), "{p}");
         }
-        assert_eq!(safe_path("./Vault//Daily/2026-11-02.md").unwrap(), "Vault/Daily/2026-11-02.md");
+        assert_eq!(
+            safe_path("./Vault//Daily/2026-11-02.md").unwrap(),
+            "Vault/Daily/2026-11-02.md"
+        );
     }
 
     #[test]
@@ -1704,7 +2203,10 @@ mod tests {
                     stack.push(p);
                 } else {
                     let rel = p.strip_prefix(&base).unwrap().to_string_lossy().to_string();
-                    files.push(VaultFile { path: rel, bytes: std::fs::read(&p).unwrap() });
+                    files.push(VaultFile {
+                        path: rel,
+                        bytes: std::fs::read(&p).unwrap(),
+                    });
                 }
             }
         }
@@ -1712,8 +2214,16 @@ mod tests {
         // El esqueleto no tiene datos operativos: solo proyectos (sin presupuesto de ejemplo) y nada más.
         let kinds: Vec<&str> = plan.items.iter().map(|i| i.entity_type.as_str()).collect();
         assert!(kinds.iter().all(|k| *k == "project"), "{kinds:?}");
-        assert!(plan.items.iter().all(|i| matches!(&i.payload, Payload::Project(p) if p.budget_items.is_empty())));
+        assert!(
+            plan.items
+                .iter()
+                .all(|i| matches!(&i.payload, Payload::Project(p) if p.budget_items.is_empty()))
+        );
         assert!(plan.ignored.iter().any(|f| f.path.starts_with("Templates/")));
-        assert!(plan.warnings.iter().any(|w| w.contains("presupuesto por rubro de ejemplo")));
+        assert!(
+            plan.warnings
+                .iter()
+                .any(|w| w.contains("presupuesto por rubro de ejemplo"))
+        );
     }
 }

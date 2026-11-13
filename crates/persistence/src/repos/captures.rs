@@ -31,7 +31,15 @@ pub struct CaptureRow {
 const COLS: &str = "id, user_id, input_text, source, intent, reference_date, status, mode, proposal, questions, errors, applied, meta, llm_model, version, created_at, updated_at";
 
 #[allow(clippy::too_many_arguments)]
-pub async fn create(db: impl PgExecutor<'_>, user_id: Uuid, text: &str, source: &str, intent: &str, reference_date: NaiveDate, meta: &serde_json::Value) -> RepoResult<CaptureRow> {
+pub async fn create(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    text: &str,
+    source: &str,
+    intent: &str,
+    reference_date: NaiveDate,
+    meta: &serde_json::Value,
+) -> RepoResult<CaptureRow> {
     Ok(sqlx::query_as::<_, CaptureRow>(crate::sqlf!(
         "INSERT INTO capture_proposals (user_id, input_text, source, intent, reference_date, meta) VALUES ($1, $2, $3, $4, $5, $6) RETURNING {COLS}"
     ))
@@ -46,15 +54,22 @@ pub async fn create(db: impl PgExecutor<'_>, user_id: Uuid, text: &str, source: 
 }
 
 pub async fn get(db: impl PgExecutor<'_>, user_id: Uuid, id: Uuid) -> RepoResult<CaptureRow> {
-    sqlx::query_as::<_, CaptureRow>(crate::sqlf!("SELECT {COLS} FROM capture_proposals WHERE user_id = $1 AND id = $2"))
-        .bind(user_id)
-        .bind(id)
-        .fetch_optional(db)
-        .await?
-        .ok_or(RepoError::NotFound)
+    sqlx::query_as::<_, CaptureRow>(crate::sqlf!(
+        "SELECT {COLS} FROM capture_proposals WHERE user_id = $1 AND id = $2"
+    ))
+    .bind(user_id)
+    .bind(id)
+    .fetch_optional(db)
+    .await?
+    .ok_or(RepoError::NotFound)
 }
 
-pub async fn list(db: impl PgExecutor<'_>, user_id: Uuid, status: Option<&str>, limit: i64) -> RepoResult<Vec<CaptureRow>> {
+pub async fn list(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    status: Option<&str>,
+    limit: i64,
+) -> RepoResult<Vec<CaptureRow>> {
     Ok(sqlx::query_as::<_, CaptureRow>(crate::sqlf!(
         "SELECT {COLS} FROM capture_proposals WHERE user_id = $1 AND ($2::text IS NULL OR status = $2) ORDER BY created_at DESC LIMIT $3"
     ))
@@ -98,7 +113,13 @@ pub async fn save_proposal(
     .await?)
 }
 
-pub async fn finish(db: impl PgExecutor<'_>, user_id: Uuid, id: Uuid, status: &str, applied: Option<&serde_json::Value>) -> RepoResult<Option<CaptureRow>> {
+pub async fn finish(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    id: Uuid,
+    status: &str,
+    applied: Option<&serde_json::Value>,
+) -> RepoResult<Option<CaptureRow>> {
     Ok(sqlx::query_as::<_, CaptureRow>(crate::sqlf!(
         "UPDATE capture_proposals SET status = $3, applied = $4, version = version + 1
          WHERE user_id = $1 AND id = $2 AND status IN ('pending', 'needs_input', 'failed') RETURNING {COLS}"

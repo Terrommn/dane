@@ -44,11 +44,18 @@ struct TokenResponse {
 }
 
 fn app(state: &AppState) -> Result<&OAuthApp, ProviderError> {
-    state.config.google.as_ref().ok_or_else(|| ProviderError::Config("Google no está configurado en el servidor (GOOGLE_CLIENT_ID)".into()))
+    state.config.google.as_ref().ok_or_else(|| {
+        ProviderError::Config("Google no está configurado en el servidor (GOOGLE_CLIENT_ID)".into())
+    })
 }
 
 /// URL de autorización. Guarda state + PKCE en `oauth_flows` (10 min, un solo uso).
-pub async fn authorize_url(state: &AppState, user_id: Uuid, endpoints: &Endpoints, redirect_to: &str) -> Result<String, ProviderError> {
+pub async fn authorize_url(
+    state: &AppState,
+    user_id: Uuid,
+    endpoints: &Endpoints,
+    redirect_to: &str,
+) -> Result<String, ProviderError> {
     let app = app(state)?;
     let (verifier, challenge) = super::pkce_pair();
     let st = crate::crypto::random_token();
@@ -63,7 +70,8 @@ pub async fn authorize_url(state: &AppState, user_id: Uuid, endpoints: &Endpoint
     .bind(state.now() + Duration::minutes(10))
     .execute(&state.pool)
     .await?;
-    let mut url = url::Url::parse(&endpoints.google_auth).map_err(|e| ProviderError::Config(e.to_string()))?;
+    let mut url =
+        url::Url::parse(&endpoints.google_auth).map_err(|e| ProviderError::Config(e.to_string()))?;
     url.query_pairs_mut()
         .append_pair("client_id", &app.client_id)
         .append_pair("redirect_uri", &state.config.google_redirect_uri())
@@ -80,7 +88,12 @@ pub async fn authorize_url(state: &AppState, user_id: Uuid, endpoints: &Endpoint
 
 /// Completa el callback: valida el state (un solo uso, del mismo flujo), intercambia el código y guarda tokens cifrados.
 /// Devuelve `(user_id, redirect_to)`.
-pub async fn complete(state: &AppState, endpoints: &Endpoints, st: &str, code: &str) -> Result<(Uuid, String), ProviderError> {
+pub async fn complete(
+    state: &AppState,
+    endpoints: &Endpoints,
+    st: &str,
+    code: &str,
+) -> Result<(Uuid, String), ProviderError> {
     let app = app(state)?;
     let flow: Option<(Option<Uuid>, String, Option<String>)> = sqlx::query_as(
         "DELETE FROM oauth_flows WHERE state = $1 AND purpose = 'connect_google' AND expires_at > $2
@@ -111,7 +124,13 @@ pub async fn complete(state: &AppState, endpoints: &Endpoints, st: &str, code: &
         ProviderError::Http { status: 400, .. } => ProviderError::Unauthorized(P),
         other => other,
     })?;
-    let scopes: Vec<String> = tr.scope.clone().unwrap_or_default().split_whitespace().map(str::to_string).collect();
+    let scopes: Vec<String> = tr
+        .scope
+        .clone()
+        .unwrap_or_default()
+        .split_whitespace()
+        .map(str::to_string)
+        .collect();
     let tokens = Tokens {
         access_token: tr.access_token,
         refresh_token: tr.refresh_token,
@@ -119,11 +138,22 @@ pub async fn complete(state: &AppState, endpoints: &Endpoints, st: &str, code: &
         scope: tr.scope,
     };
     if tokens.refresh_token.is_none() {
-        return Err(ProviderError::Config("Google no entregó refresh token; revoca el acceso en tu cuenta y vuelve a conectar".into()));
+        return Err(ProviderError::Config(
+            "Google no entregó refresh token; revoca el acceso en tu cuenta y vuelve a conectar".into(),
+        ));
     }
     let label = tr.id_token.as_deref().and_then(email_from_id_token);
     let enc = encrypt_json(state, &tokens)?;
-    repo::upsert_connected(&state.pool, user_id, P, &scopes, label.as_deref(), &enc, &serde_json::json!({})).await?;
+    repo::upsert_connected(
+        &state.pool,
+        user_id,
+        P,
+        &scopes,
+        label.as_deref(),
+        &enc,
+        &serde_json::json!({}),
+    )
+    .await?;
     Ok((user_id, redirect_to.unwrap_or_else(|| "/ajustes".into())))
 }
 
@@ -131,24 +161,45 @@ pub async fn complete(state: &AppState, endpoints: &Endpoints, st: &str, code: &
 fn email_from_id_token(t: &str) -> Option<String> {
     use base64::Engine;
     let payload = t.split('.').nth(1)?;
-    let json: serde_json::Value = serde_json::from_slice(&base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(payload.trim_end_matches('=')).ok()?).ok()?;
+    let json: serde_json::Value = serde_json::from_slice(
+        &base64::engine::general_purpose::URL_SAFE_NO_PAD
+            .decode(payload.trim_end_matches('='))
+            .ok()?,
+    )
+    .ok()?;
     json.get("email")?.as_str().map(str::to_string)
 }
 
 /// Token de acceso vigente; refresca si venció y guarda el nuevo cifrado.
-pub async fn access_token(state: &AppState, user_id: Uuid, endpoints: &Endpoints) -> Result<String, ProviderError> {
-    let conn = repo::get(&state.pool, user_id, P).await?.ok_or(ProviderError::NotConnected("Google"))?;
-    let enc = conn.credentials_enc.ok_or(ProviderError::NotConnected("Google"))?;
+pub async fn access_token(
+    state: &AppState,
+    user_id: Uuid,
+    endpoints: &Endpoints,
+) -> Result<String, ProviderError> {
+    let conn = repo::get(&state.pool, user_id, P)
+        .await?
+        .ok_or(ProviderError::NotConnected("Google"))?;
+    let enc = conn
+        .credentials_enc
+        .ok_or(ProviderError::NotConnected("Google"))?;
     let mut tokens: Tokens = decrypt_json(state, &enc)?;
     if tokens.expires_at > state.now() {
         return Ok(tokens.access_token);
     }
     let app = app(state)?;
-    let refresh = tokens.refresh_token.clone().ok_or(ProviderError::Unauthorized(P))?;
+    let refresh = tokens
+        .refresh_token
+        .clone()
+        .ok_or(ProviderError::Unauthorized(P))?;
     let resp = state
         .http
         .post(&endpoints.google_token)
-        .form(&[("grant_type", "refresh_token"), ("refresh_token", &refresh), ("client_id", &app.client_id), ("client_secret", &app.client_secret)])
+        .form(&[
+            ("grant_type", "refresh_token"),
+            ("refresh_token", &refresh),
+            ("client_id", &app.client_id),
+            ("client_secret", &app.client_secret),
+        ])
         .send()
         .await
         .map_err(net(P))?;
@@ -169,12 +220,18 @@ pub async fn access_token(state: &AppState, user_id: Uuid, endpoints: &Endpoints
 /// Revoca en Google (mejor esfuerzo) y borra credenciales locales.
 pub async fn revoke(state: &AppState, user_id: Uuid, endpoints: &Endpoints) -> Result<(), ProviderError> {
     if let Some(conn) = repo::get(&state.pool, user_id, P).await? {
-        if let Some(enc) = conn.credentials_enc {
-            if let Ok(tokens) = decrypt_json::<Tokens>(state, &enc) {
-                let token = tokens.refresh_token.unwrap_or(tokens.access_token);
-                if let Err(e) = state.http.post(&endpoints.google_revoke).form(&[("token", token.as_str())]).send().await {
-                    tracing::warn!(error = %e.without_url(), "revocación en Google falló; credenciales locales borradas igualmente");
-                }
+        if let Some(enc) = conn.credentials_enc
+            && let Ok(tokens) = decrypt_json::<Tokens>(state, &enc)
+        {
+            let token = tokens.refresh_token.unwrap_or(tokens.access_token);
+            if let Err(e) = state
+                .http
+                .post(&endpoints.google_revoke)
+                .form(&[("token", token.as_str())])
+                .send()
+                .await
+            {
+                tracing::warn!(error = %e.without_url(), "revocación en Google falló; credenciales locales borradas igualmente");
             }
         }
         repo::disconnect(&state.pool, user_id, P, "revoked").await?;
@@ -216,21 +273,38 @@ struct CalendarListEntry {
 /// Festivos, observancias, cumpleaños de contactos y números de semana nunca entran a la agenda.
 pub fn excluded_calendar(id: &str) -> bool {
     let l = id.to_lowercase();
-    l.contains("#holiday@") || l.contains("#contacts@") || l.contains("#weeknum@") || l.contains("#other@") || l.contains("#weather")
+    l.contains("#holiday@")
+        || l.contains("#contacts@")
+        || l.contains("#weeknum@")
+        || l.contains("#other@")
+        || l.contains("#weather")
 }
 
 fn configured_calendars(config: &serde_json::Value) -> Option<HashSet<String>> {
-    config.get("calendars").and_then(|v| v.as_array()).map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect())
+    config
+        .get("calendars")
+        .and_then(|v| v.as_array())
+        .map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect())
 }
 
-pub async fn list_calendars(state: &AppState, user_id: Uuid, endpoints: &Endpoints) -> Result<Vec<CalendarInfo>, ProviderError> {
+pub async fn list_calendars(
+    state: &AppState,
+    user_id: Uuid,
+    endpoints: &Endpoints,
+) -> Result<Vec<CalendarInfo>, ProviderError> {
     let token = access_token(state, user_id, endpoints).await?;
-    let conn = repo::get(&state.pool, user_id, P).await?.ok_or(ProviderError::NotConnected("Google"))?;
+    let conn = repo::get(&state.pool, user_id, P)
+        .await?
+        .ok_or(ProviderError::NotConnected("Google"))?;
     let selected = configured_calendars(&conn.config);
     let mut out = Vec::new();
     let mut page: Option<String> = None;
     for _ in 0..20 {
-        let mut req = state.http.get(format!("{}/users/me/calendarList", endpoints.google_calendar)).bearer_auth(&token).query(&[("maxResults", "250")]);
+        let mut req = state
+            .http
+            .get(format!("{}/users/me/calendarList", endpoints.google_calendar))
+            .bearer_auth(&token)
+            .query(&[("maxResults", "250")]);
         if let Some(p) = &page {
             req = req.query(&[("pageToken", p)]);
         }
@@ -238,7 +312,13 @@ pub async fn list_calendars(state: &AppState, user_id: Uuid, endpoints: &Endpoin
         for c in pg.items {
             let excluded = excluded_calendar(&c.id);
             let sel = !excluded && selected.as_ref().map(|s| s.contains(&c.id)).unwrap_or(c.primary);
-            out.push(CalendarInfo { summary: c.summary_override.unwrap_or(c.summary), selected: sel, excluded_by_rule: excluded, primary: c.primary, id: c.id });
+            out.push(CalendarInfo {
+                summary: c.summary_override.unwrap_or(c.summary),
+                selected: sel,
+                excluded_by_rule: excluded,
+                primary: c.primary,
+                id: c.id,
+            });
         }
         page = pg.next_page_token;
         if page.is_none() {
@@ -289,16 +369,33 @@ struct Attendee {
 }
 
 /// Sincroniza la agenda de `[from, to]` (fechas locales) de los calendarios seleccionados.
-pub async fn sync_calendar(state: &AppState, user_id: Uuid, endpoints: &Endpoints, from: NaiveDate, to: NaiveDate) -> Result<SyncReport, ProviderError> {
-    let mut rep = SyncReport { provider: P.into(), kind: "calendar".into(), ..Default::default() };
-    let conn = repo::get(&state.pool, user_id, P).await?.ok_or(ProviderError::NotConnected("Google"))?;
+pub async fn sync_calendar(
+    state: &AppState,
+    user_id: Uuid,
+    endpoints: &Endpoints,
+    from: NaiveDate,
+    to: NaiveDate,
+) -> Result<SyncReport, ProviderError> {
+    let mut rep = SyncReport {
+        provider: P.into(),
+        kind: "calendar".into(),
+        ..Default::default()
+    };
+    let conn = repo::get(&state.pool, user_id, P)
+        .await?
+        .ok_or(ProviderError::NotConnected("Google"))?;
     if conn.config.get("calendar_enabled").and_then(|v| v.as_bool()) == Some(false) {
         return Ok(rep);
     }
     let tz = super::user_tz(state, user_id).await;
     let calendars: Vec<String> = match configured_calendars(&conn.config) {
         Some(s) => s.into_iter().filter(|c| !excluded_calendar(c)).collect(),
-        None => list_calendars(state, user_id, endpoints).await?.into_iter().filter(|c| c.selected).map(|c| c.id).collect(),
+        None => list_calendars(state, user_id, endpoints)
+            .await?
+            .into_iter()
+            .filter(|c| c.selected)
+            .map(|c| c.id)
+            .collect(),
     };
     let token = access_token(state, user_id, endpoints).await?;
     let time_min = domain::time::start_of_local_day(from, tz);
@@ -310,7 +407,11 @@ pub async fn sync_calendar(state: &AppState, user_id: Uuid, endpoints: &Endpoint
         for _ in 0..50 {
             let mut req = state
                 .http
-                .get(format!("{}/calendars/{}/events", endpoints.google_calendar, urlencode(&cal)))
+                .get(format!(
+                    "{}/calendars/{}/events",
+                    endpoints.google_calendar,
+                    urlencode(&cal)
+                ))
                 .bearer_auth(&token)
                 .query(&[
                     ("timeMin", time_min.to_rfc3339()),
@@ -325,7 +426,13 @@ pub async fn sync_calendar(state: &AppState, user_id: Uuid, endpoints: &Endpoint
             let pg: EventsPage = read_json(P, req.send().await.map_err(net(P))?).await?;
             for ev in pg.items {
                 let start = ev.start.as_ref().and_then(|s| s.date_time);
-                if ev.status == "cancelled" || start.is_none() || matches!(ev.event_type.as_deref(), Some("birthday") | Some("workingLocation")) {
+                if ev.status == "cancelled"
+                    || start.is_none()
+                    || matches!(
+                        ev.event_type.as_deref(),
+                        Some("birthday") | Some("workingLocation")
+                    )
+                {
                     // Cancelado, de todo el día o no-agenda: se quita si existía.
                     rep.removed += sqlx::query("DELETE FROM calendar_events WHERE user_id = $1 AND source = 'google' AND calendar_id = $2 AND provider_event_id = $3")
                         .bind(user_id)
@@ -370,11 +477,24 @@ pub async fn sync_calendar(state: &AppState, user_id: Uuid, endpoints: &Endpoint
                 seen.insert(ev.id.clone());
                 // Un evento no prueba asistencia ni conversación: solo se proponen, y solo de eventos ya iniciados.
                 if start <= now {
-                    for a in attendees.iter().filter(|a| !a.is_self && a.response_status.as_deref() != Some("declined")) {
-                        if let Some(email) = &a.email {
-                            if super::suggest_contact(state, user_id, email, a.display_name.as_deref(), on_date, &title, "calendar", &format!("{}:{}", ev.id, on_date)).await? {
-                                rep.suggestions += 1;
-                            }
+                    for a in attendees
+                        .iter()
+                        .filter(|a| !a.is_self && a.response_status.as_deref() != Some("declined"))
+                    {
+                        if let Some(email) = &a.email
+                            && super::suggest_contact(
+                                state,
+                                user_id,
+                                email,
+                                a.display_name.as_deref(),
+                                on_date,
+                                &title,
+                                "calendar",
+                                &format!("{}:{}", ev.id, on_date),
+                            )
+                            .await?
+                        {
+                            rep.suggestions += 1;
                         }
                     }
                 }
@@ -443,7 +563,12 @@ struct Header {
 
 /// Correo automático o masivo que no representa una conversación personal.
 pub fn is_automated(headers: &[(String, String)]) -> bool {
-    let get = |n: &str| headers.iter().find(|(k, _)| k.eq_ignore_ascii_case(n)).map(|(_, v)| v.to_lowercase());
+    let get = |n: &str| {
+        headers
+            .iter()
+            .find(|(k, _)| k.eq_ignore_ascii_case(n))
+            .map(|(_, v)| v.to_lowercase())
+    };
     if get("List-Unsubscribe").is_some() || get("List-Id").is_some() {
         return true;
     }
@@ -458,7 +583,19 @@ pub fn is_automated(headers: &[(String, String)]) -> bool {
 
 pub fn is_automated_address(email: &str) -> bool {
     let l = email.to_lowercase();
-    ["noreply", "no-reply", "donotreply", "do-not-reply", "notifications@", "notification@", "mailer-daemon", "postmaster@", "bounce"].iter().any(|p| l.contains(p))
+    [
+        "noreply",
+        "no-reply",
+        "donotreply",
+        "do-not-reply",
+        "notifications@",
+        "notification@",
+        "mailer-daemon",
+        "postmaster@",
+        "bounce",
+    ]
+    .iter()
+    .any(|p| l.contains(p))
 }
 
 /// `Ana López <ana@x.com>, b@y.com` → [(Some("Ana López"), "ana@x.com"), (None, "b@y.com")]
@@ -469,7 +606,9 @@ pub fn parse_addresses(s: &str) -> Vec<(Option<String>, String)> {
             if let (Some(i), Some(j)) = (p.find('<'), p.rfind('>')) {
                 let name = p[..i].trim().trim_matches('"').trim();
                 let email = p[i + 1..j].trim().to_lowercase();
-                email.contains('@').then(|| (Some(name.to_string()).filter(|n| !n.is_empty()), email))
+                email
+                    .contains('@')
+                    .then(|| (Some(name.to_string()).filter(|n| !n.is_empty()), email))
             } else {
                 p.contains('@').then(|| (None, p.to_lowercase()))
             }
@@ -477,19 +616,39 @@ pub fn parse_addresses(s: &str) -> Vec<(Option<String>, String)> {
         .collect()
 }
 
-pub async fn sync_gmail(state: &AppState, user_id: Uuid, endpoints: &Endpoints, from: NaiveDate, to: NaiveDate) -> Result<SyncReport, ProviderError> {
-    let mut rep = SyncReport { provider: P.into(), kind: "gmail".into(), ..Default::default() };
-    let conn = repo::get(&state.pool, user_id, P).await?.ok_or(ProviderError::NotConnected("Google"))?;
+pub async fn sync_gmail(
+    state: &AppState,
+    user_id: Uuid,
+    endpoints: &Endpoints,
+    from: NaiveDate,
+    to: NaiveDate,
+) -> Result<SyncReport, ProviderError> {
+    let mut rep = SyncReport {
+        provider: P.into(),
+        kind: "gmail".into(),
+        ..Default::default()
+    };
+    let conn = repo::get(&state.pool, user_id, P)
+        .await?
+        .ok_or(ProviderError::NotConnected("Google"))?;
     if conn.config.get("gmail_enabled").and_then(|v| v.as_bool()) == Some(false) {
         return Ok(rep);
     }
     let tz = super::user_tz(state, user_id).await;
     let token = access_token(state, user_id, endpoints).await?;
-    let q = format!("in:sent after:{} before:{}", from.format("%Y/%m/%d"), (to + Duration::days(1)).format("%Y/%m/%d"));
+    let q = format!(
+        "in:sent after:{} before:{}",
+        from.format("%Y/%m/%d"),
+        (to + Duration::days(1)).format("%Y/%m/%d")
+    );
     let mut page: Option<String> = None;
     let mut ids = Vec::new();
     for _ in 0..10 {
-        let mut req = state.http.get(format!("{}/users/me/messages", endpoints.gmail)).bearer_auth(&token).query(&[("q", q.as_str()), ("maxResults", "100")]);
+        let mut req = state
+            .http
+            .get(format!("{}/users/me/messages", endpoints.gmail))
+            .bearer_auth(&token)
+            .query(&[("q", q.as_str()), ("maxResults", "100")]);
         if let Some(p) = &page {
             req = req.query(&[("pageToken", p)]);
         }
@@ -522,7 +681,10 @@ pub async fn sync_gmail(state: &AppState, user_id: Uuid, endpoints: &Endpoints, 
                 .map_err(net(P))?,
         )
         .await?;
-        let headers: Vec<(String, String)> = msg.payload.map(|p| p.headers.into_iter().map(|h| (h.name, h.value)).collect()).unwrap_or_default();
+        let headers: Vec<(String, String)> = msg
+            .payload
+            .map(|p| p.headers.into_iter().map(|h| (h.name, h.value)).collect())
+            .unwrap_or_default();
         if is_automated(&headers) {
             rep.skipped += 1;
             continue;
@@ -530,10 +692,14 @@ pub async fn sync_gmail(state: &AppState, user_id: Uuid, endpoints: &Endpoints, 
         let date = msg
             .internal_date
             .and_then(|ms| ms.parse::<i64>().ok())
-            .and_then(|ms| DateTime::from_timestamp_millis(ms))
+            .and_then(DateTime::from_timestamp_millis)
             .map(|d| domain::time::local_date(d, tz))
             .unwrap_or(to);
-        let subject = headers.iter().find(|(k, _)| k.eq_ignore_ascii_case("Subject")).map(|(_, v)| v.clone()).unwrap_or_default();
+        let subject = headers
+            .iter()
+            .find(|(k, _)| k.eq_ignore_ascii_case("Subject"))
+            .map(|(_, v)| v.clone())
+            .unwrap_or_default();
         let recipients: Vec<(Option<String>, String)> = headers
             .iter()
             .filter(|(k, _)| k.eq_ignore_ascii_case("To") || k.eq_ignore_ascii_case("Cc"))
@@ -543,7 +709,18 @@ pub async fn sync_gmail(state: &AppState, user_id: Uuid, endpoints: &Endpoints, 
             if is_automated_address(&email) {
                 continue;
             }
-            if super::suggest_contact(state, user_id, &email, name.as_deref(), date, &subject, "gmail", &msg.id).await? {
+            if super::suggest_contact(
+                state,
+                user_id,
+                &email,
+                name.as_deref(),
+                date,
+                &subject,
+                "gmail",
+                &msg.id,
+            )
+            .await?
+            {
                 rep.suggestions += 1;
             }
         }
@@ -553,7 +730,11 @@ pub async fn sync_gmail(state: &AppState, user_id: Uuid, endpoints: &Endpoints, 
 }
 
 /// Sincroniza Calendar (ayer → +7 días) y Gmail (últimos 2 días) y registra el resultado.
-pub async fn sync_all(state: &AppState, user_id: Uuid, window: Option<(NaiveDate, NaiveDate)>) -> Vec<SyncReport> {
+pub async fn sync_all(
+    state: &AppState,
+    user_id: Uuid,
+    window: Option<(NaiveDate, NaiveDate)>,
+) -> Vec<SyncReport> {
     let conn = repo::get(&state.pool, user_id, P).await.ok().flatten();
     let endpoints = Endpoints::resolve(state, conn.as_ref().map(|c| &c.config));
     let today = super::today(state, user_id).await;
@@ -563,13 +744,23 @@ pub async fn sync_all(state: &AppState, user_id: Uuid, window: Option<(NaiveDate
     let cal = sync_calendar(state, user_id, &endpoints, from, to).await;
     super::record_outcome(state, user_id, P, "calendar", started, &cal).await;
     let fatal = matches!(&cal, Err(e) if e.is_fatal());
-    out.push(cal.unwrap_or_else(|e| SyncReport { provider: P.into(), kind: "calendar".into(), error: Some(e.to_string()), ..Default::default() }));
+    out.push(cal.unwrap_or_else(|e| SyncReport {
+        provider: P.into(),
+        kind: "calendar".into(),
+        error: Some(e.to_string()),
+        ..Default::default()
+    }));
     if !fatal {
         let started = state.now();
         let (gfrom, gto) = window.unwrap_or((today - Duration::days(2), today));
         let gm = sync_gmail(state, user_id, &endpoints, gfrom, gto).await;
         super::record_outcome(state, user_id, P, "gmail", started, &gm).await;
-        out.push(gm.unwrap_or_else(|e| SyncReport { provider: P.into(), kind: "gmail".into(), error: Some(e.to_string()), ..Default::default() }));
+        out.push(gm.unwrap_or_else(|e| SyncReport {
+            provider: P.into(),
+            kind: "gmail".into(),
+            error: Some(e.to_string()),
+            ..Default::default()
+        }));
     }
     out
 }
@@ -580,18 +771,34 @@ mod tests {
 
     #[test]
     fn holiday_calendars_excluded() {
-        assert!(excluded_calendar("en.mexican#holiday@group.v.calendar.google.com"));
-        assert!(excluded_calendar("addressbook#contacts@group.v.calendar.google.com"));
+        assert!(excluded_calendar(
+            "en.mexican#holiday@group.v.calendar.google.com"
+        ));
+        assert!(excluded_calendar(
+            "addressbook#contacts@group.v.calendar.google.com"
+        ));
         assert!(!excluded_calendar("neil@gmail.com"));
     }
 
     #[test]
     fn automated_mail_detection() {
         assert!(is_automated(&[("List-Unsubscribe".into(), "<mailto:x>".into())]));
-        assert!(is_automated(&[("Auto-Submitted".into(), "auto-generated".into())]));
+        assert!(is_automated(&[(
+            "Auto-Submitted".into(),
+            "auto-generated".into()
+        )]));
         assert!(is_automated(&[("Precedence".into(), "bulk".into())]));
-        assert!(!is_automated(&[("Auto-Submitted".into(), "no".into()), ("Subject".into(), "Hola".into())]));
+        assert!(!is_automated(&[
+            ("Auto-Submitted".into(), "no".into()),
+            ("Subject".into(), "Hola".into())
+        ]));
         assert!(is_automated_address("no-reply@github.com"));
-        assert_eq!(parse_addresses("\"Ana López\" <Ana@X.com>, b@y.com"), vec![(Some("Ana López".into()), "ana@x.com".into()), (None, "b@y.com".into())]);
+        assert_eq!(
+            parse_addresses("\"Ana López\" <Ana@X.com>, b@y.com"),
+            vec![
+                (Some("Ana López".into()), "ana@x.com".into()),
+                (None, "b@y.com".into())
+            ]
+        );
     }
 }

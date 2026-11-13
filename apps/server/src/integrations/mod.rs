@@ -63,10 +63,16 @@ impl Endpoints {
         if state.config.env == AppEnv::Production {
             return Self::default();
         }
-        if let Some(base) = conn_config.and_then(|c| c.get("endpoints_override")).and_then(|v| v.as_str()) {
+        if let Some(base) = conn_config
+            .and_then(|c| c.get("endpoints_override"))
+            .and_then(|v| v.as_str())
+        {
             return Self::mock(base);
         }
-        match std::env::var("INTEGRATIONS_MOCK_BASE_URL").ok().filter(|s| !s.is_empty()) {
+        match std::env::var("INTEGRATIONS_MOCK_BASE_URL")
+            .ok()
+            .filter(|s| !s.is_empty())
+        {
             Some(base) => Self::mock(&base),
             None => Self::default(),
         }
@@ -82,7 +88,11 @@ pub enum ProviderError {
     #[error("límite de peticiones de {0}; se reintentará más tarde")]
     RateLimited(&'static str),
     #[error("{provider}: {message}")]
-    Http { provider: &'static str, status: u16, message: String },
+    Http {
+        provider: &'static str,
+        status: u16,
+        message: String,
+    },
     #[error("{0} no está conectado")]
     NotConnected(&'static str),
     #[error("{0}")]
@@ -95,7 +105,10 @@ pub enum ProviderError {
 
 impl ProviderError {
     pub fn is_fatal(&self) -> bool {
-        matches!(self, Self::Unauthorized(_) | Self::NotConnected(_) | Self::Config(_))
+        matches!(
+            self,
+            Self::Unauthorized(_) | Self::NotConnected(_) | Self::Config(_)
+        )
     }
 }
 
@@ -115,7 +128,9 @@ impl From<ProviderError> for crate::error::ApiError {
     fn from(e: ProviderError) -> Self {
         use axum::http::StatusCode;
         match &e {
-            ProviderError::NotConnected(_) | ProviderError::Config(_) => crate::error::ApiError::new(StatusCode::CONFLICT, "integration_not_ready", e.to_string()),
+            ProviderError::NotConnected(_) | ProviderError::Config(_) => {
+                crate::error::ApiError::new(StatusCode::CONFLICT, "integration_not_ready", e.to_string())
+            }
             ProviderError::Internal(_) => crate::error::ApiError::internal(),
             _ => crate::error::ApiError::new(StatusCode::BAD_GATEWAY, "provider_error", e.to_string()),
         }
@@ -123,7 +138,10 @@ impl From<ProviderError> for crate::error::ApiError {
 }
 
 /// Convierte una respuesta HTTP del proveedor en JSON o en `ProviderError` clasificado.
-pub async fn read_json<T: DeserializeOwned>(provider: &'static str, resp: reqwest::Response) -> Result<T, ProviderError> {
+pub async fn read_json<T: DeserializeOwned>(
+    provider: &'static str,
+    resp: reqwest::Response,
+) -> Result<T, ProviderError> {
     let status = resp.status();
     if status.as_u16() == 401 || status.as_u16() == 403 && provider == "clickup" {
         return Err(ProviderError::Unauthorized(provider));
@@ -131,12 +149,23 @@ pub async fn read_json<T: DeserializeOwned>(provider: &'static str, resp: reqwes
     if status.as_u16() == 429 {
         return Err(ProviderError::RateLimited(provider));
     }
-    let body = resp.text().await.map_err(|e| ProviderError::Network(provider, e.to_string()))?;
+    let body = resp
+        .text()
+        .await
+        .map_err(|e| ProviderError::Network(provider, e.to_string()))?;
     if !status.is_success() {
         // El cuerpo puede incluir detalles; nunca incluye nuestras credenciales. Se recorta.
-        return Err(ProviderError::Http { provider, status: status.as_u16(), message: body.chars().take(200).collect() });
+        return Err(ProviderError::Http {
+            provider,
+            status: status.as_u16(),
+            message: body.chars().take(200).collect(),
+        });
     }
-    serde_json::from_str(&body).map_err(|e| ProviderError::Http { provider, status: status.as_u16(), message: format!("respuesta inesperada: {e}") })
+    serde_json::from_str(&body).map_err(|e| ProviderError::Http {
+        provider,
+        status: status.as_u16(),
+        message: format!("respuesta inesperada: {e}"),
+    })
 }
 
 pub fn net(provider: &'static str) -> impl Fn(reqwest::Error) -> ProviderError {
@@ -159,7 +188,8 @@ pub async fn user_tz(state: &AppState, user_id: Uuid) -> chrono_tz::Tz {
         .await
         .ok()
         .flatten();
-    tz.and_then(|t| domain::time::parse_tz(&t).ok()).unwrap_or(chrono_tz::America::Monterrey)
+    tz.and_then(|t| domain::time::parse_tz(&t).ok())
+        .unwrap_or(chrono_tz::America::Monterrey)
 }
 
 pub async fn today(state: &AppState, user_id: Uuid) -> NaiveDate {
@@ -182,11 +212,13 @@ pub async fn suggest_contact(
     if email.is_empty() {
         return Ok(false);
     }
-    let person: Option<Uuid> = sqlx::query_scalar("SELECT id FROM people WHERE user_id = $1 AND lower(email) = $2 AND archived_at IS NULL LIMIT 1")
-        .bind(user_id)
-        .bind(&email)
-        .fetch_optional(&state.pool)
-        .await?;
+    let person: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM people WHERE user_id = $1 AND lower(email) = $2 AND archived_at IS NULL LIMIT 1",
+    )
+    .bind(user_id)
+    .bind(&email)
+    .fetch_optional(&state.pool)
+    .await?;
     let n = match person {
         Some(pid) => sqlx::query(
             "INSERT INTO interaction_suggestions (user_id, person_id, on_date, topic, source, source_ref) VALUES ($1, $2, $3, left($4, 300), $5, $6)
@@ -232,17 +264,51 @@ pub struct SyncReport {
 }
 
 /// Registra el resultado de una sincronización y actualiza estado/backoff de la conexión.
-pub async fn record_outcome(state: &AppState, user_id: Uuid, provider: &str, kind: &str, started: DateTime<Utc>, r: &Result<SyncReport, ProviderError>) {
+pub async fn record_outcome(
+    state: &AppState,
+    user_id: Uuid,
+    provider: &str,
+    kind: &str,
+    started: DateTime<Utc>,
+    r: &Result<SyncReport, ProviderError>,
+) {
     let now = state.now();
     let res = match r {
         Ok(rep) => {
-            let _ = repo::log_run(&state.pool, user_id, provider, kind, started, true, rep.upserted + rep.suggestions, None).await;
-            repo::mark_sync_ok(&state.pool, user_id, provider, now, now + chrono::Duration::minutes(15)).await
+            let _ = repo::log_run(
+                &state.pool,
+                user_id,
+                provider,
+                kind,
+                started,
+                true,
+                rep.upserted + rep.suggestions,
+                None,
+            )
+            .await;
+            repo::mark_sync_ok(
+                &state.pool,
+                user_id,
+                provider,
+                now,
+                now + chrono::Duration::minutes(15),
+            )
+            .await
         }
         Err(e) => {
             tracing::warn!(provider, kind, error = %e, "sincronización fallida");
             let msg = e.to_string();
-            let _ = repo::log_run(&state.pool, user_id, provider, kind, started, false, 0, Some(&msg)).await;
+            let _ = repo::log_run(
+                &state.pool,
+                user_id,
+                provider,
+                kind,
+                started,
+                false,
+                0,
+                Some(&msg),
+            )
+            .await;
             repo::mark_error(&state.pool, user_id, provider, &msg, e.is_fatal(), now).await
         }
     };
@@ -267,11 +333,11 @@ pub fn workers(state: &AppState, shutdown: &Shutdown) -> Vec<tokio::task::JoinHa
 
 pub async fn sync_due(state: &AppState) {
     let now = state.now();
-    if state.config.google.is_some() {
-        if let Ok(users) = repo::claim_due(&state.pool, "google", now, 20).await {
-            for u in users {
-                google::sync_all(state, u, None).await;
-            }
+    if state.config.google.is_some()
+        && let Ok(users) = repo::claim_due(&state.pool, "google", now, 20).await
+    {
+        for u in users {
+            google::sync_all(state, u, None).await;
         }
     }
     if let Ok(users) = repo::claim_due(&state.pool, "clickup", now, 20).await {
@@ -287,7 +353,8 @@ pub async fn sync_due(state: &AppState) {
 pub fn pkce_pair() -> (String, String) {
     use base64::Engine;
     let verifier = crate::crypto::random_token();
-    let challenge = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(crate::crypto::sha256(verifier.as_bytes()));
+    let challenge =
+        base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(crate::crypto::sha256(verifier.as_bytes()));
     (verifier, challenge)
 }
 
@@ -298,6 +365,9 @@ mod tests {
         use base64::Engine;
         let (v, c) = super::pkce_pair();
         assert!(v.len() >= 43);
-        assert_eq!(c, base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(crate::crypto::sha256(v.as_bytes())));
+        assert_eq!(
+            c,
+            base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(crate::crypto::sha256(v.as_bytes()))
+        );
     }
 }

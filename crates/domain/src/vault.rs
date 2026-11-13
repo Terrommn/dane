@@ -95,8 +95,14 @@ pub fn plain(s: &str) -> String {
         };
         let inner = after[..j].replace("\\|", "|");
         let link = match inner.split_once('|') {
-            Some((t, a)) => WikiLink { target: t.into(), alias: Some(a.into()) },
-            None => WikiLink { target: inner.clone(), alias: None },
+            Some((t, a)) => WikiLink {
+                target: t.into(),
+                alias: Some(a.into()),
+            },
+            None => WikiLink {
+                target: inner.clone(),
+                alias: None,
+            },
         };
         out.push_str(link.alias.as_deref().map(str::trim).unwrap_or(&link.basename()));
         rest = &after[j + 2..];
@@ -126,22 +132,25 @@ pub struct Note {
 /// Separa frontmatter YAML (convertido a JSON) y cuerpo. YAML inválido → frontmatter vacío + advertencia.
 pub fn split_frontmatter(text: &str) -> (BTreeMap<String, Value>, String, Option<String>) {
     let t = text.trim_start_matches('\u{feff}');
-    if let Some(rest) = t.strip_prefix("---\n") {
-        if let Some(end) = rest.find("\n---") {
-            let yaml = &rest[..end];
-            let body = rest[end + 4..].trim_start_matches(['-']).trim_start_matches('\n').to_string();
-            return match serde_norway::from_str::<serde_norway::Value>(yaml) {
-                Ok(v) => {
-                    let json = serde_json::to_value(v).unwrap_or(Value::Null);
-                    let map = match json {
-                        Value::Object(m) => m.into_iter().collect(),
-                        _ => BTreeMap::new(),
-                    };
-                    (map, body, None)
-                }
-                Err(e) => (BTreeMap::new(), body, Some(format!("frontmatter inválido: {e}"))),
-            };
-        }
+    if let Some(rest) = t.strip_prefix("---\n")
+        && let Some(end) = rest.find("\n---")
+    {
+        let yaml = &rest[..end];
+        let body = rest[end + 4..]
+            .trim_start_matches(['-'])
+            .trim_start_matches('\n')
+            .to_string();
+        return match serde_norway::from_str::<serde_norway::Value>(yaml) {
+            Ok(v) => {
+                let json = serde_json::to_value(v).unwrap_or(Value::Null);
+                let map = match json {
+                    Value::Object(m) => m.into_iter().collect(),
+                    _ => BTreeMap::new(),
+                };
+                (map, body, None)
+            }
+            Err(e) => (BTreeMap::new(), body, Some(format!("frontmatter inválido: {e}"))),
+        };
     }
     (BTreeMap::new(), t.to_string(), None)
 }
@@ -155,7 +164,11 @@ pub fn sections(body: &str) -> Vec<Section> {
         }
         let hashes = line.chars().take_while(|c| *c == '#').count();
         if !in_code && (1..=6).contains(&hashes) && line[hashes..].starts_with(' ') {
-            out.push(Section { level: hashes, title: line[hashes..].trim().to_string(), content: String::new() });
+            out.push(Section {
+                level: hashes,
+                title: line[hashes..].trim().to_string(),
+                content: String::new(),
+            });
         } else if let Some(s) = out.last_mut() {
             s.content.push_str(line);
             s.content.push('\n');
@@ -187,14 +200,25 @@ pub fn parse_note(path: &str, raw: &str) -> (Note, Vec<String>) {
     let text = normalize_text(raw);
     let (frontmatter, body, warn) = split_frontmatter(&text);
     let sections = sections(&body);
-    (Note { path: path.to_string(), frontmatter, body, sections }, warn.into_iter().collect())
+    (
+        Note {
+            path: path.to_string(),
+            frontmatter,
+            body,
+            sections,
+        },
+        warn.into_iter().collect(),
+    )
 }
 
 impl Note {
     /// Contenido de la primera sección cuyo título empieza con `prefix` (sin distinguir acentos/mayúsculas).
     pub fn section(&self, prefix: &str) -> Option<&str> {
         let p = fold(prefix);
-        self.sections.iter().find(|s| fold(&s.title).starts_with(&p)).map(|s| s.content.as_str())
+        self.sections
+            .iter()
+            .find(|s| fold(&s.title).starts_with(&p))
+            .map(|s| s.content.as_str())
     }
     pub fn fm_str(&self, key: &str) -> Option<String> {
         match self.frontmatter.get(key)? {
@@ -227,7 +251,11 @@ impl Note {
     }
     pub fn fm_list(&self, key: &str) -> Vec<String> {
         match self.frontmatter.get(key) {
-            Some(Value::Array(a)) => a.iter().filter_map(|v| v.as_str().map(|s| s.trim().to_string())).filter(|s| !s.is_empty()).collect(),
+            Some(Value::Array(a)) => a
+                .iter()
+                .filter_map(|v| v.as_str().map(|s| s.trim().to_string()))
+                .filter(|s| !s.is_empty())
+                .collect(),
             Some(Value::String(s)) if !s.trim().is_empty() => vec![s.trim().to_string()],
             _ => Vec::new(),
         }
@@ -257,7 +285,10 @@ impl Table {
         self.headers.iter().position(|h| fold(h).starts_with(&n))
     }
     pub fn cell<'a>(&self, row: &'a [String], name: &str) -> &'a str {
-        self.col(name).and_then(|i| row.get(i)).map(String::as_str).unwrap_or("")
+        self.col(name)
+            .and_then(|i| row.get(i))
+            .map(String::as_str)
+            .unwrap_or("")
     }
 }
 
@@ -289,7 +320,10 @@ pub fn tables(text: &str) -> Vec<Table> {
     while i < lines.len() {
         let l = lines[i].trim();
         let sep = lines.get(i + 1).map(|s| s.trim()).unwrap_or("");
-        if l.starts_with('|') && sep.starts_with('|') && sep.chars().all(|c| matches!(c, '|' | '-' | ':' | ' ')) {
+        if l.starts_with('|')
+            && sep.starts_with('|')
+            && sep.chars().all(|c| matches!(c, '|' | '-' | ':' | ' '))
+        {
             let headers = split_row(l);
             let mut rows = Vec::new();
             i += 2;
@@ -330,7 +364,10 @@ pub fn checkboxes(text: &str) -> Vec<Checkbox> {
             if rest.is_empty() || is_placeholder(rest) {
                 return None;
             }
-            Some(Checkbox { checked: matches!(mark, 'x' | 'X'), text: rest.to_string() })
+            Some(Checkbox {
+                checked: matches!(mark, 'x' | 'X'),
+                text: rest.to_string(),
+            })
         })
         .collect()
 }
@@ -356,7 +393,10 @@ pub fn numbered(text: &str) -> Vec<String> {
         .filter_map(|l| {
             let t = l.trim_start();
             let dot = t.find(". ")?;
-            t[..dot].chars().all(|c| c.is_ascii_digit()).then(|| t[dot + 2..].trim().to_string())
+            t[..dot]
+                .chars()
+                .all(|c| c.is_ascii_digit())
+                .then(|| t[dot + 2..].trim().to_string())
         })
         .filter(|s| !s.is_empty() && !is_placeholder(s))
         .collect()
@@ -367,7 +407,7 @@ pub fn prose(text: &str) -> String {
     text.lines()
         .filter(|l| {
             let t = l.trim();
-            !(t == "-" || t == "- [ ]" || t == "1." || t.is_empty() && false || is_placeholder(t))
+            !(t == "-" || t == "- [ ]" || t == "1." || is_placeholder(t))
         })
         .collect::<Vec<_>>()
         .join("\n")
@@ -379,7 +419,11 @@ fn md_link_url(s: &str) -> Option<(String, String)> {
     let i = s.find("](")?;
     // Corchete de apertura no escapado (`[\[Tag\] nombre](url)`).
     let head = &s[..i];
-    let start = head.char_indices().rev().find(|(j, c)| *c == '[' && !head[..*j].ends_with('\\')).map(|(j, _)| j)?;
+    let start = head
+        .char_indices()
+        .rev()
+        .find(|(j, c)| *c == '[' && !head[..*j].ends_with('\\'))
+        .map(|(j, _)| j)?;
     let end = s[i + 2..].find(')')?;
     Some((s[start + 1..i].to_string(), s[i + 2..i + 2 + end].to_string()))
 }
@@ -427,8 +471,25 @@ pub fn classify(path: &str) -> FileKind {
     let p = path.trim_start_matches("./");
     // Quitar una carpeta raíz contenedora (ej. "Vault/") si no es una carpeta conocida.
     let known = [
-        "Daily/", "Proyectos/", "Personas/", "Lecturas/", "Contenido/", "Swipe/", "Dev/", "Weekly/", "Templates/", "Scripts/", "Bases/",
-        ".claude/", ".obsidian/", "Attachments/", "Inbox.md", "Home.md", "AGENTS.md", "CLAUDE.md", "LEEME",
+        "Daily/",
+        "Proyectos/",
+        "Personas/",
+        "Lecturas/",
+        "Contenido/",
+        "Swipe/",
+        "Dev/",
+        "Weekly/",
+        "Templates/",
+        "Scripts/",
+        "Bases/",
+        ".claude/",
+        ".obsidian/",
+        "Attachments/",
+        "Inbox.md",
+        "Home.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "LEEME",
     ];
     let p = if known.iter().any(|k| p.starts_with(k)) {
         p
@@ -474,48 +535,93 @@ pub fn classify(path: &str) -> FileKind {
         return FileKind::Inbox;
     }
     match parts.as_slice() {
-        ["Daily", _] => parse_date(stem).map(|date| FileKind::Daily { date }).unwrap_or(FileKind::Note { note_kind: "note".into() }),
-        ["Weekly", _] if stem.contains("-W") => FileKind::Weekly { week: stem.to_string() },
+        ["Daily", _] => parse_date(stem)
+            .map(|date| FileKind::Daily { date })
+            .unwrap_or(FileKind::Note {
+                note_kind: "note".into(),
+            }),
+        ["Weekly", _] if stem.contains("-W") => FileKind::Weekly {
+            week: stem.to_string(),
+        },
         ["Personas", _] => FileKind::Person,
         ["Lecturas", _] => FileKind::Reading,
         ["Contenido", _] => FileKind::Content,
         ["Swipe", _] => FileKind::Swipe,
-        ["Dev", "devlog", _] => parse_date(stem).map(|date| FileKind::Devlog { date }).unwrap_or(FileKind::Note { note_kind: "note".into() }),
-        ["Dev", "til", ..] => FileKind::Note { note_kind: "til".into() },
-        ["Dev", "snippets", ..] => FileKind::Note { note_kind: "snippet".into() },
+        ["Dev", "devlog", _] => {
+            parse_date(stem)
+                .map(|date| FileKind::Devlog { date })
+                .unwrap_or(FileKind::Note {
+                    note_kind: "note".into(),
+                })
+        }
+        ["Dev", "til", ..] => FileKind::Note {
+            note_kind: "til".into(),
+        },
+        ["Dev", "snippets", ..] => FileKind::Note {
+            note_kind: "snippet".into(),
+        },
         ["Proyectos", "personal", "Devocionales", _] => stem
             .strip_prefix("Devocional ")
             .and_then(parse_date)
             .map(|date| FileKind::Devotional { date })
-            .unwrap_or(FileKind::Note { note_kind: "note".into() }),
+            .unwrap_or(FileKind::Note {
+                note_kind: "note".into(),
+            }),
         ["Proyectos", "personal", "Objetivos", _] => {
             if let Some(m) = stem.strip_prefix("Mes ") {
-                FileKind::GoalMonth { period: m.trim().into() }
+                FileKind::GoalMonth {
+                    period: m.trim().into(),
+                }
             } else if let Some(w) = stem.strip_prefix("Semana ") {
-                FileKind::GoalWeek { period: w.trim().into() }
+                FileKind::GoalWeek {
+                    period: w.trim().into(),
+                }
             } else {
-                FileKind::Note { note_kind: "note".into() }
+                FileKind::Note {
+                    note_kind: "note".into(),
+                }
             }
         }
-        ["Proyectos", "personal", "Finanzas", "Gastos", _] => {
-            stem.strip_prefix("Gastos ").map(|m| FileKind::Expenses { month: m.trim().into() }).unwrap_or(ignored("nota de finanzas sin mes"))
-        }
-        ["Proyectos", "personal", "Finanzas", "Ingresos", _] => {
-            stem.strip_prefix("Ingresos ").map(|m| FileKind::Income { month: m.trim().into() }).unwrap_or(ignored("nota de finanzas sin mes"))
-        }
+        ["Proyectos", "personal", "Finanzas", "Gastos", _] => stem
+            .strip_prefix("Gastos ")
+            .map(|m| FileKind::Expenses {
+                month: m.trim().into(),
+            })
+            .unwrap_or(ignored("nota de finanzas sin mes")),
+        ["Proyectos", "personal", "Finanzas", "Ingresos", _] => stem
+            .strip_prefix("Ingresos ")
+            .map(|m| FileKind::Income {
+                month: m.trim().into(),
+            })
+            .unwrap_or(ignored("nota de finanzas sin mes")),
         ["Proyectos", "personal", "Finanzas", "Tarjetas", _] => FileKind::Card,
         ["Proyectos", "personal", "Finanzas", "Cuentas", _] => FileKind::Account,
         ["Proyectos", "personal", "Finanzas", "Suscripciones.md"] => FileKind::Subscriptions,
         ["Proyectos", "personal", "Finanzas", "Ingresos fijos.md"] => FileKind::FixedIncome,
         ["Proyectos", "personal", "Finanzas", "Plan de crédito.md"] => FileKind::CreditPlan,
-        ["Proyectos", "personal", "Finanzas", "Dashboard.md" | "Tarjetas de crédito.md"] => ignored("tablero calculado (la app lo calcula)"),
+        [
+            "Proyectos",
+            "personal",
+            "Finanzas",
+            "Dashboard.md" | "Tarjetas de crédito.md",
+        ] => ignored("tablero calculado (la app lo calcula)"),
         ["Proyectos", "personal", "Pendientes recurrentes.md"] => FileKind::RecurringTasks,
-        ["Proyectos", _, "Clases", subject, _] => FileKind::ClassNote { subject: (*subject).to_string() },
-        ["Proyectos", project, "adr", _] => FileKind::Adr { project: (*project).to_string() },
-        ["Proyectos", project, f] if f.trim_end_matches(".md") == *project => FileKind::Project { slug: (*project).to_string() },
-        ["Proyectos", _, f] if fold(f).contains("runbook") => FileKind::Note { note_kind: "runbook".into() },
+        ["Proyectos", _, "Clases", subject, _] => FileKind::ClassNote {
+            subject: (*subject).to_string(),
+        },
+        ["Proyectos", project, "adr", _] => FileKind::Adr {
+            project: (*project).to_string(),
+        },
+        ["Proyectos", project, f] if f.trim_end_matches(".md") == *project => FileKind::Project {
+            slug: (*project).to_string(),
+        },
+        ["Proyectos", _, f] if fold(f).contains("runbook") => FileKind::Note {
+            note_kind: "runbook".into(),
+        },
         ["Attachments", ..] => unsupported("adjunto: se conserva como referencia"),
-        _ => FileKind::Note { note_kind: "note".into() },
+        _ => FileKind::Note {
+            note_kind: "note".into(),
+        },
     }
 }
 
@@ -545,7 +651,11 @@ pub struct DailyImport {
 pub fn daily(note: &Note, date: NaiveDate) -> DailyImport {
     let mut fixed_done = Vec::new();
     let mut fixed_false_ignored = 0;
-    for (key, habit) in [("devocional", "devotional"), ("ejercicio", "exercise"), ("lectura", "reading")] {
+    for (key, habit) in [
+        ("devocional", "devotional"),
+        ("ejercicio", "exercise"),
+        ("lectura", "reading"),
+    ] {
         match note.fm_bool(key) {
             Some(true) => fixed_done.push(habit.to_string()),
             Some(false) => fixed_false_ignored += 1,
@@ -577,21 +687,39 @@ pub fn daily(note: &Note, date: NaiveDate) -> DailyImport {
     let gastos = note.section("Gastos de hoy").unwrap_or("");
     let planned_spend = gastos
         .lines()
-        .find_map(|l| l.trim().strip_prefix("- Planeo gastar:").map(|v| v.trim().to_string()))
+        .find_map(|l| {
+            l.trim()
+                .strip_prefix("- Planeo gastar:")
+                .map(|v| v.trim().to_string())
+        })
         .filter(|v| !v.is_empty() && !is_placeholder(v));
     let only_items = |sec: &str| -> Vec<String> {
-        note.section(sec).map(bullets).unwrap_or_default().into_iter().filter(|b| !b.starts_with("Respecto a mis")).collect()
+        note.section(sec)
+            .map(bullets)
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|b| !b.starts_with("Respecto a mis"))
+            .collect()
     };
     DailyImport {
         date,
         weight_kg: note.fm_num("peso"),
-        energy: note.fm_num("energia").map(|e| e as i64).filter(|e| (1..=5).contains(e)),
+        energy: note
+            .fm_num("energia")
+            .map(|e| e as i64)
+            .filter(|e| (1..=5).contains(e)),
         fixed_done,
         fixed_false_ignored,
         planned_spend,
         agenda: note.section("Agenda").map(bullets).unwrap_or_default(),
-        month_habits: note.section("Hábitos del mes").map(checkboxes).unwrap_or_default(),
-        week_habits: note.section("Hábitos de la semana").map(checkboxes).unwrap_or_default(),
+        month_habits: note
+            .section("Hábitos del mes")
+            .map(checkboxes)
+            .unwrap_or_default(),
+        week_habits: note
+            .section("Hábitos de la semana")
+            .map(checkboxes)
+            .unwrap_or_default(),
         log: only_items("Log"),
         people: only_items("Personas"),
         tasks,
@@ -648,7 +776,14 @@ pub fn devotional(note: &Note, date: NaiveDate) -> DevotionalImport {
         .map(tables)
         .unwrap_or_default()
         .into_iter()
-        .flat_map(|t| t.rows.into_iter().map(|r| (unescape_cell(r.first().map(String::as_str).unwrap_or("")), unescape_cell(r.get(1).map(String::as_str).unwrap_or("")))))
+        .flat_map(|t| {
+            t.rows.into_iter().map(|r| {
+                (
+                    unescape_cell(r.first().map(String::as_str).unwrap_or("")),
+                    unescape_cell(r.get(1).map(String::as_str).unwrap_or("")),
+                )
+            })
+        })
         .filter(|(v, a)| !v.is_empty() || !a.is_empty())
         .collect();
     let passage = note.fm_str("pasaje").unwrap_or_else(|| sec("Pasaje"));
@@ -701,7 +836,11 @@ pub fn goals_note(note: &Note, kind: &str, period: &str) -> GoalsNoteImport {
     let field = |content: &str, label: &str| -> String {
         content
             .lines()
-            .find_map(|l| l.trim().strip_prefix(&format!("- **{label}:**")).map(|v| v.trim().to_string()))
+            .find_map(|l| {
+                l.trim()
+                    .strip_prefix(&format!("- **{label}:**"))
+                    .map(|v| v.trim().to_string())
+            })
             .filter(|v| !is_placeholder(v))
             .unwrap_or_default()
     };
@@ -718,7 +857,17 @@ pub fn goals_note(note: &Note, kind: &str, period: &str) -> GoalsNoteImport {
             if let Some(g) = cur.take() {
                 goals.push(g);
             }
-            let title = s.title.split_once(". ").map(|(n, t)| if n.chars().all(|c| c.is_ascii_digit()) { t } else { s.title.as_str() }).unwrap_or(&s.title);
+            let title = s
+                .title
+                .split_once(". ")
+                .map(|(n, t)| {
+                    if n.chars().all(|c| c.is_ascii_digit()) {
+                        t
+                    } else {
+                        s.title.as_str()
+                    }
+                })
+                .unwrap_or(&s.title);
             let title = plain(title);
             if title.is_empty() || is_placeholder(&title) {
                 cur = None;
@@ -727,7 +876,10 @@ pub fn goals_note(note: &Note, kind: &str, period: &str) -> GoalsNoteImport {
             let area_raw = field(&s.content, "Área");
             cur = Some(GoalImport {
                 title,
-                area: wikilinks(&area_raw).first().map(|l| l.basename()).or_else(|| Some(plain(&area_raw)).filter(|a| !a.is_empty())),
+                area: wikilinks(&area_raw)
+                    .first()
+                    .map(|l| l.basename())
+                    .or_else(|| Some(plain(&area_raw)).filter(|a| !a.is_empty())),
                 motivation: plain(&field(&s.content, "Por qué importa")),
                 success: plain(&field(&s.content, "Cómo sé que lo logré")),
                 status: map_goal_status(&field(&s.content, "Estado")),
@@ -740,7 +892,8 @@ pub fn goals_note(note: &Note, kind: &str, period: &str) -> GoalsNoteImport {
         if in_goals_area && s.level == 4 && fold(&s.title).starts_with("habitos") {
             in_habits = true;
             if let Some(g) = cur.as_mut() {
-                g.habits.extend(checkboxes(&s.content).into_iter().map(|c| plain(&c.text)));
+                g.habits
+                    .extend(checkboxes(&s.content).into_iter().map(|c| plain(&c.text)));
             }
         } else if in_habits {
             in_habits = false;
@@ -774,10 +927,20 @@ pub struct WeeklyImport {
 }
 
 pub fn weekly(note: &Note, week: &str) -> WeeklyImport {
-    let sec = |p: &str| note.section(p).map(prose).unwrap_or_default().replace("- Devocional: /7 · Ejercicio: /4 (meta) · Lectura: /7", "").trim().to_string();
+    let sec = |p: &str| {
+        note.section(p)
+            .map(prose)
+            .unwrap_or_default()
+            .replace("- Devocional: /7 · Ejercicio: /4 (meta) · Lectura: /7", "")
+            .trim()
+            .to_string()
+    };
     WeeklyImport {
         week: note.fm_str("semana").unwrap_or_else(|| week.to_string()),
-        peace: note.fm_num("paz").map(|p| p as i64).filter(|p| (1..=5).contains(p)),
+        peace: note
+            .fm_num("paz")
+            .map(|p| p as i64)
+            .filter(|p| (1..=5).contains(p)),
         what_happened: sec("Qué pasó"),
         what_didnt: sec("Qué no pasó"),
         content: sec("Contenido publicado"),
@@ -785,7 +948,13 @@ pub fn weekly(note: &Note, week: &str) -> WeeklyImport {
         goals: sec("Objetivos de la semana"),
         areas: sec("Proyectos"),
         people: sec("Personas con las que hablé"),
-        priorities: note.section("Prioridades").map(numbered).unwrap_or_default().into_iter().take(3).collect(),
+        priorities: note
+            .section("Prioridades")
+            .map(numbered)
+            .unwrap_or_default()
+            .into_iter()
+            .take(3)
+            .collect(),
     }
 }
 
@@ -818,10 +987,25 @@ pub fn parse_birthday(s: &str) -> Option<(u32, u32, Option<i32>)> {
 }
 
 pub fn person(note: &Note) -> PersonImport {
-    const RELS: [&str; 8] = ["jefe", "subordinado", "compañero", "cliente", "familia", "pareja", "amigo", "otro"];
-    let rel = note.fm_str("relacion").map(|r| fold(&r)).and_then(|r| RELS.iter().find(|x| fold(x) == r).map(|x| x.to_string()));
+    const RELS: [&str; 8] = [
+        "jefe",
+        "subordinado",
+        "compañero",
+        "cliente",
+        "familia",
+        "pareja",
+        "amigo",
+        "otro",
+    ];
+    let rel = note
+        .fm_str("relacion")
+        .map(|r| fold(&r))
+        .and_then(|r| RELS.iter().find(|x| fold(x) == r).map(|x| x.to_string()));
     let contact = note.fm_str("contacto");
-    let email = contact.as_deref().filter(|c| c.contains('@') && !c.contains(' ')).map(str::to_lowercase);
+    let email = contact
+        .as_deref()
+        .filter(|c| c.contains('@') && !c.contains(' '))
+        .map(str::to_lowercase);
     let notes = note
         .section("Notas")
         .map(bullets)
@@ -833,11 +1017,19 @@ pub fn person(note: &Note) -> PersonImport {
         })
         .filter(|(_, t)| !t.is_empty())
         .collect();
-    let context: Vec<String> = note.section("Contexto").map(bullets).unwrap_or_default().into_iter().filter(|b| b.trim_end() != "Quién es para el usuario:").collect();
+    let context: Vec<String> = note
+        .section("Contexto")
+        .map(bullets)
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|b| b.trim_end() != "Quién es para el usuario:")
+        .collect();
     PersonImport {
         name: note.stem(),
         aliases: note.fm_list("aliases"),
-        area: note.fm_str("area").and_then(|a| wikilinks(&a).first().map(|l| l.basename()).or(Some(a))),
+        area: note
+            .fm_str("area")
+            .and_then(|a| wikilinks(&a).first().map(|l| l.basename()).or(Some(a))),
         relationship: rel,
         org: note.fm_str("org"),
         role: note.fm_str("rol"),
@@ -873,10 +1065,19 @@ pub fn reading(note: &Note) -> ReadingImport {
     };
     ReadingImport {
         title: note.stem(),
-        kind: if note.fm_str("tipo").as_deref() == Some("articulo") || note.fm_str("tipo").as_deref() == Some("artículo") { "article".into() } else { "book".into() },
+        kind: if note.fm_str("tipo").as_deref() == Some("articulo")
+            || note.fm_str("tipo").as_deref() == Some("artículo")
+        {
+            "article".into()
+        } else {
+            "book".into()
+        },
         author: note.fm_str("autor").unwrap_or_default(),
         status: status.into(),
-        rating: note.fm_num("rating").map(|r| r as i64).filter(|r| (1..=5).contains(r)),
+        rating: note
+            .fm_num("rating")
+            .map(|r| r as i64)
+            .filter(|r| (1..=5).contains(r)),
         started_on: note.fm_date("inicio"),
         finished_on: note.fm_date("fin"),
         ideas: note.section("Ideas clave").map(prose).unwrap_or_default(),
@@ -917,12 +1118,27 @@ pub fn content(note: &Note) -> ContentImport {
         Some("publicado") => "published",
         _ => "idea",
     };
-    let hooks: Vec<String> = note.section("Hooks").map(numbered).unwrap_or_default().into_iter().take(10).collect();
+    let hooks: Vec<String> = note
+        .section("Hooks")
+        .map(numbered)
+        .unwrap_or_default()
+        .into_iter()
+        .take(10)
+        .collect();
     let fm_hook = note.fm_str("hook");
-    let chosen_hook = fm_hook.as_ref().and_then(|h| hooks.iter().position(|x| fold(x) == fold(h)));
+    let chosen_hook = fm_hook
+        .as_ref()
+        .and_then(|h| hooks.iter().position(|x| fold(x) == fold(h)));
     let guion = note.section("Guion").unwrap_or("");
     let script_part = |label: &str| {
-        guion.lines().find_map(|l| l.trim().strip_prefix(&format!("**{label}")).map(|r| r.split_once("**").map(|x| x.1).unwrap_or(r).trim().to_string())).unwrap_or_default()
+        guion
+            .lines()
+            .find_map(|l| {
+                l.trim()
+                    .strip_prefix(&format!("**{label}"))
+                    .map(|r| r.split_once("**").map(|x| x.1).unwrap_or(r).trim().to_string())
+            })
+            .unwrap_or_default()
     };
     let shot_list = note
         .section("Shot list")
@@ -938,14 +1154,25 @@ pub fn content(note: &Note) -> ContentImport {
         .filter(|v| v["shot"].as_str().is_some_and(|s| !s.is_empty()) || v["text"].as_str().is_some_and(|s| !s.is_empty()))
         .collect();
     let result = note.section("Resultado").unwrap_or("");
-    let res = |label: &str| result.lines().find_map(|l| l.trim().strip_prefix(&format!("- {label}")).map(|v| v.trim().to_string())).unwrap_or_default();
+    let res = |label: &str| {
+        result
+            .lines()
+            .find_map(|l| {
+                l.trim()
+                    .strip_prefix(&format!("- {label}"))
+                    .map(|v| v.trim().to_string())
+            })
+            .unwrap_or_default()
+    };
     let mut hooks = hooks;
-    if let (Some(h), None) = (&fm_hook, chosen_hook) {
-        if hooks.len() < 10 {
-            hooks.push(h.clone());
-        }
+    if let (Some(h), None) = (&fm_hook, chosen_hook)
+        && hooks.len() < 10
+    {
+        hooks.push(h.clone());
     }
-    let chosen_hook = fm_hook.as_ref().and_then(|h| hooks.iter().position(|x| fold(x) == fold(h)));
+    let chosen_hook = fm_hook
+        .as_ref()
+        .and_then(|h| hooks.iter().position(|x| fold(x) == fold(h)));
     ContentImport {
         title: note.stem(),
         status: status.into(),
@@ -959,7 +1186,10 @@ pub fn content(note: &Note) -> ContentImport {
         script_body: script_part("Desarrollo"),
         script_cta: script_part("Cierre"),
         shot_list,
-        edit_notes: note.section("Notas de edición").map(|s| bullets(s).join("\n")).unwrap_or_default(),
+        edit_notes: note
+            .section("Notas de edición")
+            .map(|s| bullets(s).join("\n"))
+            .unwrap_or_default(),
         result_worked: res("Lo que funcionó:"),
         result_change: res("Lo que cambiaría:"),
         publish_on: note.fm_date("fecha_pub"),
@@ -985,7 +1215,9 @@ pub fn swipe(note: &Note) -> SwipeImport {
         title: note.stem(),
         url,
         why: note.section("Por qué funciona").map(prose).unwrap_or_default(),
-        hook: note.fm_str("hook").unwrap_or_else(|| note.section("Hook").map(prose).unwrap_or_default()),
+        hook: note
+            .fm_str("hook")
+            .unwrap_or_else(|| note.section("Hook").map(prose).unwrap_or_default()),
         creator: note.fm_str("creador").or_else(|| note.fm_str("creator")),
     }
 }
@@ -1007,7 +1239,10 @@ pub fn class_note(note: &Note, subject: &str) -> ClassImport {
         _ => (None, stem.clone()),
     };
     ClassImport {
-        subject: note.fm_str("materia").map(|m| plain(&m)).unwrap_or_else(|| subject.to_string()),
+        subject: note
+            .fm_str("materia")
+            .map(|m| plain(&m))
+            .unwrap_or_else(|| subject.to_string()),
         date: note.fm_date("fecha").or(date),
         topic,
         topics: note.section("Temas").map(prose).unwrap_or_default(),
@@ -1034,21 +1269,50 @@ pub struct DevlogImport {
 }
 
 pub fn devlog(note: &Note, date: NaiveDate) -> DevlogImport {
-    let projects = note.fm_list("proyectos").iter().filter_map(|p| wikilinks(p).first().map(|l| l.basename())).collect();
+    let projects = note
+        .fm_list("proyectos")
+        .iter()
+        .filter_map(|p| wikilinks(p).first().map(|l| l.basename()))
+        .collect();
     let mut sessions = Vec::new();
     for s in note.sections.iter().filter(|s| s.level == 3) {
         let (repo, time) = match s.title.split_once(" — ").or_else(|| s.title.split_once(" - ")) {
             Some((r, t)) => (r.trim().to_string(), Some(t.trim().to_string())),
             None => (s.title.clone(), None),
         };
-        sessions.push(DevlogSessionImport { repo, at_time: time, changes: prose(&s.content), bugs: String::new(), decisions: String::new(), next_steps: String::new() });
+        sessions.push(DevlogSessionImport {
+            repo,
+            at_time: time,
+            changes: prose(&s.content),
+            bugs: String::new(),
+            decisions: String::new(),
+            next_steps: String::new(),
+        });
     }
     let whole = |p: &str| note.section(p).map(prose).unwrap_or_default();
-    let (changes, bugs, decisions, next) = (whole("Qué hice"), whole("Bloqueos"), whole("Decisiones"), whole("Siguiente"));
-    if sessions.is_empty() && !(changes.is_empty() && bugs.is_empty() && decisions.is_empty() && next.is_empty()) {
-        sessions.push(DevlogSessionImport { repo: String::new(), at_time: None, changes, bugs, decisions, next_steps: next });
+    let (changes, bugs, decisions, next) = (
+        whole("Qué hice"),
+        whole("Bloqueos"),
+        whole("Decisiones"),
+        whole("Siguiente"),
+    );
+    if sessions.is_empty()
+        && !(changes.is_empty() && bugs.is_empty() && decisions.is_empty() && next.is_empty())
+    {
+        sessions.push(DevlogSessionImport {
+            repo: String::new(),
+            at_time: None,
+            changes,
+            bugs,
+            decisions,
+            next_steps: next,
+        });
     }
-    DevlogImport { date, projects, sessions }
+    DevlogImport {
+        date,
+        projects,
+        sessions,
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -1075,7 +1339,10 @@ pub fn adr(note: &Note, project_folder: &str) -> AdrImport {
         Some("reemplazada") => "superseded",
         _ => "proposed",
     };
-    let project = note.fm_str("proyecto").and_then(|p| wikilinks(&p).first().map(|l| l.basename())).unwrap_or_else(|| project_folder.to_string());
+    let project = note
+        .fm_str("proyecto")
+        .and_then(|p| wikilinks(&p).first().map(|l| l.basename()))
+        .unwrap_or_else(|| project_folder.to_string());
     AdrImport {
         project,
         number,
@@ -1108,10 +1375,16 @@ pub fn payment_ref(cell: &str) -> PaymentRef {
     }
     let low = fold(t);
     if low.starts_with("prestado") {
-        let person = wikilinks(t).first().map(|l| l.basename()).unwrap_or_else(|| plain(t.trim_start_matches(|c: char| c != '(').trim_matches(['(', ')'])));
+        let person = wikilinks(t)
+            .first()
+            .map(|l| l.basename())
+            .unwrap_or_else(|| plain(t.trim_start_matches(|c: char| c != '(').trim_matches(['(', ')'])));
         return PaymentRef::Borrowed { person };
     }
-    if let Some(l) = wikilinks(t).into_iter().find(|l| fold(&l.basename()).starts_with("tarjeta")) {
+    if let Some(l) = wikilinks(t)
+        .into_iter()
+        .find(|l| fold(&l.basename()).starts_with("tarjeta"))
+    {
         return PaymentRef::Card { name: l.basename() };
     }
     if low == "efectivo" {
@@ -1120,7 +1393,10 @@ pub fn payment_ref(cell: &str) -> PaymentRef {
     for kind in ["debito", "transferencia"] {
         if let Some(rest) = low.strip_prefix(kind) {
             let bank = plain(&t[t.len() - rest.len()..]).trim().to_string();
-            return PaymentRef::Bank { kind: kind.into(), bank };
+            return PaymentRef::Bank {
+                kind: kind.into(),
+                bank,
+            };
         }
     }
     PaymentRef::Other { text: plain(t) }
@@ -1149,7 +1425,10 @@ pub struct MoneyNoteImport {
 
 /// Tabla de gastos (`| Fecha | Concepto | Monto | Categoría | Pago |`) o ingresos (`… | Cuenta |`).
 pub fn money_note(note: &Note, month: &str, account_col: &str) -> MoneyNoteImport {
-    let mut out = MoneyNoteImport { month: month.into(), ..Default::default() };
+    let mut out = MoneyNoteImport {
+        month: month.into(),
+        ..Default::default()
+    };
     let registro = note.section("Registro").unwrap_or(&note.body);
     let mut seen: BTreeMap<(NaiveDate, String, i64), usize> = BTreeMap::new();
     for t in tables(registro) {
@@ -1159,7 +1438,8 @@ pub fn money_note(note: &Note, month: &str, account_col: &str) -> MoneyNoteImpor
         for r in &t.rows {
             let date_s = t.cell(r, "Fecha");
             let Some(date) = parse_date(date_s) else {
-                out.warnings.push(format!("fila sin fecha válida en {}: '{date_s}'", note.path));
+                out.warnings
+                    .push(format!("fila sin fecha válida en {}: '{date_s}'", note.path));
                 continue;
             };
             let concept_raw = unescape_cell(t.cell(r, "Concepto"));
@@ -1168,7 +1448,10 @@ pub fn money_note(note: &Note, month: &str, account_col: &str) -> MoneyNoteImpor
             let amount = match parse_amount_to_cents(amount_s) {
                 Ok(a) if a > 0 => a,
                 _ => {
-                    out.warnings.push(format!("monto inválido en {} ({date}, {concept}): '{amount_s}'", note.path));
+                    out.warnings.push(format!(
+                        "monto inválido en {} ({date}, {concept}): '{amount_s}'",
+                        note.path
+                    ));
                     continue;
                 }
             };
@@ -1190,10 +1473,11 @@ pub fn money_note(note: &Note, month: &str, account_col: &str) -> MoneyNoteImpor
         for t in tables(p) {
             for r in &t.rows {
                 let cat = plain(t.cell(r, "Categor"));
-                if let Ok(c) = parse_amount_to_cents(t.cell(r, "Presupuesto")) {
-                    if !cat.is_empty() && c > 0 {
-                        out.budget.push((cat, c));
-                    }
+                if let Ok(c) = parse_amount_to_cents(t.cell(r, "Presupuesto"))
+                    && !cat.is_empty()
+                    && c > 0
+                {
+                    out.budget.push((cat, c));
                 }
             }
         }
@@ -1231,10 +1515,19 @@ pub fn card(note: &Note) -> CardImport {
         limit_cents: cents(note, "limite"),
         available_cents: cents(note, "disponible"),
         updated: note.fm_date("actualizado"),
-        cut_day: note.fm_num("dia_corte").map(|d| d as i16).filter(|d| (1..=31).contains(d)),
-        pay_day: note.fm_num("dia_pago").map(|d| d as i16).filter(|d| (1..=31).contains(d)),
+        cut_day: note
+            .fm_num("dia_corte")
+            .map(|d| d as i16)
+            .filter(|d| (1..=31).contains(d)),
+        pay_day: note
+            .fm_num("dia_pago")
+            .map(|d| d as i16)
+            .filter(|d| (1..=31).contains(d)),
         status: status.into(),
-        notes: note.section("Notas").map(|s| bullets(s).join("\n")).unwrap_or_default(),
+        notes: note
+            .section("Notas")
+            .map(|s| bullets(s).join("\n"))
+            .unwrap_or_default(),
     }
 }
 
@@ -1249,14 +1542,23 @@ pub struct AccountImport {
 }
 
 pub fn account(note: &Note) -> AccountImport {
-    let status = if fold(&note.fm_str("estado").unwrap_or_default()) == "cerrada" { "closed" } else { "active" };
+    let status = if fold(&note.fm_str("estado").unwrap_or_default()) == "cerrada" {
+        "closed"
+    } else {
+        "active"
+    };
     AccountImport {
         name: note.stem(),
-        bank: note.fm_str("banco").unwrap_or_else(|| note.stem().trim_start_matches("Cuenta ").to_string()),
+        bank: note
+            .fm_str("banco")
+            .unwrap_or_else(|| note.stem().trim_start_matches("Cuenta ").to_string()),
         balance_cents: note.fm_str("saldo").and_then(|s| parse_signed_cents(&s)),
         updated: note.fm_date("actualizado"),
         status: status.into(),
-        notes: note.section("Notas").map(|s| bullets(s).join("\n")).unwrap_or_default(),
+        notes: note
+            .section("Notas")
+            .map(|s| bullets(s).join("\n"))
+            .unwrap_or_default(),
     }
 }
 
@@ -1284,7 +1586,11 @@ pub fn day_spec(s: &str) -> Option<crate::time::DayOfMonth> {
     match fold(s.trim()).as_str() {
         "ultimo" => Some(crate::time::DayOfMonth::Last),
         "penultimo" => Some(crate::time::DayOfMonth::Penultimate),
-        n => n.parse::<u32>().ok().filter(|d| (1..=31).contains(d)).map(crate::time::DayOfMonth::Day),
+        n => n
+            .parse::<u32>()
+            .ok()
+            .filter(|d| (1..=31).contains(d))
+            .map(crate::time::DayOfMonth::Day),
     }
 }
 
@@ -1343,7 +1649,10 @@ pub fn recurring_tasks(note: &Note) -> Vec<RecurringTaskImport> {
                         title,
                         day,
                         area: Some(fold(&plain(t.cell(r, "Área")))).filter(|a| !a.is_empty()),
-                        active: !matches!(fold(t.cell(r, "Estado")).as_str(), "inactivo" | "pausado" | "terminado"),
+                        active: !matches!(
+                            fold(t.cell(r, "Estado")).as_str(),
+                            "inactivo" | "pausado" | "terminado"
+                        ),
                     })
                 })
                 .collect::<Vec<_>>()
@@ -1375,7 +1684,12 @@ pub fn project(note: &Note, slug: &str) -> ProjectImport {
             for r in &t.rows {
                 let name = plain(t.cell(r, "Rubro"));
                 if let Ok(c) = parse_amount_to_cents(t.cell(r, "Presupuesto")) {
-                    let kws = t.cell(r, "Palabras").split(',').map(|k| k.trim().to_string()).filter(|k| !k.is_empty()).collect();
+                    let kws = t
+                        .cell(r, "Palabras")
+                        .split(',')
+                        .map(|k| k.trim().to_string())
+                        .filter(|k| !k.is_empty())
+                        .collect();
                     if !name.is_empty() {
                         budget_items.push((name, c, kws));
                     }
@@ -1407,11 +1721,22 @@ pub struct CreditPlanImport {
 }
 
 pub fn credit_plan(note: &Note) -> CreditPlanImport {
-    let goal = note.fm_str("meta").or_else(|| note.body.lines().find_map(|l| l.trim().strip_prefix("Meta:").map(|m| m.trim().to_string())).filter(|m| !is_placeholder(m))).unwrap_or_default();
+    let goal = note
+        .fm_str("meta")
+        .or_else(|| {
+            note.body
+                .lines()
+                .find_map(|l| l.trim().strip_prefix("Meta:").map(|m| m.trim().to_string()))
+                .filter(|m| !is_placeholder(m))
+        })
+        .unwrap_or_default();
     CreditPlanImport {
         goal,
         steps: note.section("Pasos").map(checkboxes).unwrap_or_default(),
-        rules: note.section("Reglas").map(|s| bullets(s).into_iter().map(|b| b.replace("**", "")).collect()).unwrap_or_default(),
+        rules: note
+            .section("Reglas")
+            .map(|s| bullets(s).into_iter().map(|b| b.replace("**", "")).collect())
+            .unwrap_or_default(),
     }
 }
 
@@ -1454,7 +1779,10 @@ pub fn consolidate_tasks(dailies: &[DailyImport]) -> Vec<TaskImport> {
             let external = clickup_link(&cb.text);
             let title = match &external {
                 Some((name, _, _)) => name.clone(),
-                None => plain(cb.text.split(" · ").next().unwrap_or(&cb.text)).replace("#clickup", "").trim().to_string(),
+                None => plain(cb.text.split(" · ").next().unwrap_or(&cb.text))
+                    .replace("#clickup", "")
+                    .trim()
+                    .to_string(),
             };
             if title.is_empty() {
                 continue;
@@ -1477,7 +1805,11 @@ pub fn consolidate_tasks(dailies: &[DailyImport]) -> Vec<TaskImport> {
                 None => {
                     let occurrence = out.iter().filter(|t| t.key.starts_with(&key)).count();
                     let t = TaskImport {
-                        key: if occurrence == 0 { key.clone() } else { format!("{key}#{occurrence}") },
+                        key: if occurrence == 0 {
+                            key.clone()
+                        } else {
+                            format!("{key}#{occurrence}")
+                        },
                         title,
                         area: area.clone(),
                         first_date: d.date,
@@ -1510,7 +1842,11 @@ mod tests {
         assert_eq!(normalize_text("CanciÃ³n"), "Canción");
         let nfd = "Cancio\u{301}n";
         assert_eq!(normalize_text(nfd), "Canción");
-        assert_eq!(normalize_text("Ãrbol raro ñ✓"), "Ãrbol raro ñ✓", "sin poder repararlo se deja igual");
+        assert_eq!(
+            normalize_text("Ãrbol raro ñ✓"),
+            "Ãrbol raro ñ✓",
+            "sin poder repararlo se deja igual"
+        );
     }
 
     #[test]
@@ -1519,30 +1855,80 @@ mod tests {
         let tb = &tables(t)[0];
         assert_eq!(tb.rows[0].len(), 5);
         assert_eq!(plain(&unescape_cell(&tb.rows[0][1])), "Cena con Ana");
-        assert_eq!(payment_ref(&tb.rows[0][4]), PaymentRef::Card { name: "Tarjeta A".into() });
+        assert_eq!(
+            payment_ref(&tb.rows[0][4]),
+            PaymentRef::Card {
+                name: "Tarjeta A".into()
+            }
+        );
     }
 
     #[test]
     fn payments_are_classified() {
-        assert_eq!(payment_ref("Débito BBVA"), PaymentRef::Bank { kind: "debito".into(), bank: "BBVA".into() });
+        assert_eq!(
+            payment_ref("Débito BBVA"),
+            PaymentRef::Bank {
+                kind: "debito".into(),
+                bank: "BBVA".into()
+            }
+        );
         assert_eq!(payment_ref("Efectivo"), PaymentRef::Cash);
-        assert_eq!(payment_ref("Prestado ([[Ana López\\|Ana]])"), PaymentRef::Borrowed { person: "Ana López".into() });
+        assert_eq!(
+            payment_ref("Prestado ([[Ana López\\|Ana]])"),
+            PaymentRef::Borrowed {
+                person: "Ana López".into()
+            }
+        );
         assert_eq!(payment_ref(""), PaymentRef::None);
         assert_eq!(payment_ref("Débito <tu banco>"), PaymentRef::None);
     }
 
     #[test]
     fn classifies_paths_and_ignores_templates() {
-        assert_eq!(classify("Vault/Daily/2026-11-02.md"), FileKind::Daily { date: d("2026-11-02") });
+        assert_eq!(
+            classify("Vault/Daily/2026-11-02.md"),
+            FileKind::Daily {
+                date: d("2026-11-02")
+            }
+        );
         assert!(matches!(classify("Templates/Daily.md"), FileKind::Ignored { .. }));
-        assert!(matches!(classify(".claude/commands/daily.md"), FileKind::Ignored { .. }));
+        assert!(matches!(
+            classify(".claude/commands/daily.md"),
+            FileKind::Ignored { .. }
+        ));
         assert!(matches!(classify("Scripts/home.js"), FileKind::Ignored { .. }));
-        assert!(matches!(classify("Bases/Personas.base"), FileKind::Ignored { .. }));
-        assert_eq!(classify("Proyectos/personal/Objetivos/Semana 2026-W45.md"), FileKind::GoalWeek { period: "2026-W45".into() });
-        assert_eq!(classify("Proyectos/escuela/Clases/Cálculo/2026-11-02 Límites.md"), FileKind::ClassNote { subject: "Cálculo".into() });
-        assert_eq!(classify("Proyectos/negocio/negocio.md"), FileKind::Project { slug: "negocio".into() });
-        assert_eq!(classify("Proyectos/trabajo/adr/ADR-0001 Usar Postgres.md"), FileKind::Adr { project: "trabajo".into() });
-        assert!(matches!(classify("Attachments/foto.png"), FileKind::Unsupported { .. }));
+        assert!(matches!(
+            classify("Bases/Personas.base"),
+            FileKind::Ignored { .. }
+        ));
+        assert_eq!(
+            classify("Proyectos/personal/Objetivos/Semana 2026-W45.md"),
+            FileKind::GoalWeek {
+                period: "2026-W45".into()
+            }
+        );
+        assert_eq!(
+            classify("Proyectos/escuela/Clases/Cálculo/2026-11-02 Límites.md"),
+            FileKind::ClassNote {
+                subject: "Cálculo".into()
+            }
+        );
+        assert_eq!(
+            classify("Proyectos/negocio/negocio.md"),
+            FileKind::Project {
+                slug: "negocio".into()
+            }
+        );
+        assert_eq!(
+            classify("Proyectos/trabajo/adr/ADR-0001 Usar Postgres.md"),
+            FileKind::Adr {
+                project: "trabajo".into()
+            }
+        );
+        assert!(matches!(
+            classify("Attachments/foto.png"),
+            FileKind::Unsupported { .. }
+        ));
     }
 
     #[test]
@@ -1562,7 +1948,10 @@ mod tests {
         assert_eq!(x.tasks[1].0, "trabajo");
         assert_eq!(x.bad, vec!["Dormí tarde"]);
         assert_eq!(x.good, vec!["Hice ejercicio"]);
-        assert_eq!(agenda_line(&x.agenda[0]).unwrap(), ("10:00".into(), Some("11:00".into()), "Reunión".into()));
+        assert_eq!(
+            agenda_line(&x.agenda[0]).unwrap(),
+            ("10:00".into(), Some("11:00".into()), "Reunión".into())
+        );
         let tasks = consolidate_tasks(&[x]);
         assert_eq!(tasks[1].external.as_ref().unwrap().0, "86abc");
         assert_eq!(tasks[1].title, "[Config] Ajustar campo");
@@ -1582,14 +1971,29 @@ mod tests {
             week_habits: vec![],
             log: vec![],
             people: vec![],
-            tasks: vec![("personal".into(), Checkbox { checked, text: "Pagar luz".into() })],
+            tasks: vec![(
+                "personal".into(),
+                Checkbox {
+                    checked,
+                    text: "Pagar luz".into(),
+                },
+            )],
             good: vec![],
             bad: vec![],
         };
-        let t = consolidate_tasks(&[mk("2026-11-03", false), mk("2026-11-01", false), mk("2026-11-02", false), mk("2026-11-04", true), mk("2026-11-20", false)]);
+        let t = consolidate_tasks(&[
+            mk("2026-11-03", false),
+            mk("2026-11-01", false),
+            mk("2026-11-02", false),
+            mk("2026-11-04", true),
+            mk("2026-11-20", false),
+        ]);
         assert_eq!(t.len(), 2, "{t:?}");
         assert_eq!(t[0].first_date, d("2026-11-01"));
-        assert_eq!(t[0].carried_to, vec![d("2026-11-02"), d("2026-11-03"), d("2026-11-04")]);
+        assert_eq!(
+            t[0].carried_to,
+            vec![d("2026-11-02"), d("2026-11-03"), d("2026-11-04")]
+        );
         assert_eq!(t[0].done_on, Some(d("2026-11-04")));
         assert_ne!(t[0].key, t[1].key, "el mismo texto semanas después es otra tarea");
     }

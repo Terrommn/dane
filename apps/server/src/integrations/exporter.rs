@@ -1,5 +1,6 @@
 //! Exportación completa (T54): JSON de todas las tablas propias, CSV útiles y Markdown con el formato del vault
 //! (reimportable). Se excluyen sesiones, identidades, credenciales cifradas, flujos OAuth e idempotency keys.
+#![allow(clippy::type_complexity)] // tuplas de filas SQL
 
 use std::io::Write;
 
@@ -75,13 +76,16 @@ pub async fn export_json(state: &AppState, user_id: Uuid) -> anyhow::Result<Valu
         .await?;
         tables.insert((*t).to_string(), rows);
     }
-    let user: Value = sqlx::query_scalar("SELECT to_jsonb(u) FROM users u WHERE id = $1").bind(user_id).fetch_one(&state.pool).await?;
+    let user: Value = sqlx::query_scalar("SELECT to_jsonb(u) FROM users u WHERE id = $1")
+        .bind(user_id)
+        .fetch_one(&state.pool)
+        .await?;
     Ok(json!({
         "format": "vida-export",
         "version": 1,
         "exported_at": state.now(),
         "user": { "id": user["id"], "display_name": user["display_name"], "created_at": user["created_at"] },
-        "excluded": ["sessions", "identities", "oauth_flows", "idempotency_keys", "credenciales cifradas"],
+        "excluded": ["sesiones", "identidades", "flujos OAuth", "claves de idempotencia", "credenciales cifradas"],
         "tables": tables,
     }))
 }
@@ -96,7 +100,12 @@ fn csv_of(rows: Vec<Vec<String>>, header: &[&str]) -> anyhow::Result<Vec<u8>> {
 }
 
 fn cents(c: i64) -> String {
-    format!("{}{}.{:02}", if c < 0 { "-" } else { "" }, c.unsigned_abs() / 100, c.unsigned_abs() % 100)
+    format!(
+        "{}{}.{:02}",
+        if c < 0 { "-" } else { "" },
+        c.unsigned_abs() / 100,
+        c.unsigned_abs() % 100
+    )
 }
 
 fn yaml_str(s: &str) -> String {
@@ -112,11 +121,12 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
     let pool = &state.pool;
     let mut zip = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
     let opts = zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
-    let add = |zip: &mut zip::ZipWriter<std::io::Cursor<Vec<u8>>>, path: &str, data: &[u8]| -> anyhow::Result<()> {
-        zip.start_file(path, opts)?;
-        zip.write_all(data)?;
-        Ok(())
-    };
+    let add =
+        |zip: &mut zip::ZipWriter<std::io::Cursor<Vec<u8>>>, path: &str, data: &[u8]| -> anyhow::Result<()> {
+            zip.start_file(path, opts)?;
+            zip.write_all(data)?;
+            Ok(())
+        };
     let json = export_json(state, user_id).await?;
     add(&mut zip, "vida-export.json", &serde_json::to_vec_pretty(&json)?)?;
 
@@ -133,8 +143,30 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
         &mut zip,
         "csv/transacciones.csv",
         &csv_of(
-            tx.iter().map(|r| vec![r.0.to_string(), r.1.clone(), r.2.clone(), r.3.clone(), cents(r.4), r.5.clone(), r.6.clone().unwrap_or_default(), r.7.clone().unwrap_or_default()]).collect(),
-            &["fecha", "tipo", "estado", "concepto", "monto", "moneda", "categoria", "cuenta"],
+            tx.iter()
+                .map(|r| {
+                    vec![
+                        r.0.to_string(),
+                        r.1.clone(),
+                        r.2.clone(),
+                        r.3.clone(),
+                        cents(r.4),
+                        r.5.clone(),
+                        r.6.clone().unwrap_or_default(),
+                        r.7.clone().unwrap_or_default(),
+                    ]
+                })
+                .collect(),
+            &[
+                "fecha",
+                "tipo",
+                "estado",
+                "concepto",
+                "monto",
+                "moneda",
+                "categoria",
+                "cuenta",
+            ],
         )?,
     )?;
     let he: Vec<(chrono::NaiveDate, String, String, Option<rust_decimal::Decimal>, Option<String>)> = sqlx::query_as(
@@ -147,7 +179,17 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
         &mut zip,
         "csv/habitos.csv",
         &csv_of(
-            he.iter().map(|r| vec![r.0.to_string(), r.1.clone(), r.2.clone(), r.3.map(|q| q.to_string()).unwrap_or_default(), r.4.clone().unwrap_or_default()]).collect(),
+            he.iter()
+                .map(|r| {
+                    vec![
+                        r.0.to_string(),
+                        r.1.clone(),
+                        r.2.clone(),
+                        r.3.map(|q| q.to_string()).unwrap_or_default(),
+                        r.4.clone().unwrap_or_default(),
+                    ]
+                })
+                .collect(),
             &["fecha", "habito", "estado", "cantidad", "motivo"],
         )?,
     )?;
@@ -163,9 +205,27 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
         "csv/tareas.csv",
         &csv_of(
             ts.iter()
-                .map(|r| vec![r.0.clone(), r.1.clone(), r.2.clone().unwrap_or_default(), r.3.clone().unwrap_or_default(), r.4.map(|d| d.to_string()).unwrap_or_default(), r.5.map(|d| d.to_string()).unwrap_or_default(), r.6.clone().unwrap_or_default()])
+                .map(|r| {
+                    vec![
+                        r.0.clone(),
+                        r.1.clone(),
+                        r.2.clone().unwrap_or_default(),
+                        r.3.clone().unwrap_or_default(),
+                        r.4.map(|d| d.to_string()).unwrap_or_default(),
+                        r.5.map(|d| d.to_string()).unwrap_or_default(),
+                        r.6.clone().unwrap_or_default(),
+                    ]
+                })
                 .collect(),
-            &["titulo", "estado", "area", "proyecto", "planeada", "vence", "enlace_externo"],
+            &[
+                "titulo",
+                "estado",
+                "area",
+                "proyecto",
+                "planeada",
+                "vence",
+                "enlace_externo",
+            ],
         )?,
     )?;
 
@@ -183,11 +243,18 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
             (Some(m), Some(d), None) => format!("{m:02}-{d:02}"),
             _ => String::new(),
         };
-        let mut md = format!("---\ncategories:\n  - \"[[Personas]]\"\n");
+        let mut md = "---\ncategories:\n  - \"[[Personas]]\"\n".to_string();
         if !p.1.is_empty() {
             md.push_str(&format!("aliases: {}\n", serde_json::to_string(&p.1)?));
         }
-        for (k, v) in [("area", p.2.as_ref().map(|a| format!("[[{a}]]"))), ("relacion", p.3.clone()), ("org", p.4.clone()), ("rol", p.5.clone()), ("contacto", p.6.clone()), ("ultimo_contacto", p.7.map(|d| d.to_string()))] {
+        for (k, v) in [
+            ("area", p.2.as_ref().map(|a| format!("[[{a}]]"))),
+            ("relacion", p.3.clone()),
+            ("org", p.4.clone()),
+            ("rol", p.5.clone()),
+            ("contacto", p.6.clone()),
+            ("ultimo_contacto", p.7.map(|d| d.to_string())),
+        ] {
             if let Some(v) = v {
                 md.push_str(&format!("{k}: {}\n", yaml_str(&v)));
             }
@@ -199,7 +266,11 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
         for l in p.8.lines().filter(|l| !l.trim().is_empty()) {
             md.push_str(&format!("- {l}\n"));
         }
-        add(&mut zip, &format!("Personas/{}.md", file_safe(&p.0)), md.as_bytes())?;
+        add(
+            &mut zip,
+            &format!("Personas/{}.md", file_safe(&p.0)),
+            md.as_bytes(),
+        )?;
     }
 
     let days: Vec<(chrono::NaiveDate, Option<rust_decimal::Decimal>, Option<i16>, Option<String>)> =
@@ -213,11 +284,15 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
         .fetch_all(pool)
         .await?;
         let mut md = format!("---\nfecha: {date}\ncategories:\n  - \"[[Daily]]\"\n");
-        for (key, es) in [("devotional", "devocional"), ("exercise", "ejercicio"), ("reading", "lectura")] {
-            if let Some((_, st)) = fixed.iter().find(|f| f.0 == key) {
-                if st == "done" {
-                    md.push_str(&format!("{es}: true\n"));
-                }
+        for (key, es) in [
+            ("devotional", "devocional"),
+            ("exercise", "ejercicio"),
+            ("reading", "lectura"),
+        ] {
+            if let Some((_, st)) = fixed.iter().find(|f| f.0 == key)
+                && st == "done"
+            {
+                md.push_str(&format!("{es}: true\n"));
             }
         }
         if let Some(e) = energy {
@@ -227,7 +302,10 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
             md.push_str(&format!("peso: {w}\n"));
         }
         md.push_str("---\n\n## Gastos de hoy\n");
-        md.push_str(&format!("- Planeo gastar: {}\n\n## Log\n", planned.unwrap_or_default()));
+        md.push_str(&format!(
+            "- Planeo gastar: {}\n\n## Log\n",
+            planned.unwrap_or_default()
+        ));
         let logs: Vec<String> = sqlx::query_scalar("SELECT text FROM daily_log_entries WHERE user_id = $1 AND on_date = $2 ORDER BY position, created_at").bind(user_id).bind(date).fetch_all(pool).await?;
         for l in logs {
             md.push_str(&format!("- {l}\n"));
@@ -257,7 +335,10 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
                 md.push_str(&format!("### {cap}\n"));
                 current = Some(area);
             }
-            md.push_str(&format!("- [{}] {title}\n", if status == "done" { "x" } else { " " }));
+            md.push_str(&format!(
+                "- [{}] {title}\n",
+                if status == "done" { "x" } else { " " }
+            ));
         }
         for (polarity, heading) in [("bad", "Lo que hice mal hoy"), ("good", "Lo que hice bien hoy")] {
             md.push_str(&format!("\n## {heading}\n"));
@@ -299,19 +380,34 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
             r.8,
             r.9
         );
-        add(&mut zip, &format!("Lecturas/{}.md", file_safe(&r.0)), md.as_bytes())?;
+        add(
+            &mut zip,
+            &format!("Lecturas/{}.md", file_safe(&r.0)),
+            md.as_bytes(),
+        )?;
     }
 
     let notes: Vec<(String, String, String, Vec<String>, Vec<String>)> =
-        sqlx::query_as("SELECT kind, title, body_md, tags, aliases FROM notes WHERE user_id = $1").bind(user_id).fetch_all(pool).await?;
+        sqlx::query_as("SELECT kind, title, body_md, tags, aliases FROM notes WHERE user_id = $1")
+            .bind(user_id)
+            .fetch_all(pool)
+            .await?;
     for (kind, title, body, tags, aliases) in notes {
         let folder = match kind.as_str() {
             "til" => "Dev/til",
             "snippet" => "Dev/snippets",
             _ => "Notas",
         };
-        let md = format!("---\ntags: {}\naliases: {}\n---\n{body}\n", serde_json::to_string(&tags)?, serde_json::to_string(&aliases)?);
-        add(&mut zip, &format!("{folder}/{}.md", file_safe(&title)), md.as_bytes())?;
+        let md = format!(
+            "---\ntags: {}\naliases: {}\n---\n{body}\n",
+            serde_json::to_string(&tags)?,
+            serde_json::to_string(&aliases)?
+        );
+        add(
+            &mut zip,
+            &format!("{folder}/{}.md", file_safe(&title)),
+            md.as_bytes(),
+        )?;
     }
 
     // Cuentas y tarjetas (con su último saldo observado) para que los gastos reimportados se asocien.
@@ -325,12 +421,28 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
                 limit.map(cents).unwrap_or_default(),
                 cut.map(|x| x.to_string()).unwrap_or_default(),
                 pay.map(|x| x.to_string()).unwrap_or_default(),
-                if status == "cancelled" { "cancelada" } else { "activa" }
+                if status == "cancelled" {
+                    "cancelada"
+                } else {
+                    "activa"
+                }
             );
-            add(&mut zip, &format!("Proyectos/personal/Finanzas/Tarjetas/{}.md", file_safe(&name)), md.as_bytes())?;
+            add(
+                &mut zip,
+                &format!("Proyectos/personal/Finanzas/Tarjetas/{}.md", file_safe(&name)),
+                md.as_bytes(),
+            )?;
         } else {
-            let md = format!("---\ncategories:\n  - \"[[Cuentas]]\"\nbanco: {}\nestado: {}\n---\n# {name}\n", yaml_str(&bank), if status == "closed" { "cerrada" } else { "activa" });
-            add(&mut zip, &format!("Proyectos/personal/Finanzas/Cuentas/{}.md", file_safe(&name)), md.as_bytes())?;
+            let md = format!(
+                "---\ncategories:\n  - \"[[Cuentas]]\"\nbanco: {}\nestado: {}\n---\n# {name}\n",
+                yaml_str(&bank),
+                if status == "closed" { "cerrada" } else { "activa" }
+            );
+            add(
+                &mut zip,
+                &format!("Proyectos/personal/Finanzas/Cuentas/{}.md", file_safe(&name)),
+                md.as_bytes(),
+            )?;
         }
     }
 
@@ -356,16 +468,33 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
             _ => String::new(),
         };
         let concept = match counter {
-            Some(card) if kind == "card_payment" || kind == "debt_payment" => format!("Pago [[{card}\\|{card}]]"),
+            Some(card) if kind == "card_payment" || kind == "debt_payment" => {
+                format!("Pago [[{card}\\|{card}]]")
+            }
             _ => cell(&concept),
         };
-        let line = format!("| {date} | {concept} | {} | {} | {} |\n", cents(amount), cell(&cat.unwrap_or_default()), pay);
+        let line = format!(
+            "| {date} | {concept} | {} | {} | {} |\n",
+            cents(amount),
+            cell(&cat.unwrap_or_default()),
+            pay
+        );
         by_month.entry((month, income)).or_default().push_str(&line);
     }
     for ((month, income), lines) in by_month {
-        let (folder, title, col) = if income { ("Ingresos", "Ingresos", "Cuenta") } else { ("Gastos", "Gastos", "Pago") };
-        let md = format!("---\nmes: {month}\n---\n# {title} {month}\n\n## Registro\n| Fecha | Concepto | Monto | Categoría | {col} |\n|---|---|---|---|---|\n{lines}");
-        add(&mut zip, &format!("Proyectos/personal/Finanzas/{folder}/{title} {month}.md"), md.as_bytes())?;
+        let (folder, title, col) = if income {
+            ("Ingresos", "Ingresos", "Cuenta")
+        } else {
+            ("Gastos", "Gastos", "Pago")
+        };
+        let md = format!(
+            "---\nmes: {month}\n---\n# {title} {month}\n\n## Registro\n| Fecha | Concepto | Monto | Categoría | {col} |\n|---|---|---|---|---|\n{lines}"
+        );
+        add(
+            &mut zip,
+            &format!("Proyectos/personal/Finanzas/{folder}/{title} {month}.md"),
+            md.as_bytes(),
+        )?;
     }
 
     let cur = zip.finish()?;
@@ -373,7 +502,20 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
 }
 
 fn file_safe(s: &str) -> String {
-    let t: String = s.chars().map(|c| if matches!(c, '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|') || c.is_control() { '-' } else { c }).collect();
+    let t: String = s
+        .chars()
+        .map(|c| {
+            if matches!(c, '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|') || c.is_control() {
+                '-'
+            } else {
+                c
+            }
+        })
+        .collect();
     let t = t.trim().trim_start_matches('.').to_string();
-    if t.is_empty() { "sin-titulo".into() } else { t.chars().take(120).collect() }
+    if t.is_empty() {
+        "sin-titulo".into()
+    } else {
+        t.chars().take(120).collect()
+    }
 }

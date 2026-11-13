@@ -14,7 +14,9 @@ use crate::integrations::exporter;
 use crate::state::AppState;
 
 pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::new().routes(routes!(export_json)).routes(routes!(export_zip))
+    OpenApiRouter::new()
+        .routes(routes!(export_json))
+        .routes(routes!(export_zip))
 }
 
 /// Todos los datos propios en JSON (excluye sesiones, identidades, credenciales y claves de idempotencia).
@@ -29,10 +31,28 @@ async fn export_json(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Jso
 #[utoipa::path(get, path = "/exports/zip", tag = "exports", responses((status = 200, content_type = "application/zip", body = Vec<u8>)))]
 async fn export_zip(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Response> {
     let bytes = exporter::export_zip(&s, auth.user_id).await?;
-    audit(&s, auth.user_id, "export", None, "zip", serde_json::json!({ "bytes": bytes.len() })).await;
-    let name = format!("vida-export-{}.zip", crate::integrations::today(&s, auth.user_id).await);
+    audit(
+        &s,
+        auth.user_id,
+        "export",
+        None,
+        "zip",
+        serde_json::json!({ "bytes": bytes.len() }),
+    )
+    .await;
+    let name = format!(
+        "vida-export-{}.zip",
+        crate::integrations::today(&s, auth.user_id).await
+    );
     Ok((
-        [(header::CONTENT_TYPE, "application/zip".to_string()), (header::CONTENT_DISPOSITION, format!("attachment; filename=\"{name}\"")), (header::CACHE_CONTROL, "no-store".to_string())],
+        [
+            (header::CONTENT_TYPE, "application/zip".to_string()),
+            (
+                header::CONTENT_DISPOSITION,
+                format!("attachment; filename=\"{name}\""),
+            ),
+            (header::CACHE_CONTROL, "no-store".to_string()),
+        ],
         bytes,
     )
         .into_response())

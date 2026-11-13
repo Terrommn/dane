@@ -65,18 +65,22 @@ impl Connection {
 const COLS: &str = "id, user_id, provider, status, scopes, account_label, credentials_enc, config, cursor, last_sync_at, last_error, last_error_at, version";
 
 pub async fn get(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str) -> RepoResult<Option<Connection>> {
-    Ok(sqlx::query_as::<_, Connection>(crate::sqlf!("SELECT {COLS} FROM integration_connections WHERE user_id = $1 AND provider = $2"))
-        .bind(user_id)
-        .bind(provider)
-        .fetch_optional(db)
-        .await?)
+    Ok(sqlx::query_as::<_, Connection>(crate::sqlf!(
+        "SELECT {COLS} FROM integration_connections WHERE user_id = $1 AND provider = $2"
+    ))
+    .bind(user_id)
+    .bind(provider)
+    .fetch_optional(db)
+    .await?)
 }
 
 pub async fn list(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<Vec<Connection>> {
-    Ok(sqlx::query_as::<_, Connection>(crate::sqlf!("SELECT {COLS} FROM integration_connections WHERE user_id = $1 ORDER BY provider"))
-        .bind(user_id)
-        .fetch_all(db)
-        .await?)
+    Ok(sqlx::query_as::<_, Connection>(crate::sqlf!(
+        "SELECT {COLS} FROM integration_connections WHERE user_id = $1 ORDER BY provider"
+    ))
+    .bind(user_id)
+    .fetch_all(db)
+    .await?)
 }
 
 /// Crea o reemplaza una conexión como conectada, conservando la configuración previa si existe.
@@ -108,18 +112,31 @@ pub async fn upsert_connected(
     Ok(())
 }
 
-pub async fn save_credentials(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str, credentials_enc: &[u8]) -> RepoResult<()> {
-    sqlx::query("UPDATE integration_connections SET credentials_enc = $3 WHERE user_id = $1 AND provider = $2")
-        .bind(user_id)
-        .bind(provider)
-        .bind(credentials_enc)
-        .execute(db)
-        .await?;
+pub async fn save_credentials(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    provider: &str,
+    credentials_enc: &[u8],
+) -> RepoResult<()> {
+    sqlx::query(
+        "UPDATE integration_connections SET credentials_enc = $3 WHERE user_id = $1 AND provider = $2",
+    )
+    .bind(user_id)
+    .bind(provider)
+    .bind(credentials_enc)
+    .execute(db)
+    .await?;
     Ok(())
 }
 
 /// Actualiza la configuración (merge) con control de versión. Devuelve `false` si la versión no coincide.
-pub async fn patch_config(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str, version: i32, patch: &serde_json::Value) -> RepoResult<bool> {
+pub async fn patch_config(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    provider: &str,
+    version: i32,
+    patch: &serde_json::Value,
+) -> RepoResult<bool> {
     Ok(sqlx::query(
         "UPDATE integration_connections SET config = config || $4, version = version + 1
          WHERE user_id = $1 AND provider = $2 AND version = $3",
@@ -134,7 +151,13 @@ pub async fn patch_config(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str
         == 1)
 }
 
-pub async fn mark_sync_ok(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str, at: DateTime<Utc>, next_sync_at: DateTime<Utc>) -> RepoResult<()> {
+pub async fn mark_sync_ok(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    provider: &str,
+    at: DateTime<Utc>,
+    next_sync_at: DateTime<Utc>,
+) -> RepoResult<()> {
     sqlx::query(
         "UPDATE integration_connections SET last_sync_at = $3, last_error = NULL, last_error_at = NULL,
             cursor = (cursor - 'lease_until' - 'failures') || jsonb_build_object('next_sync_at', $4::timestamptz)
@@ -150,7 +173,14 @@ pub async fn mark_sync_ok(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str
 }
 
 /// Registra un error. `fatal` = requiere reconectar (status `error`); si no, solo backoff exponencial.
-pub async fn mark_error(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str, error: &str, fatal: bool, at: DateTime<Utc>) -> RepoResult<()> {
+pub async fn mark_error(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    provider: &str,
+    error: &str,
+    fatal: bool,
+    at: DateTime<Utc>,
+) -> RepoResult<()> {
     sqlx::query(
         "UPDATE integration_connections SET last_error = left($3, 500), last_error_at = $5,
             status = CASE WHEN $4 THEN 'error' ELSE status END,
@@ -170,7 +200,12 @@ pub async fn mark_error(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str, 
 }
 
 /// Desconecta: borra credenciales cifradas y deja la configuración no sensible.
-pub async fn disconnect(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str, status: &str) -> RepoResult<()> {
+pub async fn disconnect(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    provider: &str,
+    status: &str,
+) -> RepoResult<()> {
     sqlx::query(
         "UPDATE integration_connections SET status = $3, credentials_enc = NULL, cursor = '{}', version = version + 1
          WHERE user_id = $1 AND provider = $2",
@@ -184,7 +219,12 @@ pub async fn disconnect(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str, 
 }
 
 /// Reclama conexiones vencidas para sincronizar (lease de 10 min en `cursor`), seguro con varias instancias.
-pub async fn claim_due(db: impl PgExecutor<'_>, provider: &str, now: DateTime<Utc>, limit: i64) -> RepoResult<Vec<Uuid>> {
+pub async fn claim_due(
+    db: impl PgExecutor<'_>,
+    provider: &str,
+    now: DateTime<Utc>,
+    limit: i64,
+) -> RepoResult<Vec<Uuid>> {
     Ok(sqlx::query_scalar(
         "UPDATE integration_connections SET cursor = cursor || jsonb_build_object('lease_until', $2::timestamptz + interval '10 minutes')
          WHERE id IN (
@@ -213,7 +253,17 @@ pub struct SyncRun {
     pub error: Option<String>,
 }
 
-pub async fn log_run(db: impl PgExecutor<'_>, user_id: Uuid, provider: &str, kind: &str, started: DateTime<Utc>, ok: bool, items: i32, error: Option<&str>) -> RepoResult<()> {
+#[allow(clippy::too_many_arguments)]
+pub async fn log_run(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+    provider: &str,
+    kind: &str,
+    started: DateTime<Utc>,
+    ok: bool,
+    items: i32,
+    error: Option<&str>,
+) -> RepoResult<()> {
     sqlx::query(
         "INSERT INTO integration_sync_runs (user_id, provider, kind, started_at, finished_at, ok, items, error)
          VALUES ($1, $2, $3, $4, now(), $5, $6, left($7, 500))",
@@ -263,7 +313,10 @@ pub struct PersonSuggestion {
     pub status: String,
 }
 
-pub async fn pending_interaction_suggestions(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<Vec<InteractionSuggestion>> {
+pub async fn pending_interaction_suggestions(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+) -> RepoResult<Vec<InteractionSuggestion>> {
     Ok(sqlx::query_as::<_, InteractionSuggestion>(
         "SELECT s.id, s.person_id, p.name AS person_name, s.on_date, s.topic, s.source, s.status
          FROM interaction_suggestions s JOIN people p ON p.id = s.person_id
@@ -274,7 +327,10 @@ pub async fn pending_interaction_suggestions(db: impl PgExecutor<'_>, user_id: U
     .await?)
 }
 
-pub async fn pending_person_suggestions(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<Vec<PersonSuggestion>> {
+pub async fn pending_person_suggestions(
+    db: impl PgExecutor<'_>,
+    user_id: Uuid,
+) -> RepoResult<Vec<PersonSuggestion>> {
     Ok(sqlx::query_as::<_, PersonSuggestion>(
         "SELECT id, name, email, source, on_date, context, status FROM person_suggestions
          WHERE user_id = $1 AND status = 'pending' ORDER BY on_date DESC NULLS LAST, name LIMIT 200",

@@ -58,7 +58,10 @@ pub struct CaptureView {
 
 fn view(s: &AppState, r: CaptureRow) -> CaptureView {
     CaptureView {
-        allowed_fields: capture::allowed_fields(&r.intent).iter().map(|x| x.to_string()).collect(),
+        allowed_fields: capture::allowed_fields(&r.intent)
+            .iter()
+            .map(|x| x.to_string())
+            .collect(),
         id: r.id,
         intent: r.intent,
         input_text: r.input_text,
@@ -84,9 +87,20 @@ pub async fn extract_if_needed(s: &AppState, row: CaptureRow) -> ApiResult<Captu
     }
     if !llm::configured(s) {
         let errors = json!(["La IA no está configurada: completa la propuesta manualmente."]);
-        return Ok(repo::save_proposal(&s.pool, row.user_id, row.id, Some(row.version), "pending", "manual", &json!(Proposal::default()), &json!([]), &errors, None)
-            .await?
-            .unwrap_or(row));
+        return Ok(repo::save_proposal(
+            &s.pool,
+            row.user_id,
+            row.id,
+            Some(row.version),
+            "pending",
+            "manual",
+            &json!(Proposal::default()),
+            &json!([]),
+            &errors,
+            None,
+        )
+        .await?
+        .unwrap_or(row));
     }
     let ctx = llm::context(s, row.user_id, row.reference_date).await?;
     match llm::extract(s, &row.intent, &ctx, &row.input_text).await {
@@ -97,20 +111,56 @@ pub async fn extract_if_needed(s: &AppState, row: CaptureRow) -> ApiResult<Captu
         Err(e) => {
             tracing::warn!(error = %e, "extracción LLM fallida");
             let errors = json!([format!("{e}. Puedes completar la propuesta manualmente.")]);
-            Ok(repo::save_proposal(&s.pool, row.user_id, row.id, Some(row.version), "failed", "manual", &json!(Proposal::default()), &json!([]), &errors, None)
-                .await?
-                .unwrap_or(row))
+            Ok(repo::save_proposal(
+                &s.pool,
+                row.user_id,
+                row.id,
+                Some(row.version),
+                "failed",
+                "manual",
+                &json!(Proposal::default()),
+                &json!([]),
+                &errors,
+                None,
+            )
+            .await?
+            .unwrap_or(row))
         }
     }
 }
 
-async fn save_validated(s: &AppState, row: &CaptureRow, v: Validated, mode: &str, version: Option<i32>) -> ApiResult<CaptureRow> {
+async fn save_validated(
+    s: &AppState,
+    row: &CaptureRow,
+    v: Validated,
+    mode: &str,
+    version: Option<i32>,
+) -> ApiResult<CaptureRow> {
     let blocking = apply::blocking_questions(&v.proposal);
-    let status = if v.questions.is_empty() && blocking.is_empty() { "pending" } else { "needs_input" };
+    let status = if v.questions.is_empty() && blocking.is_empty() {
+        "pending"
+    } else {
+        "needs_input"
+    };
     let model = (mode == "llm").then(|| s.config.llm_model.clone());
-    match repo::save_proposal(&s.pool, row.user_id, row.id, version, status, mode, &json!(v.proposal), &json!(v.questions), &json!(v.errors), model.as_deref()).await? {
+    match repo::save_proposal(
+        &s.pool,
+        row.user_id,
+        row.id,
+        version,
+        status,
+        mode,
+        &json!(v.proposal),
+        &json!(v.questions),
+        &json!(v.errors),
+        model.as_deref(),
+    )
+    .await?
+    {
         Some(r) => Ok(r),
-        None => Err(ApiError::conflict(serde_json::to_value(view(s, repo::get(&s.pool, row.user_id, row.id).await?)).unwrap_or_default())),
+        None => Err(ApiError::conflict(
+            serde_json::to_value(view(s, repo::get(&s.pool, row.user_id, row.id).await?)).unwrap_or_default(),
+        )),
     }
 }
 
@@ -124,7 +174,11 @@ pub struct NewCapture {
 
 /// Crea una captura desde la app y, si hay IA, propone su interpretación.
 #[utoipa::path(post, path = "/captures", tag = "captures", request_body = NewCapture, responses((status = 201, body = CaptureView)))]
-async fn create_capture(State(s): State<AppState>, auth: AuthUser, Json(b): Json<NewCapture>) -> ApiResult<(StatusCode, Json<CaptureView>)> {
+async fn create_capture(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Json(b): Json<NewCapture>,
+) -> ApiResult<(StatusCode, Json<CaptureView>)> {
     if !capture::valid_intent(&b.intent) {
         return Err(ApiError::validation("intent", "comando desconocido"));
     }
@@ -144,14 +198,22 @@ pub struct CaptureFilter {
 }
 
 #[utoipa::path(get, path = "/captures", tag = "captures", params(CaptureFilter), responses((status = 200, body = Vec<CaptureView>)))]
-async fn list_captures(State(s): State<AppState>, auth: AuthUser, Query(f): Query<CaptureFilter>) -> ApiResult<Json<Vec<CaptureView>>> {
+async fn list_captures(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Query(f): Query<CaptureFilter>,
+) -> ApiResult<Json<Vec<CaptureView>>> {
     let rows = repo::list(&s.pool, auth.user_id, f.status.as_deref(), 100).await?;
     Ok(Json(rows.into_iter().map(|r| view(&s, r)).collect()))
 }
 
 /// Obtiene la captura; si viene del bot y aún no tiene propuesta, la extrae (o explica el modo manual).
 #[utoipa::path(get, path = "/captures/{id}", tag = "captures", responses((status = 200, body = CaptureView), (status = 404, body = crate::error::ErrorBody)))]
-async fn get_capture(State(s): State<AppState>, auth: AuthUser, Path(id): Path<Uuid>) -> ApiResult<Json<CaptureView>> {
+async fn get_capture(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Path(id): Path<Uuid>,
+) -> ApiResult<Json<CaptureView>> {
     let row = repo::get(&s.pool, auth.user_id, id).await?;
     let row = extract_if_needed(&s, row).await?;
     Ok(Json(view(&s, row)))
@@ -166,9 +228,15 @@ pub struct EditCapture {
 
 /// Edita la propuesta (vista previa). Se valida formato y catálogos; el autor es el usuario.
 #[utoipa::path(put, path = "/captures/{id}", tag = "captures", request_body = EditCapture, responses((status = 200, body = CaptureView), (status = 409, body = crate::error::ErrorBody)))]
-async fn update_capture(State(s): State<AppState>, auth: AuthUser, Path(id): Path<Uuid>, Json(b): Json<EditCapture>) -> ApiResult<Json<CaptureView>> {
+async fn update_capture(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Path(id): Path<Uuid>,
+    Json(b): Json<EditCapture>,
+) -> ApiResult<Json<CaptureView>> {
     let row = repo::get(&s.pool, auth.user_id, id).await?;
-    let p: Proposal = serde_json::from_value(b.proposal).map_err(|e| ApiError::validation("proposal", format!("propuesta inválida: {e}")))?;
+    let p: Proposal = serde_json::from_value(b.proposal)
+        .map_err(|e| ApiError::validation("proposal", format!("propuesta inválida: {e}")))?;
     let ctx = llm::context(&s, auth.user_id, row.reference_date).await?;
     let v = capture::validate(&row.intent, p, &row.input_text, &ctx, false);
     let mode = row.mode.clone();
@@ -183,18 +251,30 @@ pub struct ApplyBody {
 
 /// Confirma y aplica la propuesta en una sola transacción. Repetir no duplica (claves de idempotencia por elemento).
 #[utoipa::path(post, path = "/captures/{id}/apply", tag = "captures", request_body = ApplyBody, responses((status = 200, body = CaptureView), (status = 409, body = crate::error::ErrorBody), (status = 422, body = crate::error::ErrorBody)))]
-async fn apply_capture(State(s): State<AppState>, auth: AuthUser, Path(id): Path<Uuid>, Json(b): Json<ApplyBody>) -> ApiResult<Json<CaptureView>> {
+async fn apply_capture(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Path(id): Path<Uuid>,
+    Json(b): Json<ApplyBody>,
+) -> ApiResult<Json<CaptureView>> {
     let row = repo::get(&s.pool, auth.user_id, id).await?;
     if row.status == "applied" {
         return Ok(Json(view(&s, row)));
     }
     if row.status == "rejected" {
-        return Err(ApiError::new(StatusCode::CONFLICT, "rejected", "La captura fue descartada"));
+        return Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "rejected",
+            "La captura fue descartada",
+        ));
     }
     if row.version != b.version {
-        return Err(ApiError::conflict(serde_json::to_value(view(&s, row)).unwrap_or_default()));
+        return Err(ApiError::conflict(
+            serde_json::to_value(view(&s, row)).unwrap_or_default(),
+        ));
     }
-    let p: Proposal = serde_json::from_value(row.proposal.clone()).map_err(|_| ApiError::validation("proposal", "propuesta inválida"))?;
+    let p: Proposal = serde_json::from_value(row.proposal.clone())
+        .map_err(|_| ApiError::validation("proposal", "propuesta inválida"))?;
     let blocking = apply::blocking_questions(&p);
     if !blocking.is_empty() {
         return Err(ApiError {
@@ -205,30 +285,67 @@ async fn apply_capture(State(s): State<AppState>, auth: AuthUser, Path(id): Path
     if p.is_empty() && row.meta.get("habits").is_none() {
         return Err(ApiError::validation("proposal", "La propuesta está vacía"));
     }
-    let origin = if row.source == "telegram" { "bot" } else if row.mode == "llm" { "llm" } else { "manual" };
+    let origin = if row.source == "telegram" {
+        "bot"
+    } else if row.mode == "llm" {
+        "llm"
+    } else {
+        "manual"
+    };
     let mut tx = s.pool.begin().await?;
     // Bloqueo de la fila: dos confirmaciones simultáneas no aplican dos veces.
-    let locked: Option<String> = sqlx::query_scalar("SELECT status FROM capture_proposals WHERE user_id = $1 AND id = $2 FOR UPDATE").bind(auth.user_id).bind(id).fetch_optional(&mut *tx).await?;
+    let locked: Option<String> =
+        sqlx::query_scalar("SELECT status FROM capture_proposals WHERE user_id = $1 AND id = $2 FOR UPDATE")
+            .bind(auth.user_id)
+            .bind(id)
+            .fetch_optional(&mut *tx)
+            .await?;
     if locked.as_deref() == Some("applied") {
         tx.rollback().await?;
         return Ok(Json(view(&s, repo::get(&s.pool, auth.user_id, id).await?)));
     }
-    let applied = apply::apply(&mut tx, auth.user_id, &p, row.reference_date, origin, &format!("capture:{id}"), &row.meta)
-        .await
-        .map_err(|e| ApiError::validation("proposal", e))?;
-    let done = repo::finish(&mut *tx, auth.user_id, id, "applied", Some(&applied)).await?.ok_or_else(ApiError::not_found)?;
+    let applied = apply::apply(
+        &mut tx,
+        auth.user_id,
+        &p,
+        row.reference_date,
+        origin,
+        &format!("capture:{id}"),
+        &row.meta,
+    )
+    .await
+    .map_err(|e| ApiError::validation("proposal", e))?;
+    let done = repo::finish(&mut *tx, auth.user_id, id, "applied", Some(&applied))
+        .await?
+        .ok_or_else(ApiError::not_found)?;
     tx.commit().await?;
-    audit(&s, auth.user_id, "capture", Some(id), "apply", json!({ "intent": done.intent })).await;
+    audit(
+        &s,
+        auth.user_id,
+        "capture",
+        Some(id),
+        "apply",
+        json!({ "intent": done.intent }),
+    )
+    .await;
     Ok(Json(view(&s, done)))
 }
 
 /// Descarta la captura sin aplicar nada.
 #[utoipa::path(post, path = "/captures/{id}/reject", tag = "captures", responses((status = 200, body = CaptureView)))]
-async fn reject_capture(State(s): State<AppState>, auth: AuthUser, Path(id): Path<Uuid>) -> ApiResult<Json<CaptureView>> {
+async fn reject_capture(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Path(id): Path<Uuid>,
+) -> ApiResult<Json<CaptureView>> {
     let r = repo::finish(&s.pool, auth.user_id, id, "rejected", None).await?;
     match r {
         Some(r) => Ok(Json(view(&s, r))),
-        None => Err(ApiError::new(StatusCode::CONFLICT, "not_pending", "La captura ya no está pendiente")),
+        None => Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "not_pending",
+            "La captura ya no está pendiente",
+        )),
     }
 }
 
@@ -243,15 +360,26 @@ pub struct SuggestBody {
 /// Sugerencia asistida por IA sobre datos propios (resumen semanal, clasificación de Inbox, hábitos para un objetivo).
 /// Se crea como propuesta que requiere confirmación; los datos se envían como texto delimitado y mínimo.
 #[utoipa::path(post, path = "/captures/suggest", tag = "captures", request_body = SuggestBody, responses((status = 201, body = CaptureView), (status = 409, body = crate::error::ErrorBody)))]
-async fn suggest(State(s): State<AppState>, auth: AuthUser, Json(b): Json<SuggestBody>) -> ApiResult<(StatusCode, Json<CaptureView>)> {
+async fn suggest(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Json(b): Json<SuggestBody>,
+) -> ApiResult<(StatusCode, Json<CaptureView>)> {
     if !llm::configured(&s) {
-        return Err(ApiError::new(StatusCode::CONFLICT, "llm_not_configured", "La IA no está configurada; esta sugerencia requiere ANTHROPIC_API_KEY"));
+        return Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "llm_not_configured",
+            "La IA no está configurada; esta sugerencia requiere ANTHROPIC_API_KEY",
+        ));
     }
     let u = auth.user_id;
     let today = crate::integrations::today(&s, u).await;
     let (intent, text, meta) = match b.kind.as_str() {
         "weekly_summary" => {
-            let week = b.iso_week.clone().unwrap_or_else(|| domain::time::iso_week_key(today));
+            let week = b
+                .iso_week
+                .clone()
+                .unwrap_or_else(|| domain::time::iso_week_key(today));
             let p = domain::time::parse_iso_week(&week)?;
             let logs: Vec<(NaiveDate, String)> = sqlx::query_as("SELECT on_date, text FROM daily_log_entries WHERE user_id = $1 AND on_date BETWEEN $2 AND $3 ORDER BY on_date, position LIMIT 200")
                 .bind(u)
@@ -271,19 +399,27 @@ async fn suggest(State(s): State<AppState>, auth: AuthUser, Json(b): Json<Sugges
                 .bind(p.end)
                 .fetch_all(&s.pool)
                 .await?;
-            let mut t = format!("Semana {week}. Resume en 5 líneas qué pasó, sin inventar nada.\nBitácora:\n");
+            let mut t =
+                format!("Semana {week}. Resume en 5 líneas qué pasó, sin inventar nada.\nBitácora:\n");
             for (d, l) in logs {
                 t.push_str(&format!("- {d}: {l}\n"));
             }
             t.push_str("Reflexiones:\n");
             for (d, pol, l) in refl {
-                t.push_str(&format!("- {d} ({}): {l}\n", if pol == "good" { "bien" } else { "mal" }));
+                t.push_str(&format!(
+                    "- {d} ({}): {l}\n",
+                    if pol == "good" { "bien" } else { "mal" }
+                ));
             }
             t.push_str("Pendientes cerrados:\n");
             for x in done {
                 t.push_str(&format!("- {x}\n"));
             }
-            ("weekly_review", t, json!({ "iso_week": week, "kind": "weekly_summary" }))
+            (
+                "weekly_review",
+                t,
+                json!({ "iso_week": week, "kind": "weekly_summary" }),
+            )
         }
         "inbox_classification" => {
             let items: Vec<(Uuid, String)> = sqlx::query_as("SELECT id, text FROM inbox_items WHERE user_id = $1 AND status = 'pending' ORDER BY captured_at LIMIT 50")
@@ -293,20 +429,30 @@ async fn suggest(State(s): State<AppState>, auth: AuthUser, Json(b): Json<Sugges
             if items.is_empty() {
                 return Err(ApiError::validation("kind", "El Inbox está vacío"));
             }
-            let mut t = String::from("Convierte en pendientes (tasks) los elementos del Inbox que sean acciones; clasifica cada uno en un área.\n");
+            let mut t = String::from(
+                "Convierte en pendientes (tasks) los elementos del Inbox que sean acciones; clasifica cada uno en un área.\n",
+            );
             for (_, x) in &items {
                 t.push_str(&format!("- {x}\n"));
             }
-            ("inbox", t, json!({ "inbox_ids": items.iter().map(|i| i.0).collect::<Vec<_>>(), "kind": "inbox_classification" }))
+            (
+                "inbox",
+                t,
+                json!({ "inbox_ids": items.iter().map(|i| i.0).collect::<Vec<_>>(), "kind": "inbox_classification" }),
+            )
         }
         "goal_habits" => {
-            let gid = b.goal_id.ok_or_else(|| ApiError::validation("goal_id", "obligatorio"))?;
-            let g: (String, String, String, String) = sqlx::query_as("SELECT title, kind, motivation, success_criteria FROM goals WHERE user_id = $1 AND id = $2")
-                .bind(u)
-                .bind(gid)
-                .fetch_optional(&s.pool)
-                .await?
-                .ok_or_else(ApiError::not_found)?;
+            let gid = b
+                .goal_id
+                .ok_or_else(|| ApiError::validation("goal_id", "obligatorio"))?;
+            let g: (String, String, String, String) = sqlx::query_as(
+                "SELECT title, kind, motivation, success_criteria FROM goals WHERE user_id = $1 AND id = $2",
+            )
+            .bind(u)
+            .bind(gid)
+            .fetch_optional(&s.pool)
+            .await?
+            .ok_or_else(ApiError::not_found)?;
             let t = format!(
                 "Propón de 1 a 3 hábitos diarios (acciones marcables en una línea) para el objetivo: {}. Por qué importa: {}. Cómo sabré que lo logré: {}. Devuélvelos en goals[0].habits con el mismo título y kind {}.",
                 g.0, g.2, g.3, g.1

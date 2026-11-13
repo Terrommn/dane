@@ -5,7 +5,9 @@ use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Redirect, Response};
 use chrono::NaiveDate;
-use persistence::repos::integrations::{self as repo, ConnectionStatus, InteractionSuggestion, PersonSuggestion, SyncRun};
+use persistence::repos::integrations::{
+    self as repo, ConnectionStatus, InteractionSuggestion, PersonSuggestion, SyncRun,
+};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::router::OpenApiRouter;
@@ -76,7 +78,13 @@ fn disconnected(provider: &str) -> ConnectionStatus {
 #[utoipa::path(get, path = "/integrations", tag = "integrations", responses((status = 200, body = IntegrationsOverview)))]
 async fn overview(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<IntegrationsOverview>> {
     let conns = repo::list(&s.pool, auth.user_id).await?;
-    let find = |p: &str| conns.iter().find(|c| c.provider == p).map(|c| c.status()).unwrap_or_else(|| disconnected(p));
+    let find = |p: &str| {
+        conns
+            .iter()
+            .find(|c| c.provider == p)
+            .map(|c| c.status())
+            .unwrap_or_else(|| disconnected(p))
+    };
     Ok(Json(IntegrationsOverview {
         google: find("google"),
         clickup: find("clickup"),
@@ -84,7 +92,11 @@ async fn overview(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<I
         llm: LlmStatus {
             configured: llm::configured(&s),
             model: llm::configured(&s).then(|| s.config.llm_model.clone()),
-            mode: if llm::configured(&s) { "llm".into() } else { "manual".into() },
+            mode: if llm::configured(&s) {
+                "llm".into()
+            } else {
+                "manual".into()
+            },
         },
         recent_runs: repo::recent_runs(&s.pool, auth.user_id, 20).await?,
         google_redirect_uri: s.config.google_redirect_uri(),
@@ -104,14 +116,20 @@ pub struct AuthorizeUrl {
 
 fn safe_redirect(p: Option<&str>) -> String {
     match p {
-        Some(p) if p.starts_with('/') && !p.starts_with("//") && !p.contains('\\') && p.len() < 300 => p.to_string(),
+        Some(p) if p.starts_with('/') && !p.starts_with("//") && !p.contains('\\') && p.len() < 300 => {
+            p.to_string()
+        }
         _ => "/ajustes".into(),
     }
 }
 
 /// Inicia la conexión con Google (OAuth + PKCE, scopes de solo lectura).
 #[utoipa::path(get, path = "/integrations/google/connect", tag = "integrations", params(ConnectQuery), responses((status = 200, body = AuthorizeUrl)))]
-async fn google_connect(State(s): State<AppState>, auth: AuthUser, Query(q): Query<ConnectQuery>) -> ApiResult<Json<AuthorizeUrl>> {
+async fn google_connect(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Query(q): Query<ConnectQuery>,
+) -> ApiResult<Json<AuthorizeUrl>> {
     let ep = Endpoints::resolve(&s, None);
     let url = google::authorize_url(&s, auth.user_id, &ep, &safe_redirect(q.redirect_to.as_deref())).await?;
     Ok(Json(AuthorizeUrl { url }))
@@ -128,12 +146,24 @@ pub struct CallbackQuery {
 #[utoipa::path(get, path = "/integrations/google/callback", tag = "integrations", params(CallbackQuery), responses((status = 302)))]
 async fn google_callback(State(s): State<AppState>, Query(q): Query<CallbackQuery>) -> Response {
     let (Some(code), Some(st)) = (q.code, q.state) else {
-        return Redirect::to(&format!("/ajustes?google={}", if q.error.is_some() { "cancelled" } else { "error" })).into_response();
+        return Redirect::to(&format!(
+            "/ajustes?google={}",
+            if q.error.is_some() { "cancelled" } else { "error" }
+        ))
+        .into_response();
     };
     let ep = Endpoints::resolve(&s, None);
     match google::complete(&s, &ep, &st, &code).await {
         Ok((user, redirect)) => {
-            audit(&s, user, "integration", None, "connect", serde_json::json!({ "provider": "google" })).await;
+            audit(
+                &s,
+                user,
+                "integration",
+                None,
+                "connect",
+                serde_json::json!({ "provider": "google" }),
+            )
+            .await;
             let sep = if redirect.contains('?') { '&' } else { '?' };
             Redirect::to(&format!("{redirect}{sep}google=connected")).into_response()
         }
@@ -146,7 +176,10 @@ async fn google_callback(State(s): State<AppState>, Query(q): Query<CallbackQuer
 
 /// Calendarios disponibles; los de festivos/observancias se marcan como excluidos siempre.
 #[utoipa::path(get, path = "/integrations/google/calendars", tag = "integrations", responses((status = 200, body = Vec<google::CalendarInfo>)))]
-async fn google_calendars(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<Vec<google::CalendarInfo>>> {
+async fn google_calendars(
+    State(s): State<AppState>,
+    auth: AuthUser,
+) -> ApiResult<Json<Vec<google::CalendarInfo>>> {
     let conn = repo::get(&s.pool, auth.user_id, "google").await?;
     let ep = Endpoints::resolve(&s, conn.as_ref().map(|c| &c.config));
     Ok(Json(google::list_calendars(&s, auth.user_id, &ep).await?))
@@ -162,7 +195,11 @@ pub struct GoogleConfigBody {
 }
 
 #[utoipa::path(put, path = "/integrations/google/config", tag = "integrations", request_body = GoogleConfigBody, responses((status = 200, body = ConnectionStatus), (status = 409, body = crate::error::ErrorBody)))]
-async fn google_config(State(s): State<AppState>, auth: AuthUser, Json(b): Json<GoogleConfigBody>) -> ApiResult<Json<ConnectionStatus>> {
+async fn google_config(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Json(b): Json<GoogleConfigBody>,
+) -> ApiResult<Json<ConnectionStatus>> {
     let mut patch = serde_json::Map::new();
     if let Some(c) = b.calendars {
         let c: Vec<String> = c.into_iter().filter(|x| !google::excluded_calendar(x)).collect();
@@ -174,10 +211,21 @@ async fn google_config(State(s): State<AppState>, auth: AuthUser, Json(b): Json<
     if let Some(v) = b.gmail_enabled {
         patch.insert("gmail_enabled".into(), v.into());
     }
-    let ok = repo::patch_config(&s.pool, auth.user_id, "google", b.version, &serde_json::Value::Object(patch)).await?;
-    let conn = repo::get(&s.pool, auth.user_id, "google").await?.ok_or_else(ApiError::not_found)?;
+    let ok = repo::patch_config(
+        &s.pool,
+        auth.user_id,
+        "google",
+        b.version,
+        &serde_json::Value::Object(patch),
+    )
+    .await?;
+    let conn = repo::get(&s.pool, auth.user_id, "google")
+        .await?
+        .ok_or_else(ApiError::not_found)?;
     if !ok {
-        return Err(ApiError::conflict(serde_json::to_value(conn.status()).unwrap_or_default()));
+        return Err(ApiError::conflict(
+            serde_json::to_value(conn.status()).unwrap_or_default(),
+        ));
     }
     Ok(Json(conn.status()))
 }
@@ -190,14 +238,24 @@ pub struct SyncBody {
 
 /// Sincroniza ahora (agenda y correos enviados). Ventana máxima de 62 días.
 #[utoipa::path(post, path = "/integrations/google/sync", tag = "integrations", request_body = SyncBody, responses((status = 200, body = Vec<SyncReport>)))]
-async fn google_sync(State(s): State<AppState>, auth: AuthUser, body: Option<Json<SyncBody>>) -> ApiResult<Json<Vec<SyncReport>>> {
+async fn google_sync(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    body: Option<Json<SyncBody>>,
+) -> ApiResult<Json<Vec<SyncReport>>> {
     let b = body.map(|b| b.0).unwrap_or_default();
     let window = match (b.from, b.to) {
         (Some(f), Some(t)) if t >= f && (t - f).num_days() <= 62 => Some((f, t)),
         (None, None) => None,
         _ => return Err(ApiError::validation("to", "rango inválido (máximo 62 días)")),
     };
-    repo::get(&s.pool, auth.user_id, "google").await?.ok_or_else(|| ApiError::new(StatusCode::CONFLICT, "integration_not_ready", "Google no está conectado"))?;
+    repo::get(&s.pool, auth.user_id, "google").await?.ok_or_else(|| {
+        ApiError::new(
+            StatusCode::CONFLICT,
+            "integration_not_ready",
+            "Google no está conectado",
+        )
+    })?;
     Ok(Json(google::sync_all(&s, auth.user_id, window).await))
 }
 
@@ -207,7 +265,15 @@ async fn google_disconnect(State(s): State<AppState>, auth: AuthUser) -> ApiResu
     let conn = repo::get(&s.pool, auth.user_id, "google").await?;
     let ep = Endpoints::resolve(&s, conn.as_ref().map(|c| &c.config));
     google::revoke(&s, auth.user_id, &ep).await?;
-    audit(&s, auth.user_id, "integration", None, "revoke", serde_json::json!({ "provider": "google" })).await;
+    audit(
+        &s,
+        auth.user_id,
+        "integration",
+        None,
+        "revoke",
+        serde_json::json!({ "provider": "google" }),
+    )
+    .await;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -225,14 +291,25 @@ pub struct ClickupBody {
 }
 
 #[utoipa::path(put, path = "/integrations/clickup", tag = "integrations", request_body = ClickupBody, responses((status = 200, body = ConnectionStatus)))]
-async fn clickup_connect(State(s): State<AppState>, auth: AuthUser, Json(b): Json<ClickupBody>) -> ApiResult<Json<ConnectionStatus>> {
-    if let Some(m) = &b.status_map {
-        if m.values().any(|v| !["open", "need_info", "closed"].contains(&v.as_str())) {
-            return Err(ApiError::validation("status_map", "cada estado debe mapear a open, need_info o closed"));
-        }
+async fn clickup_connect(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Json(b): Json<ClickupBody>,
+) -> ApiResult<Json<ConnectionStatus>> {
+    if let Some(m) = &b.status_map
+        && m.values()
+            .any(|v| !["open", "need_info", "closed"].contains(&v.as_str()))
+    {
+        return Err(ApiError::validation(
+            "status_map",
+            "cada estado debe mapear a open, need_info o closed",
+        ));
     }
     if b.endpoints_override.is_some() && s.config.env == AppEnv::Production {
-        return Err(ApiError::validation("endpoints_override", "no permitido en producción"));
+        return Err(ApiError::validation(
+            "endpoints_override",
+            "no permitido en producción",
+        ));
     }
     let mut extra = serde_json::Map::new();
     if let Some(o) = &b.endpoints_override {
@@ -250,11 +327,29 @@ async fn clickup_connect(State(s): State<AppState>, auth: AuthUser, Json(b): Jso
                 status_map: b.status_map.clone().unwrap_or_default(),
                 area_id: b.area_id,
             };
-            clickup::connect(&s, auth.user_id, &ep, token, cfg, serde_json::Value::Object(extra)).await?;
-            audit(&s, auth.user_id, "integration", None, "connect", serde_json::json!({ "provider": "clickup" })).await;
+            clickup::connect(
+                &s,
+                auth.user_id,
+                &ep,
+                token,
+                cfg,
+                serde_json::Value::Object(extra),
+            )
+            .await?;
+            audit(
+                &s,
+                auth.user_id,
+                "integration",
+                None,
+                "connect",
+                serde_json::json!({ "provider": "clickup" }),
+            )
+            .await;
         }
         None => {
-            let version = b.version.ok_or_else(|| ApiError::validation("version", "obligatoria al actualizar la configuración"))?;
+            let version = b.version.ok_or_else(|| {
+                ApiError::validation("version", "obligatoria al actualizar la configuración")
+            })?;
             let mut patch = extra;
             if let Some(v) = b.view_id {
                 patch.insert("view_id".into(), v.into());
@@ -265,13 +360,27 @@ async fn clickup_connect(State(s): State<AppState>, auth: AuthUser, Json(b): Jso
             if let Some(m) = b.status_map {
                 patch.insert("status_map".into(), serde_json::json!(m));
             }
-            if !repo::patch_config(&s.pool, auth.user_id, "clickup", version, &serde_json::Value::Object(patch)).await? {
-                let cur = repo::get(&s.pool, auth.user_id, "clickup").await?.ok_or_else(ApiError::not_found)?;
-                return Err(ApiError::conflict(serde_json::to_value(cur.status()).unwrap_or_default()));
+            if !repo::patch_config(
+                &s.pool,
+                auth.user_id,
+                "clickup",
+                version,
+                &serde_json::Value::Object(patch),
+            )
+            .await?
+            {
+                let cur = repo::get(&s.pool, auth.user_id, "clickup")
+                    .await?
+                    .ok_or_else(ApiError::not_found)?;
+                return Err(ApiError::conflict(
+                    serde_json::to_value(cur.status()).unwrap_or_default(),
+                ));
             }
         }
     }
-    let conn = repo::get(&s.pool, auth.user_id, "clickup").await?.ok_or_else(ApiError::not_found)?;
+    let conn = repo::get(&s.pool, auth.user_id, "clickup")
+        .await?
+        .ok_or_else(ApiError::not_found)?;
     Ok(Json(conn.status()))
 }
 
@@ -286,14 +395,25 @@ async fn clickup_sync(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Js
 
 /// Tareas abiertas de ClickUp en el orden de la daily: fáciles (con razón), resto, need info.
 #[utoipa::path(get, path = "/integrations/clickup/tasks", tag = "integrations", responses((status = 200, body = Vec<clickup::OrderedTask>)))]
-async fn clickup_tasks(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Json<Vec<clickup::OrderedTask>>> {
+async fn clickup_tasks(
+    State(s): State<AppState>,
+    auth: AuthUser,
+) -> ApiResult<Json<Vec<clickup::OrderedTask>>> {
     Ok(Json(clickup::ordered_tasks(&s, auth.user_id).await?))
 }
 
 #[utoipa::path(delete, path = "/integrations/clickup", tag = "integrations", responses((status = 204)))]
 async fn clickup_disconnect(State(s): State<AppState>, auth: AuthUser) -> ApiResult<StatusCode> {
     clickup::disconnect(&s, auth.user_id).await?;
-    audit(&s, auth.user_id, "integration", None, "disconnect", serde_json::json!({ "provider": "clickup" })).await;
+    audit(
+        &s,
+        auth.user_id,
+        "integration",
+        None,
+        "disconnect",
+        serde_json::json!({ "provider": "clickup" }),
+    )
+    .await;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -319,7 +439,12 @@ pub struct AcceptInteraction {
 }
 
 #[utoipa::path(post, path = "/integrations/suggestions/interactions/{id}/accept", tag = "integrations", request_body = AcceptInteraction, responses((status = 200, body = InteractionSuggestion)))]
-async fn accept_interaction(State(s): State<AppState>, auth: AuthUser, Path(id): Path<Uuid>, body: Option<Json<AcceptInteraction>>) -> ApiResult<Json<serde_json::Value>> {
+async fn accept_interaction(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Path(id): Path<Uuid>,
+    body: Option<Json<AcceptInteraction>>,
+) -> ApiResult<Json<serde_json::Value>> {
     let topic = body.and_then(|b| b.0.topic);
     let mut tx = s.pool.begin().await?;
     let sug: Option<(Uuid, NaiveDate, String, String, String)> = sqlx::query_as(
@@ -343,7 +468,12 @@ async fn accept_interaction(State(s): State<AppState>, auth: AuthUser, Path(id):
     .bind(&sref)
     .fetch_optional(&mut *tx)
     .await?;
-    sqlx::query("UPDATE interaction_suggestions SET interaction_id = $3 WHERE user_id = $1 AND id = $2").bind(auth.user_id).bind(id).bind(iid).execute(&mut *tx).await?;
+    sqlx::query("UPDATE interaction_suggestions SET interaction_id = $3 WHERE user_id = $1 AND id = $2")
+        .bind(auth.user_id)
+        .bind(id)
+        .bind(iid)
+        .execute(&mut *tx)
+        .await?;
     sqlx::query("UPDATE people SET last_contact_on = greatest(coalesce(last_contact_on, $3), $3) WHERE user_id = $1 AND id = $2")
         .bind(auth.user_id)
         .bind(person)
@@ -355,7 +485,11 @@ async fn accept_interaction(State(s): State<AppState>, auth: AuthUser, Path(id):
 }
 
 #[utoipa::path(post, path = "/integrations/suggestions/interactions/{id}/dismiss", tag = "integrations", responses((status = 204)))]
-async fn dismiss_interaction(State(s): State<AppState>, auth: AuthUser, Path(id): Path<Uuid>) -> ApiResult<StatusCode> {
+async fn dismiss_interaction(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Path(id): Path<Uuid>,
+) -> ApiResult<StatusCode> {
     let n = sqlx::query("UPDATE interaction_suggestions SET status = 'dismissed' WHERE user_id = $1 AND id = $2 AND status = 'pending'")
         .bind(auth.user_id)
         .bind(id)
@@ -376,7 +510,12 @@ pub struct AcceptPerson {
 
 /// Crea la persona sugerida (decisión explícita del usuario).
 #[utoipa::path(post, path = "/integrations/suggestions/people/{id}/accept", tag = "integrations", request_body = AcceptPerson, responses((status = 200)))]
-async fn accept_person(State(s): State<AppState>, auth: AuthUser, Path(id): Path<Uuid>, body: Option<Json<AcceptPerson>>) -> ApiResult<Json<serde_json::Value>> {
+async fn accept_person(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Path(id): Path<Uuid>,
+    body: Option<Json<AcceptPerson>>,
+) -> ApiResult<Json<serde_json::Value>> {
     let b = body.map(|b| b.0).unwrap_or_default();
     let mut tx = s.pool.begin().await?;
     let sug: Option<(String, Option<String>, Option<NaiveDate>, String)> =
@@ -395,14 +534,33 @@ async fn accept_person(State(s): State<AppState>, auth: AuthUser, Path(id): Path
         .bind(date)
         .fetch_one(&mut *tx)
         .await?;
-    sqlx::query("UPDATE person_suggestions SET status = 'accepted', person_id = $3 WHERE user_id = $1 AND id = $2").bind(auth.user_id).bind(id).bind(pid).execute(&mut *tx).await?;
+    sqlx::query(
+        "UPDATE person_suggestions SET status = 'accepted', person_id = $3 WHERE user_id = $1 AND id = $2",
+    )
+    .bind(auth.user_id)
+    .bind(id)
+    .bind(pid)
+    .execute(&mut *tx)
+    .await?;
     tx.commit().await?;
-    audit(&s, auth.user_id, "person", Some(pid), "create_from_suggestion", serde_json::json!({ "name": name })).await;
+    audit(
+        &s,
+        auth.user_id,
+        "person",
+        Some(pid),
+        "create_from_suggestion",
+        serde_json::json!({ "name": name }),
+    )
+    .await;
     Ok(Json(serde_json::json!({ "person_id": pid })))
 }
 
 #[utoipa::path(post, path = "/integrations/suggestions/people/{id}/dismiss", tag = "integrations", responses((status = 204)))]
-async fn dismiss_person(State(s): State<AppState>, auth: AuthUser, Path(id): Path<Uuid>) -> ApiResult<StatusCode> {
+async fn dismiss_person(
+    State(s): State<AppState>,
+    auth: AuthUser,
+    Path(id): Path<Uuid>,
+) -> ApiResult<StatusCode> {
     let n = sqlx::query("UPDATE person_suggestions SET status = 'dismissed' WHERE user_id = $1 AND id = $2 AND status = 'pending'")
         .bind(auth.user_id)
         .bind(id)
