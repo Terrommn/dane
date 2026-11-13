@@ -21,6 +21,137 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/adrs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_adrs"];
+        put?: never;
+        /** Crea un ADR con el siguiente número libre del proyecto (estado inicial: propuesta). */
+        post: operations["create_adr"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/adrs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_adr"];
+        put: operations["update_adr"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agenda": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_range"];
+        put?: never;
+        post: operations["create_event"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agenda/day/{date}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agenda de un día (manual + sincronizada), ordenada por hora. */
+        get: operations["day_agenda"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agenda/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["update_event"];
+        post?: never;
+        delete: operations["delete_event"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Elementos archivados de todos los módulos (para recuperarlos). */
+        get: operations["list_archived"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/archive/{entity_type}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["archive_entity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/archive/{entity_type}/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["restore_entity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/areas": {
         parameters: {
             query?: never;
@@ -174,6 +305,801 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/class-notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_class_notes"];
+        put?: never;
+        post: operations["create_class_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/class-notes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_class_note"];
+        put: operations["update_class_note"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/class-notes/{id}/deliverables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Crea una entrega como tarea ligada a la clase (área de la materia, aparece en la daily el día de entrega). */
+        post: operations["add_deliverable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tabla del pipeline (Pipeline.base), con días para publicar. */
+        get: operations["list_content"];
+        put?: never;
+        post: operations["create_content"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/content/ai-context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["content_ai_context"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/content/board": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kanban por estado (idea → guion → grabado → editado → publicado). */
+        get: operations["content_board"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/content/published": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Publicados ordenados por métricas. */
+        get: operations["content_published"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/content/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_content"];
+        put: operations["update_content"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devlog-sessions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["update_session"];
+        post?: never;
+        delete: operations["delete_session"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devlogs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_devlogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devlogs/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Crea una sesión desde el texto pegado (guarda también el texto original). */
+        post: operations["import_text"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devlogs/import/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Vista previa del texto pegado sin guardar nada. */
+        post: operations["preview_import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devlogs/{date}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_devlog"];
+        put: operations["set_summary"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devlogs/{date}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Agrega una sesión al devlog del día (varias por día). */
+        post: operations["add_session"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/drawings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_drawings"];
+        put?: never;
+        post: operations["create_drawing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/drawings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_drawing"];
+        put: operations["update_drawing"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/favorites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_favorites"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/favorites/{entity_type}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["add_favorite"];
+        post?: never;
+        delete: operations["remove_favorite"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cuentas y tarjetas con saldo/disponible estimado y antigüedad del snapshot (sin conexión al banco). */
+        get: operations["list_accounts"];
+        put?: never;
+        post: operations["create_account"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/accounts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_account"];
+        put: operations["update_account"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/accounts/{id}/snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_snapshots"];
+        put?: never;
+        /** Registra el saldo/disponible observado (conciliación manual). Los movimientos posteriores se suman/restan al estimado. */
+        post: operations["add_snapshot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/budgets/{month}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Presupuesto del mes (snapshot propio del mes; si no existe, propuesta copiada del mes anterior). */
+        get: operations["get_budget"];
+        /**
+         * Guarda el presupuesto del mes. Solo modifica este mes; los meses anteriores conservan su snapshot.
+         *     Las categorías con rubros de proyecto toman como línea la suma de sus rubros.
+         */
+        put: operations["put_budget"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/card-suggestion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Tarjeta sugerida para gastar hoy según disponible, uso máximo del plan, corte, deudas y gasto planeado (D-022).
+         *     Es una recomendación personal; no ejecuta pagos ni consulta bancos.
+         */
+        get: operations["card_suggestion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catálogo de categorías (gasto e ingreso). */
+        get: operations["list_categories"];
+        put?: never;
+        post: operations["create_category"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Renombrar/archivar conserva el ID y los movimientos históricos. */
+        put: operations["update_category"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/credit-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Plan de crédito (meta, pasos, reglas, tarjetas excluidas, % máximo de uso). El 30% es una regla personal inicial,
+         *     no una garantía financiera.
+         */
+        get: operations["get_plan"];
+        put: operations["put_plan"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dashboard financiero del mes (por defecto, el actual). */
+        get: operations["dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/debts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_debts"];
+        put?: never;
+        post: operations["create_debt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/debts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_debt"];
+        put: operations["update_debt"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/projects/{id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gastos de un proyecto derivados del registro general (sin duplicar movimientos), por rubro y por mes. */
+        get: operations["project_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/recurring": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_rules"];
+        put?: never;
+        post: operations["create_rule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/recurring/materialize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Registra ahora las ocurrencias vencidas del usuario (el scheduler lo hace solo; esto lo adelanta). Idempotente. */
+        post: operations["materialize"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/recurring/occurrences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["occurrences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/recurring/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_rule"];
+        /** Cambios futuros: las ocurrencias ya creadas conservan su monto y fecha. */
+        put: operations["update_rule"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Histórico de movimientos con filtros, orden, paginación y totales. */
+        get: operations["list_transactions"];
+        put?: never;
+        /** Registra un movimiento confirmado por el usuario. */
+        post: operations["create_transaction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/transactions/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Captura múltiple atómica: si un elemento es inválido no se guarda ninguno (422 con el índice en `field`). */
+        post: operations["create_batch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/transactions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_transaction"];
+        /** Edita un movimiento (versión obligatoria). El tipo no cambia; se recalculan deudas afectadas. */
+        put: operations["update_transaction"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/transactions/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirma (y opcionalmente corrige) una ocurrencia pendiente de conciliación. Actualiza la **misma** fila; los efectos
+         *     se activan una sola vez. Confirmar algo ya confirmado devuelve el movimiento sin repetir efectos.
+         */
+        post: operations["confirm_transaction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/finance/transactions/{id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Anula un movimiento sin borrarlo (deja de contar en saldos y totales). */
+        post: operations["void_transaction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inbox": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_inbox"];
+        put?: never;
+        /** Captura sin clasificar. 201 si es nueva, 200 si el `client_id` ya existía. */
+        post: operations["capture"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inbox/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["edit_item"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inbox/{id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Aplica la decisión del usuario: crea el destino y cierra el elemento en una sola transacción. */
+        post: operations["apply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inbox/{id}/propose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Calcula una propuesta determinista (no mueve nada). La IA, si está configurada, la propone el módulo de capturas. */
+        post: operations["propose"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inbox/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recupera un elemento archivado o descartado a pendiente. */
+        post: operations["reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_interactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interactions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_interaction"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Enlaces salientes y backlinks de cualquier entidad del usuario. */
+        get: operations["get_links"];
+        put?: never;
+        /** Crea un enlace validando que ambos extremos existan y sean del usuario. */
+        post: operations["add_link"];
+        delete: operations["remove_link"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me": {
         parameters: {
             query?: never;
@@ -185,6 +1111,219 @@ export interface paths {
         get: operations["me"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_notes"];
+        put?: never;
+        post: operations["create_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_note"];
+        put: operations["update_note"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_people"];
+        put?: never;
+        post: operations["create_person"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/birthdays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["upcoming_birthdays"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/by-area": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vista Personas.base: agrupado por área, con días sin hablar y cumpleaños. */
+        get: operations["people_by_area"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Busca a quién se refiere un nombre o apodo, sin crear nada. */
+        get: operations["resolve_people"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_person"];
+        /** Editar no borra el cumpleaños existente salvo que se envíe vacío explícitamente. */
+        put: operations["update_person"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/{id}/interactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Registra con quién habló el usuario ese día; actualiza "último contacto". */
+        post: operations["add_interaction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["add_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/{id}/notes/{note_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_note"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/person-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_suggestions"];
+        put?: never;
+        /** Sugiere una persona detectada (no la crea). */
+        post: operations["create_suggestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/person-suggestions/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["accept_suggestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/person-suggestions/{id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["dismiss_suggestion"];
         delete?: never;
         options?: never;
         head?: never;
@@ -240,6 +1379,73 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Próximos recordatorios, estado del chat y entregas recientes. */
+        get: operations["status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reminders/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pausa los recordatorios y cancela los pendientes. */
+        post: operations["pause"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reminders/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reanuda los recordatorios (el scheduler programa la próxima ocurrencia vigente; no envía atrasados). */
+        post: operations["resume"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/settings": {
         parameters: {
             query?: never;
@@ -257,10 +1463,380 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/subjects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_subjects"];
+        put?: never;
+        post: operations["create_subject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/subjects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["update_subject"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/swipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_swipe"];
+        put?: never;
+        post: operations["create_swipe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/swipe/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_swipe"];
+        put: operations["update_swipe"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_tags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_rules"];
+        put?: never;
+        post: operations["create_rule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/materialize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Genera las ocurrencias pendientes hasta hoy (idempotente; también lo hace el worker periódicamente). */
+        post: operations["materialize_rules"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Editar o desactivar una regla no modifica las tareas ya generadas. */
+        put: operations["update_rule"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_tasks"];
+        put?: never;
+        post: operations["create_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/carry-over": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Arrastra las pendientes abiertas de días anteriores al día indicado, conservando ID e historial. */
+        post: operations["carry_over"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/day/{date}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pendientes del día agrupados por área (Personal/Trabajo/Negocio/Escuela + las que agregue el usuario). */
+        get: operations["tasks_for_day"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_task"];
+        put: operations["update_task"];
+        post?: never;
+        /** Archiva (no borra). Se recupera con `POST /archive/task/{id}/restore`. */
+        delete: operations["archive_task"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marca como hecha. En tareas de ClickUp solo cambia el estado local (no modifica ClickUp). */
+        post: operations["complete_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reopen_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/views/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vista Proyectos.base: actividad reciente + ADRs. */
+        get: operations["projects_view"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AcceptResult: {
+            person: components["schemas"]["Person"];
+            created: boolean;
+        };
+        AcceptSuggestion: {
+            /**
+             * Format: uuid
+             * @description Vincular a una persona existente…
+             */
+            person_id?: string | null;
+            person?: components["schemas"]["PersonBody"] | null;
+            /** @description Registrar además la interacción del día sugerido. */
+            record_interaction?: boolean;
+        };
+        Account: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            bank: string;
+            /** @description `debit | cash | savings | credit_card` */
+            kind: string;
+            currency: string;
+            /** Format: int64 */
+            credit_limit_cents?: number | null;
+            /** Format: int32 */
+            cut_day?: number | null;
+            /** Format: int32 */
+            pay_day?: number | null;
+            /** @description `active | to_cancel | cancelled | closed` */
+            status: string;
+            is_default_debit: boolean;
+            notes_md: string;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        AccountBody: {
+            name: string;
+            bank?: string;
+            /** @description `debit | cash | savings | credit_card` (no cambia al actualizar). */
+            kind: string;
+            currency?: string | null;
+            /** Format: int64 */
+            credit_limit_cents?: number | null;
+            /** Format: int32 */
+            cut_day?: number | null;
+            /** Format: int32 */
+            pay_day?: number | null;
+            /** @description `active | to_cancel | cancelled | closed` */
+            status?: string;
+            is_default_debit?: boolean;
+            notes_md?: string;
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        AccountView: {
+            account: components["schemas"]["Account"];
+            snapshot?: components["schemas"]["BalanceSnapshot"] | null;
+            /**
+             * Format: int64
+             * @description Estimado = observado + movimientos confirmados posteriores. No es un dato del banco.
+             */
+            estimated_cents?: number | null;
+            /**
+             * Format: int64
+             * @description Días desde la observación (antigüedad del dato).
+             */
+            snapshot_age_days?: number | null;
+            /**
+             * Format: int64
+             * @description Tarjetas: usado = límite − disponible estimado.
+             */
+            used_cents?: number | null;
+            /** Format: int64 */
+            usage_pct?: number | null;
+            /** Format: date */
+            next_cut_on?: string | null;
+            /** Format: date */
+            next_pay_on?: string | null;
+            /** Format: int64 */
+            days_to_pay?: number | null;
+        };
+        AccountsSummary: {
+            /**
+             * Format: int64
+             * @description Suma del saldo estimado de cuentas de débito/efectivo/ahorro con snapshot.
+             */
+            cash_estimated_cents: number;
+            /** Format: int64 */
+            cards_available_cents: number;
+            /** Format: int64 */
+            cards_limit_cents: number;
+            /**
+             * Format: int64
+             * @description Cuentas sin saldo observado (no se incluyen en los totales).
+             */
+            without_snapshot: number;
+            /**
+             * Format: int64
+             * @description Antigüedad máxima (días) de los saldos observados usados.
+             */
+            oldest_snapshot_days?: number | null;
+        };
         /** @description Elemento de actividad reciente (vista "Dev reciente" de Proyectos.base, sin devocionales/clases/objetivos/finanzas). */
         ActivityItem: {
             entity_type: string;
@@ -272,6 +1848,71 @@ export interface components {
             status?: string | null;
             /** Format: date-time */
             updated_at: string;
+        };
+        Adr: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            project_id: string;
+            /**
+             * Format: int32
+             * @description Número por proyecto (ADR-0001…).
+             */
+            number: number;
+            title: string;
+            /** @description `proposed | accepted | superseded` */
+            status: string;
+            /** Format: uuid */
+            superseded_by_id?: string | null;
+            /** Format: date */
+            decided_on: string;
+            context_md: string;
+            decision_md: string;
+            alternatives_md: string;
+            consequences_md: string;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        AdrBody: {
+            /** Format: uuid */
+            project_id: string;
+            title: string;
+            /** Format: date */
+            decided_on?: string | null;
+            context_md?: string;
+            decision_md?: string;
+            alternatives_md?: string;
+            consequences_md?: string;
+            /** @description Al actualizar: `proposed | accepted | superseded`. */
+            status?: string | null;
+            /**
+             * Format: uuid
+             * @description Obligatorio con `superseded`: ADR que lo reemplaza (mismo usuario).
+             */
+            superseded_by_id?: string | null;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        AiContentContext: {
+            /** @description Las 5 piezas publicadas más recientes (views, retención y "Resultado") a considerar antes de proponer un guion. */
+            recent_published: components["schemas"]["ContentPiece"][];
+        };
+        ApplyBody: {
+            /**
+             * Format: int32
+             * @description Versión vista por el usuario al revisar.
+             */
+            version: number;
+            /** @description Acción aceptada o editada explícitamente por el usuario. */
+            action: components["schemas"]["InboxAction"];
+        };
+        ApplyResult: {
+            item: components["schemas"]["InboxItem"];
+            result_type?: string | null;
+            /** Format: uuid */
+            result_id?: string | null;
         };
         Area: {
             /** Format: uuid */
@@ -304,11 +1945,44 @@ export interface components {
              */
             version?: number | null;
         };
+        AreaTasks: {
+            /** Format: uuid */
+            area_id?: string | null;
+            area_name: string;
+            tasks: components["schemas"]["Task"][];
+        };
         AuthConfig: {
             miniapp_enabled: boolean;
             oidc_enabled: boolean;
             dev_login_enabled: boolean;
             bot_username?: string | null;
+        };
+        BalanceSnapshot: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            account_id: string;
+            /** Format: date-time */
+            observed_at: string;
+            /** Format: date */
+            observed_on: string;
+            /**
+             * Format: int64
+             * @description Débito: saldo. Tarjeta: crédito disponible.
+             */
+            balance_cents: number;
+            /** @description `instant | legacy_day_start_inclusive | legacy_after_day` */
+            semantics: string;
+            note: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        BatchBody: {
+            /** @description Cada elemento debería llevar `client_key` propio para reintentos seguros. */
+            items: components["schemas"]["TxBody"][];
+        };
+        BatchResult: {
+            results: components["schemas"]["CreatedTransaction"][];
         };
         BearerSession: {
             /** @description Token Bearer: guárdalo solo en memoria. */
@@ -319,6 +1993,469 @@ export interface components {
             user_id: string;
             /** @description `start_param` del enlace de la Mini App (ej. `checkin_2026-11-12`). */
             start_param?: string | null;
+        };
+        BoardColumn: {
+            status: string;
+            items: components["schemas"]["ContentView"][];
+        };
+        BudgetBody: {
+            /**
+             * Format: int32
+             * @description Versión actual del snapshot (0 si aún no existe).
+             */
+            version: number;
+            lines: components["schemas"]["BudgetLine"][];
+            items?: components["schemas"]["BudgetItem"][];
+        };
+        BudgetItem: {
+            /** Format: uuid */
+            id?: string | null;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: uuid */
+            category_id: string;
+            /** @description Rubro (ej. Servidores, WhatsApp, Ads). */
+            name: string;
+            /** Format: int64 */
+            amount_cents: number;
+            /** @description Palabras clave que sugieren el rubro cuando el gasto no tiene asignación explícita. */
+            keywords?: string[];
+            /** Format: int32 */
+            position?: number;
+        };
+        BudgetLine: {
+            /** Format: uuid */
+            category_id: string;
+            /** Format: int64 */
+            amount_cents: number;
+        };
+        BudgetLineView: {
+            /** Format: uuid */
+            category_id: string;
+            category_name: string;
+            role: string;
+            /** Format: int64 */
+            amount_cents: number;
+            /** @description La línea es la suma de rubros de proyecto. */
+            from_items: boolean;
+        };
+        BudgetView: {
+            month: string;
+            /** @description `false`: el mes aún no tiene snapshot; se muestra la propuesta copiada del mes anterior. */
+            persisted: boolean;
+            copied_from?: string | null;
+            /**
+             * Format: int32
+             * @description Versión del snapshot (0 si no existe) para `PUT`.
+             */
+            version: number;
+            lines: components["schemas"]["BudgetLineView"][];
+            items: components["schemas"]["BudgetItem"][];
+            /**
+             * Format: int64
+             * @description Tope de gasto (sin categorías de pago de deuda), como en el vault.
+             */
+            spending_cap_cents: number;
+            /**
+             * Format: int64
+             * @description Total de todas las líneas (incluye pagos de deuda presupuestados).
+             */
+            total_cents: number;
+        };
+        CalendarEvent: {
+            /** Format: uuid */
+            id: string;
+            /** @description `manual | google` */
+            source: string;
+            calendar_id: string;
+            /** Format: date */
+            on_date: string;
+            /** Format: date-time */
+            starts_at?: string | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            all_day: boolean;
+            title: string;
+            location?: string | null;
+            /** @description Invitados `[{email, name}]` (propuesta de personas; no prueban asistencia). */
+            attendees: Record<string, never>[];
+            status: string;
+            html_link?: string | null;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        CaptureBody: {
+            text: string;
+            /** @description ID generado en el dispositivo: reenviar la misma captura (offline) no duplica. */
+            client_id?: string | null;
+            /** @description `app` (por defecto) o `telegram`. */
+            source?: string | null;
+        };
+        CardSuggestionView: {
+            /** Format: date */
+            date: string;
+            /** Format: int64 */
+            amount_cents?: number | null;
+            /** Format: uuid */
+            card_id?: string | null;
+            card_name?: string | null;
+            /**
+             * Format: uuid
+             * @description Si ninguna tarjeta sirve: cuenta de débito por defecto.
+             */
+            debit_account_id?: string | null;
+            debit_account_name?: string | null;
+            provisional: boolean;
+            explanation: string;
+            /** Format: int32 */
+            max_usage_pct: number;
+            cards: components["schemas"]["CardVerdictView"][];
+        };
+        CardVerdictView: {
+            /** Format: uuid */
+            account_id: string;
+            name: string;
+            eligible: boolean;
+            /** @description Motivos de exclusión. */
+            reasons: string[];
+            /** Format: int64 */
+            days_to_cut?: number | null;
+            /** Format: date */
+            next_cut_on?: string | null;
+            /** Format: int64 */
+            available_cents?: number | null;
+            /** Format: int64 */
+            usage_after_pct?: number | null;
+        };
+        CarryOverBody: {
+            /**
+             * Format: date
+             * @description Fecha destino; por defecto hoy en la zona del usuario.
+             */
+            to_date?: string | null;
+        };
+        CarryOverResult: {
+            /** Format: date */
+            to_date: string;
+            /** @description IDs movidos (los mismos de antes: no se crean tareas nuevas). */
+            moved: string[];
+        };
+        Category: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @description `expense | income` */
+            kind: string;
+            /** @description `consumption | debt_payment | investment | payroll | earned | financing | other_income` */
+            role: string;
+            color?: string | null;
+            /** Format: int32 */
+            position: number;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+        };
+        CategoryBody: {
+            name: string;
+            /** @description `expense | income` (no cambia al actualizar). */
+            kind: string;
+            /** @description Gasto: `consumption | debt_payment | investment | payroll`. Ingreso: `earned | financing | other_income`. */
+            role: string;
+            color?: string | null;
+            /** Format: int32 */
+            position?: number;
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        CategoryVsBudget: {
+            /** Format: uuid */
+            category_id?: string | null;
+            category_name: string;
+            /** Format: int64 */
+            spent_cents: number;
+            /** Format: int64 */
+            budget_cents?: number | null;
+            /**
+             * Format: int64
+             * @description Presupuesto − gastado (negativo = excedido).
+             */
+            remaining_cents?: number | null;
+        };
+        ClassNote: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            subject_id: string;
+            subject_name: string;
+            /** Format: date */
+            on_date: string;
+            topic: string;
+            topics_md: string;
+            questions_md: string;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ClassNoteBody: {
+            /** Format: uuid */
+            subject_id: string;
+            /** Format: date */
+            on_date?: string | null;
+            topic: string;
+            topics_md?: string;
+            questions_md?: string;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        ClassNoteDetail: {
+            note: components["schemas"]["ClassNote"];
+            /** @description Entregas/tareas relacionadas. */
+            deliverables: components["schemas"]["Task"][];
+        };
+        ConfirmBody: {
+            /** Format: int32 */
+            version: number;
+            /**
+             * Format: int64
+             * @description Corrección del monto real cobrado/recibido (centavos).
+             */
+            amount_cents?: number | null;
+            /**
+             * Format: date
+             * @description Fecha real del cargo/abono si difiere de la programada.
+             */
+            occurred_on?: string | null;
+            /** Format: uuid */
+            account_id?: string | null;
+        };
+        ContentBody: {
+            title: string;
+            idea?: string;
+            status?: string;
+            format?: string;
+            platforms?: string[];
+            pillar?: string | null;
+            /** @description Escribe hasta 10 y elige 1. */
+            hooks?: string[];
+            /** Format: int32 */
+            chosen_hook?: number | null;
+            script_hook?: string;
+            script_body?: string;
+            script_cta?: string;
+            shot_list?: components["schemas"]["ShotRow"][];
+            edit_notes?: string;
+            result_worked?: string;
+            result_change?: string;
+            /** Format: date */
+            publish_on?: string | null;
+            /** Format: date */
+            published_on?: string | null;
+            /** @description Enlace al original (Drive, etc.). No se descarga. */
+            raw_url?: string | null;
+            render_url?: string | null;
+            /** Format: int64 */
+            views?: number | null;
+            retention_pct?: string | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        ContentPiece: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            idea: string;
+            /** @description `idea | script | recorded | edited | published` */
+            status: string;
+            format: string;
+            platforms: string[];
+            pillar?: string | null;
+            /** @description Hasta 10 hooks; `chosen_hook` es el índice elegido. */
+            hooks: string[];
+            /** Format: int32 */
+            chosen_hook?: number | null;
+            script_hook: string;
+            script_body: string;
+            script_cta: string;
+            /** @description Lista de `{ "n", "shot", "text", "motion" }`. */
+            shot_list: Record<string, never>[];
+            edit_notes: string;
+            result_worked: string;
+            result_change: string;
+            /** Format: date */
+            publish_on?: string | null;
+            /** Format: date */
+            published_on?: string | null;
+            raw_url?: string | null;
+            render_url?: string | null;
+            /** Format: int64 */
+            views?: number | null;
+            retention_pct?: string | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ContentView: components["schemas"]["ContentPiece"] & {
+            /**
+             * Format: int64
+             * @description Días para publicar (negativo si ya pasó). Fórmula de Pipeline.base.
+             */
+            days_to_publish?: number | null;
+            chosen_hook_text?: string | null;
+        };
+        CreatedTransaction: {
+            transaction: components["schemas"]["Transaction"];
+            /** @description `false` si era un reintento con la misma `client_key` (no se duplicó). */
+            created: boolean;
+            /** @description Aviso para el usuario (ej. préstamo recibido = deuda). */
+            notice?: string | null;
+        };
+        CreditPlan: {
+            goal_text: string;
+            /** Format: date */
+            target_date?: string | null;
+            /** @description Lista de `{ "text": "...", "done": bool }`. */
+            steps: Record<string, never>[];
+            /** @description Lista de `{ "text": "..." }`. */
+            rules: Record<string, never>[];
+            /** Format: int32 */
+            max_usage_pct: number;
+            excluded_account_ids: string[];
+            forbid_cards_with_debt: boolean;
+            /** Format: int32 */
+            version: number;
+        };
+        DayPoint: {
+            /** Format: int32 */
+            day: number;
+            /**
+             * Format: int64
+             * @description Gasto acumulado (sin pagos de deuda) hasta ese día; `None` en días que aún no ocurren.
+             */
+            spent_cents?: number | null;
+            /**
+             * Format: int64
+             * @description Ritmo presupuestado acumulado.
+             */
+            pace_cents?: number | null;
+        };
+        DayTasks: {
+            /** Format: date */
+            date: string;
+            groups: components["schemas"]["AreaTasks"][];
+            open_count: number;
+            done_count: number;
+        };
+        Debt: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @description `credit_card | loan | family | other` */
+            kind: string;
+            /** Format: uuid */
+            account_id?: string | null;
+            /** Format: uuid */
+            person_id?: string | null;
+            /** Format: int64 */
+            principal_cents?: number | null;
+            currency: string;
+            /** Format: date */
+            opened_on: string;
+            /** @description `open | paid | cancelled` */
+            status: string;
+            /** Format: date */
+            paid_on?: string | null;
+            /** Format: uuid */
+            goal_id?: string | null;
+            notes_md: string;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        DebtBody: {
+            name: string;
+            /** @description `credit_card | loan | family | other` */
+            kind: string;
+            /**
+             * Format: uuid
+             * @description Tarjeta asociada (kind = credit_card).
+             */
+            account_id?: string | null;
+            /**
+             * Format: uuid
+             * @description Acreedor (préstamo familiar).
+             */
+            person_id?: string | null;
+            /**
+             * Format: int64
+             * @description Monto original (obligatorio salvo tarjeta, cuyo saldo se deriva de su disponible).
+             */
+            principal_cents?: number | null;
+            currency?: string | null;
+            /** Format: date */
+            opened_on: string;
+            /**
+             * Format: uuid
+             * @description Objetivo que se completa al saldarla (además de los enlaces `contributes_to`).
+             */
+            goal_id?: string | null;
+            notes_md?: string;
+            cancelled?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        DebtView: {
+            debt: components["schemas"]["Debt"];
+            /**
+             * Format: int64
+             * @description Abonos confirmados.
+             */
+            paid_cents: number;
+            /**
+             * Format: int64
+             * @description Saldo pendiente (tarjeta: límite − disponible estimado; desconocido sin snapshot).
+             */
+            remaining_cents?: number | null;
+            /** Format: date */
+            last_payment_on?: string | null;
+        };
+        DeliverableBody: {
+            title: string;
+            /** Format: date */
+            due_on?: string | null;
+            /** Format: int32 */
+            priority?: number | null;
+        };
+        /** @description Entrega visible para el usuario (sin payload). */
+        Delivery: {
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            occurrence_key: string;
+            /** @description `pending | leased | sent | failed | cancelled | expired` */
+            status: string;
+            /** Format: int32 */
+            attempts: number;
+            /** Format: date-time */
+            run_at: string;
+            /** Format: date-time */
+            sent_at?: string | null;
+            last_error?: string | null;
         };
         DevLogin: {
             /** Format: int64 */
@@ -332,6 +2469,107 @@ export interface components {
             user_id: string;
             token?: string | null;
             csrf?: string | null;
+        };
+        DevSession: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            devlog_id: string;
+            repo: string;
+            branch: string;
+            /** @example 18:30:00 */
+            at_time?: string | null;
+            changes_md: string;
+            bugs_md: string;
+            decisions_md: string;
+            next_steps_md: string;
+            raw_text?: string | null;
+            /** Format: int32 */
+            position: number;
+            /** Format: int32 */
+            version: number;
+            project_ids: string[];
+            /** Format: date-time */
+            updated_at: string;
+        };
+        Devlog: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            on_date: string;
+            summary_md: string;
+            /** Format: int32 */
+            version: number;
+            /** Format: int64 */
+            session_count: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        DevlogDay: {
+            /** Format: date */
+            date: string;
+            devlog?: components["schemas"]["Devlog"] | null;
+            sessions: components["schemas"]["DevSession"][];
+        };
+        Drawing: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** @description Escena Excalidraw (`elements`, `appState`, `files`). */
+            scene: Record<string, never>;
+            /** Format: uuid */
+            note_id?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        DrawingBody: {
+            title: string;
+            /** @description Escena Excalidraw serializada (objeto). */
+            scene?: Record<string, never>;
+            /** Format: uuid */
+            note_id?: string | null;
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        DrawingSummary: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: uuid */
+            note_id?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        EditBody: {
+            text?: string | null;
+            /** @description Propuesta editada por el usuario (se guarda como `manual`). */
+            proposal?: Record<string, never> | null;
+            /** Format: int32 */
+            version: number;
+        };
+        EntityLinks: {
+            links: components["schemas"]["LinkView"][];
+            backlinks: components["schemas"]["LinkView"][];
+        };
+        EntityRef: {
+            entity_type: string;
+            /** Format: uuid */
+            entity_id: string;
+            title?: string | null;
+            /** Format: date */
+            on_date?: string | null;
+            status?: string | null;
+            /** Format: date-time */
+            at: string;
         };
         ErrorBody: {
             error: components["schemas"]["ErrorDetail"];
@@ -348,6 +2586,115 @@ export interface components {
             /** @description En `conflict`: estado actual del recurso para resolver explícitamente. */
             current?: Record<string, never> | null;
         };
+        EventBody: {
+            /** Format: date */
+            on_date: string;
+            title: string;
+            /** @description Hora local `HH:MM` (zona del usuario). */
+            start_time?: string | null;
+            end_time?: string | null;
+            all_day?: boolean;
+            location?: string | null;
+        };
+        FinanceDashboard: {
+            month: string;
+            /** Format: date */
+            today: string;
+            /** Format: int32 */
+            days_in_month: number;
+            /** Format: int32 */
+            days_elapsed: number;
+            totals: components["schemas"]["FlowTotals"];
+            /**
+             * Format: int64
+             * @description Gasto del mes sin pagos de deuda (equivale al "gastado" del vault).
+             */
+            spent_cents: number;
+            /** Format: int64 */
+            spending_cap_cents: number;
+            /** @description El presupuesto mostrado es una propuesta copiada del mes anterior (aún sin snapshot propio). */
+            budget_is_proposal: boolean;
+            /**
+             * Format: int64
+             * @description Tope − gastado (negativo = excedido).
+             */
+            budget_remaining_cents: number;
+            by_category: components["schemas"]["CategoryVsBudget"][];
+            daily: components["schemas"]["DayPoint"][];
+            /**
+             * Format: int64
+             * @description Proyección (estimación): variable/días transcurridos × días del mes + suscripciones previstas del mes.
+             */
+            projection_cents: number;
+            /** Format: int64 */
+            variable_spent_cents: number;
+            /** Format: int64 */
+            subscriptions_month_cents: number;
+            income: components["schemas"]["IncomeStatus"];
+            occurrences: components["schemas"]["OccurrenceView"][];
+            last_six_months: components["schemas"]["MonthSummary"][];
+            history: components["schemas"]["MonthSummary"][];
+            top_expenses: components["schemas"]["ReportRow"][];
+            by_project: components["schemas"]["ProjectSpend"][];
+            accounts: components["schemas"]["AccountsSummary"];
+        };
+        FlowTotals: {
+            /**
+             * Format: int64
+             * @description Consumo: una sola vez aunque se pague con tarjeta o lo financie otra persona.
+             */
+            consumption_cents: number;
+            /**
+             * Format: int64
+             * @description Pagos de tarjeta y abonos a deudas (no son consumo).
+             */
+            debt_payments_cents: number;
+            /** Format: int64 */
+            earned_income_cents: number;
+            /** Format: int64 */
+            other_income_cents: number;
+            /**
+             * Format: int64
+             * @description Préstamos recibidos (no son ingreso ganado).
+             */
+            financing_cents: number;
+            /** Format: int64 */
+            investment_cents: number;
+            /** Format: int64 */
+            cash_in_cents: number;
+            /** Format: int64 */
+            cash_out_cents: number;
+            /**
+             * Format: int64
+             * @description Ingreso ganado − consumo (neto corregido, C3).
+             */
+            consumption_net_cents: number;
+            /**
+             * Format: int64
+             * @description Entradas − salidas de cuentas de efectivo/débito.
+             */
+            cash_net_cents: number;
+            /**
+             * Format: int64
+             * @description Movimientos en otra moneda sin conversión, excluidos de los totales.
+             */
+            excluded_foreign_count: number;
+        };
+        FxBody: {
+            /**
+             * Format: int64
+             * @description Monto original en centavos de `currency` (o `amount` en texto).
+             */
+            amount_cents?: number | null;
+            amount?: string | null;
+            currency: string;
+            /** @description Tasa explícita: unidades de moneda base por 1 unidad original (ej. "17.2345"). No se inventan cotizaciones. */
+            fx_rate: string;
+            /** Format: date */
+            fx_date: string;
+            /** @description Fuente de la tasa (banco, app, Banxico…). */
+            fx_source: string;
+        };
         Identity: {
             /** Format: uuid */
             id: string;
@@ -361,6 +2708,162 @@ export interface components {
             first_name?: string | null;
             last_name?: string | null;
         };
+        ImportBody: {
+            /** @description Texto pegado (resumen de sesión al estilo /log-session). Se trata como datos. */
+            text: string;
+            /**
+             * Format: date
+             * @description Fecha del devlog (por defecto hoy).
+             */
+            date?: string | null;
+        };
+        ImportPreview: {
+            parsed: components["schemas"]["ParsedSessionDto"];
+            /** @description Proyectos reconocidos por slug. */
+            project_ids: string[];
+            /** @description Slugs mencionados que no existen (no se crean). */
+            unknown_projects: string[];
+        };
+        InboxAction: {
+            title: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** Format: date */
+            planned_on?: string | null;
+            /** Format: date */
+            due_on?: string | null;
+            /** Format: int32 */
+            priority?: number | null;
+            notes_md?: string;
+            /** @enum {string} */
+            type: "task";
+        } | {
+            title: string;
+            body_md?: string;
+            tags?: string[];
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** @enum {string} */
+            type: "note";
+        } | {
+            name: string;
+            aliases?: string[];
+            /** Format: uuid */
+            area_id?: string | null;
+            context_md?: string;
+            /** @enum {string} */
+            type: "person";
+        } | {
+            /** @enum {string} */
+            type: "discard";
+        } | {
+            /** @enum {string} */
+            type: "archive";
+        };
+        InboxItem: {
+            /** Format: uuid */
+            id: string;
+            text: string;
+            /** @description `app | telegram | import` */
+            source: string;
+            /** @description `pending | processed | discarded | archived` */
+            status: string;
+            /** Format: date-time */
+            captured_at: string;
+            /** @description Propuesta revisable `{destination, title, area_slug, reason, …}`. */
+            proposal?: Record<string, never> | null;
+            proposal_source?: string | null;
+            /** Format: date-time */
+            processed_at?: string | null;
+            result_type?: string | null;
+            /** Format: uuid */
+            result_id?: string | null;
+            client_id?: string | null;
+            /** Format: int32 */
+            version: number;
+        };
+        IncomeStatus: {
+            /**
+             * Format: int64
+             * @description Ingresos confirmados del mes (manuales + ocurrencias conciliadas).
+             */
+            confirmed_cents: number;
+            /**
+             * Format: int64
+             * @description Ocurrencias de ingresos fijos registradas pero sin conciliar.
+             */
+            pending_cents: number;
+            /**
+             * Format: int64
+             * @description Ingresos fijos que aún no se registran este mes.
+             */
+            projected_cents: number;
+            /**
+             * Format: int64
+             * @description Esperado del mes por ingresos fijos (pendientes + proyectados + conciliados de reglas).
+             */
+            expected_fixed_cents: number;
+            /**
+             * Format: int64
+             * @description Esperado − presupuesto total (lo que planeo que me quede).
+             */
+            expected_minus_budget_cents: number;
+        };
+        Interaction: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            person_id: string;
+            person_name: string;
+            /** Format: date */
+            on_date: string;
+            topic: string;
+            /** @description `manual | calendar | gmail | bot | import` */
+            source: string;
+            source_ref?: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        InteractionBody: {
+            /** Format: date */
+            on_date?: string | null;
+            topic?: string;
+            /** @description `manual` (por defecto), `calendar`, `gmail`, `bot`, `import`. */
+            source?: string | null;
+            /** @description Referencia externa (id de evento/correo) para no duplicar. */
+            source_ref?: string | null;
+        };
+        LinkBody: {
+            src_type: string;
+            /** Format: uuid */
+            src_id: string;
+            dst_type: string;
+            /** Format: uuid */
+            dst_id: string;
+            /** @description `related` (por defecto) o `contributes_to` (aporte explícito a un objetivo). */
+            relation?: string | null;
+        };
+        LinkView: {
+            src_type: string;
+            /** Format: uuid */
+            src_id: string;
+            dst_type: string;
+            /** Format: uuid */
+            dst_id: string;
+            relation: string;
+            /** @description Título del otro extremo (desde el índice de búsqueda). */
+            other_title?: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        MaterializeResult: {
+            /** Format: int32 */
+            created: number;
+        };
         Me: {
             user: components["schemas"]["User"];
             identities: components["schemas"]["Identity"][];
@@ -371,6 +2874,294 @@ export interface components {
         MiniAppLogin: {
             /** @description `Telegram.WebApp.initData` sin modificar. */
             init_data: string;
+        };
+        MonthSummary: {
+            month: string;
+            /** Format: int64 */
+            spending_cap_cents?: number | null;
+            /**
+             * Format: int64
+             * @description Gasto sin pagos de deuda.
+             */
+            spent_cents: number;
+            /** Format: int64 */
+            consumption_cents: number;
+            /** Format: int64 */
+            earned_income_cents: number;
+            /** Format: int64 */
+            consumption_net_cents: number;
+        };
+        Note: {
+            /** Format: uuid */
+            id: string;
+            /** @description `note | runbook | til | snippet` */
+            kind: string;
+            title: string;
+            body_md: string;
+            /** @description Lenguaje del snippet (texto; nunca se ejecuta). */
+            language?: string | null;
+            aliases: string[];
+            tags: string[];
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            metadata: Record<string, never>;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        NoteBody: {
+            /**
+             * Format: date
+             * @description Por defecto hoy.
+             */
+            on_date?: string | null;
+            text: string;
+        };
+        NoteDetail: {
+            note: components["schemas"]["Note"];
+            links: components["schemas"]["LinkView"][];
+            backlinks: components["schemas"]["LinkView"][];
+            favorite: boolean;
+        };
+        OccurrenceView: {
+            /** Format: uuid */
+            rule_id: string;
+            rule_name: string;
+            /** @description `subscription | fixed_income` */
+            kind: string;
+            /** Format: date */
+            date: string;
+            /** Format: int64 */
+            amount_cents: number;
+            /** @description `pending` (registrada, pendiente de conciliar) | `confirmed` | `void` | `projected` (aún no registrada). */
+            state: string;
+            /** Format: uuid */
+            transaction_id?: string | null;
+            /** Format: int32 */
+            transaction_version?: number | null;
+        };
+        Page_Note: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                /** @description `note | runbook | til | snippet` */
+                kind: string;
+                title: string;
+                body_md: string;
+                /** @description Lenguaje del snippet (texto; nunca se ejecuta). */
+                language?: string | null;
+                aliases: string[];
+                tags: string[];
+                /** Format: uuid */
+                area_id?: string | null;
+                /** Format: uuid */
+                project_id?: string | null;
+                metadata: Record<string, never>;
+                /** Format: date-time */
+                archived_at?: string | null;
+                /** Format: int32 */
+                version: number;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: date-time */
+                updated_at: string;
+            }[];
+            /** Format: int64 */
+            total: number;
+            /** Format: int64 */
+            limit: number;
+            /** Format: int64 */
+            offset: number;
+        };
+        Page_Task: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                title: string;
+                notes_md: string;
+                /** Format: uuid */
+                area_id?: string | null;
+                /** Format: uuid */
+                project_id?: string | null;
+                /** @description `open | done | cancelled` */
+                status: string;
+                /** Format: int32 */
+                priority?: number | null;
+                /** Format: date */
+                due_on?: string | null;
+                /** Format: date */
+                planned_on?: string | null;
+                /** Format: date-time */
+                done_at?: string | null;
+                /** Format: uuid */
+                recurrence_rule_id?: string | null;
+                recurrence_period?: string | null;
+                /** Format: uuid */
+                class_note_id?: string | null;
+                external_source?: string | null;
+                external_id?: string | null;
+                external_url?: string | null;
+                external_status?: string | null;
+                /** @description `open | need_info | closed` */
+                external_status_category?: string | null;
+                external_priority?: string | null;
+                ease_hint?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                /** Format: int32 */
+                version: number;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: date-time */
+                updated_at: string;
+                /** @description Personas relacionadas (task_people). */
+                person_ids: string[];
+            }[];
+            /** Format: int64 */
+            total: number;
+            /** Format: int64 */
+            limit: number;
+            /** Format: int64 */
+            offset: number;
+        };
+        ParsedSessionDto: {
+            repo: string;
+            branch: string;
+            at_time?: string | null;
+            changes_md: string;
+            bugs_md: string;
+            decisions_md: string;
+            next_steps_md: string;
+            project_slugs: string[];
+        };
+        PauseBody: {
+            /**
+             * Format: int64
+             * @description Días de pausa (1–365). Sin valor: pausa indefinida hasta reanudar.
+             */
+            days?: number | null;
+        };
+        PeopleGroup: {
+            /** Format: uuid */
+            area_id?: string | null;
+            area_name: string;
+            people: components["schemas"]["PersonView"][];
+        };
+        Person: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            aliases: string[];
+            /** Format: uuid */
+            area_id?: string | null;
+            /** @description `jefe | subordinado | compañero | cliente | familia | pareja | amigo | otro` */
+            relationship?: string | null;
+            org?: string | null;
+            role?: string | null;
+            contact?: string | null;
+            email?: string | null;
+            context_md: string;
+            /** Format: int32 */
+            birthday_month?: number | null;
+            /** Format: int32 */
+            birthday_day?: number | null;
+            /** Format: int32 */
+            birthday_year?: number | null;
+            /** Format: date */
+            last_contact_on?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        PersonBody: {
+            name: string;
+            aliases?: string[];
+            /** Format: uuid */
+            area_id?: string | null;
+            relationship?: string | null;
+            org?: string | null;
+            role?: string | null;
+            contact?: string | null;
+            email?: string | null;
+            context_md?: string;
+            /** @description `YYYY-MM-DD` o `MM-DD` (sin año). */
+            birthday?: string | null;
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        PersonDetail: {
+            person: components["schemas"]["PersonView"];
+            notes: components["schemas"]["PersonNote"][];
+            interactions: components["schemas"]["Interaction"][];
+        };
+        PersonNote: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            person_id: string;
+            /** Format: date */
+            on_date: string;
+            text: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        PersonSuggestion: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            email?: string | null;
+            /** @description `calendar | gmail | dictation | import` */
+            source: string;
+            source_ref: string;
+            /** Format: date */
+            on_date?: string | null;
+            context: string;
+            /** @description `pending | accepted | dismissed` */
+            status: string;
+            /** Format: uuid */
+            person_id?: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        PersonView: components["schemas"]["Person"] & {
+            /**
+             * Format: int64
+             * @description Días sin hablar (fórmula de Personas.base).
+             */
+            days_since_contact?: number | null;
+            /** Format: date */
+            next_birthday?: string | null;
+            /** Format: int64 */
+            days_to_birthday?: number | null;
+            /**
+             * Format: int32
+             * @description Años que cumple, si se conoce el año.
+             */
+            turning?: number | null;
+        };
+        PlanBody: {
+            /** Format: int32 */
+            version: number;
+            goal_text?: string;
+            /** Format: date */
+            target_date?: string | null;
+            steps?: Record<string, never>[];
+            rules?: Record<string, never>[];
+            /** Format: int32 */
+            max_usage_pct: number;
+            excluded_account_ids?: string[];
+            forbid_cards_with_debt?: boolean;
         };
         Project: {
             /** Format: uuid */
@@ -404,6 +3195,206 @@ export interface components {
             links?: Record<string, never>[];
             notes_md?: string;
             archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        ProjectExpense: components["schemas"]["ReportRow"] & {
+            /**
+             * Format: uuid
+             * @description Rubro asignado: explícito o sugerido por palabra clave.
+             */
+            rubro_id?: string | null;
+            rubro_name: string;
+            /** @description `explicit | keyword | none` */
+            rubro_source: string;
+        };
+        ProjectMonth: {
+            month: string;
+            /** Format: int64 */
+            spent_cents: number;
+            /** Format: int64 */
+            budget_cents?: number | null;
+        };
+        ProjectReport: {
+            /** Format: uuid */
+            project_id: string;
+            project_name: string;
+            month: string;
+            rubros: components["schemas"]["RubroSpend"][];
+            /** Format: int64 */
+            spent_cents: number;
+            /** Format: int64 */
+            budget_cents: number;
+            /** @description Avisos (ej. el desglose no suma lo mismo que la categoría del mes). */
+            warnings: string[];
+            expenses: components["schemas"]["ProjectExpense"][];
+            by_month: components["schemas"]["ProjectMonth"][];
+            subscriptions: components["schemas"]["ProjectSubscription"][];
+            /** Format: int64 */
+            subscriptions_month_cents: number;
+        };
+        ProjectSpend: {
+            /** Format: uuid */
+            project_id: string;
+            project_name: string;
+            /** Format: int64 */
+            spent_cents: number;
+        };
+        ProjectSubscription: {
+            /** Format: uuid */
+            rule_id: string;
+            name: string;
+            /** Format: int64 */
+            amount_cents: number;
+        };
+        ProjectsView: {
+            /** @description "Dev reciente" (excluye devocionales, clases, objetivos y finanzas). */
+            recent: components["schemas"]["ActivityItem"][];
+            adrs: components["schemas"]["Adr"][];
+        };
+        RecurrenceRule: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** @description `day | last | penultimate` */
+            day_kind: string;
+            /** Format: int32 */
+            day?: number | null;
+            active: boolean;
+            /** Format: date */
+            starts_on: string;
+            /** Format: int32 */
+            version: number;
+        };
+        RecurringRule: {
+            /** Format: uuid */
+            id: string;
+            /** @description `subscription | fixed_income` */
+            kind: string;
+            name: string;
+            /** Format: int64 */
+            amount_cents: number;
+            currency: string;
+            /** @description `day | last | penultimate` */
+            day_kind: string;
+            /** Format: int32 */
+            day?: number | null;
+            /** Format: uuid */
+            category_id?: string | null;
+            /** Format: uuid */
+            account_id?: string | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** @description `active | cancelled | ended` */
+            status: string;
+            /** Format: date */
+            starts_on: string;
+            /** Format: date */
+            ends_on?: string | null;
+            notes_md: string;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ReminderStatus: {
+            paused: boolean;
+            /** Format: date-time */
+            paused_until?: string | null;
+            /** @description El bot conoce tu chat privado (enviaste /start). */
+            chat_known: boolean;
+            /** @description Telegram acepta mensajes del bot (no bloqueado). */
+            can_message: boolean;
+            last_error?: string | null;
+            timezone: string;
+            upcoming: components["schemas"]["UpcomingReminder"][];
+            /** @description Últimas entregas: `sent | failed | cancelled | expired | pending | leased`. */
+            recent: components["schemas"]["Delivery"][];
+        };
+        /** @description Gasto/ingreso confirmado para reportes (categoría, proyecto, rubro y si viene de una suscripción). */
+        ReportRow: {
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            /** Format: date */
+            occurred_on: string;
+            concept: string;
+            /** Format: int64 */
+            amount_cents: number;
+            /** Format: uuid */
+            category_id?: string | null;
+            category_name?: string | null;
+            role?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** Format: uuid */
+            budget_item_id?: string | null;
+            from_subscription: boolean;
+        };
+        RubroSpend: {
+            /** Format: uuid */
+            budget_item_id?: string | null;
+            /** @description Nombre del rubro o "Sin rubro". */
+            name: string;
+            /** Format: int64 */
+            budget_cents?: number | null;
+            /** Format: int64 */
+            spent_cents: number;
+            /** Format: int64 */
+            remaining_cents?: number | null;
+        };
+        RuleBody: {
+            title: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** @description `day` (con `day` 1–31), `last` o `penultimate`. */
+            day_kind: string;
+            /** Format: int32 */
+            day?: number | null;
+            active?: boolean;
+            /**
+             * Format: date
+             * @description Por defecto hoy: no se generan ocurrencias anteriores a la creación.
+             */
+            starts_on?: string | null;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        SearchHit: {
+            entity_type: string;
+            /** Format: uuid */
+            entity_id: string;
+            title: string;
+            /** @description Fragmento del cuerpo (texto plano). */
+            snippet: string;
+            tags: string[];
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: date */
+            on_date?: string | null;
+            status?: string | null;
+            archived: boolean;
+            /** Format: float */
+            rank: number;
+        };
+        SessionBody: {
+            repo?: string;
+            branch?: string;
+            /** @description `HH:MM` */
+            at_time?: string | null;
+            changes_md?: string;
+            bugs_md?: string;
+            decisions_md?: string;
+            next_steps_md?: string;
+            project_ids?: string[];
             /** Format: int32 */
             version?: number | null;
         };
@@ -442,12 +3433,357 @@ export interface components {
             paused_until?: string | null;
             onboarding_completed?: boolean | null;
         };
+        ShotRow: {
+            /** Format: int32 */
+            n?: number | null;
+            shot?: string;
+            text?: string;
+            motion?: string;
+        };
+        SnapshotBody: {
+            /**
+             * Format: int64
+             * @description Débito: saldo actual. Tarjeta: crédito disponible que muestra la app del banco. Centavos.
+             */
+            balance_cents?: number | null;
+            /** @description Alternativa en texto (`"4,500.50"`). */
+            balance?: string | null;
+            /**
+             * Format: date-time
+             * @description Momento de la observación; por defecto, ahora.
+             */
+            observed_at?: string | null;
+            /**
+             * Format: date
+             * @description Solo semánticas legacy del vault: fecha base (`actualizado`).
+             */
+            observed_on?: string | null;
+            /** @description `instant` (por defecto) | `legacy_day_start_inclusive` (cuentas del vault) | `legacy_after_day` (tarjetas del vault). */
+            semantics?: string | null;
+            note?: string;
+        };
+        Subject: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: int64 */
+            note_count: number;
+        };
+        SubjectBody: {
+            name: string;
+            /**
+             * Format: uuid
+             * @description Por defecto el área con slug `escuela` si existe.
+             */
+            area_id?: string | null;
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        SuggestionBody: {
+            name: string;
+            email?: string | null;
+            /** @description `calendar | gmail | dictation | import` */
+            source: string;
+            source_ref: string;
+            /** Format: date */
+            on_date?: string | null;
+            context?: string;
+        };
+        SummaryBody: {
+            summary_md: string;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        SwipeBody: {
+            title?: string;
+            url: string;
+            creator?: string | null;
+            platform?: string | null;
+            why_it_works?: string;
+            hook?: string;
+            tags?: string[];
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        SwipeRef: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            url: string;
+            creator?: string | null;
+            platform?: string | null;
+            why_it_works: string;
+            /** @description Hook transcrito. */
+            hook: string;
+            tags: string[];
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        TagCount: {
+            tag: string;
+            /** Format: int64 */
+            count: number;
+        };
+        Task: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            notes_md: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** @description `open | done | cancelled` */
+            status: string;
+            /** Format: int32 */
+            priority?: number | null;
+            /** Format: date */
+            due_on?: string | null;
+            /** Format: date */
+            planned_on?: string | null;
+            /** Format: date-time */
+            done_at?: string | null;
+            /** Format: uuid */
+            recurrence_rule_id?: string | null;
+            recurrence_period?: string | null;
+            /** Format: uuid */
+            class_note_id?: string | null;
+            external_source?: string | null;
+            external_id?: string | null;
+            external_url?: string | null;
+            external_status?: string | null;
+            /** @description `open | need_info | closed` */
+            external_status_category?: string | null;
+            external_priority?: string | null;
+            ease_hint?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** @description Personas relacionadas (task_people). */
+            person_ids: string[];
+        };
+        TaskBody: {
+            title: string;
+            notes_md?: string;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /**
+             * Format: int32
+             * @description 1 (alta) a 4 (baja).
+             */
+            priority?: number | null;
+            /** Format: date */
+            due_on?: string | null;
+            /**
+             * Format: date
+             * @description Día en que aparece en la daily; las abiertas se arrastran sin duplicarse.
+             */
+            planned_on?: string | null;
+            /** Format: uuid */
+            class_note_id?: string | null;
+            person_ids?: string[];
+            archived?: boolean;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        TaskDetail: {
+            task: components["schemas"]["Task"];
+            events: components["schemas"]["TaskEvent"][];
+        };
+        TaskEvent: {
+            /** Format: int64 */
+            id: number;
+            /** Format: date-time */
+            at: string;
+            /** @description `created | carried_over | completed | reopened | edited | cancelled | external_sync` */
+            kind: string;
+            /** Format: date */
+            from_date?: string | null;
+            /** Format: date */
+            to_date?: string | null;
+            data: Record<string, never>;
+        };
         TelegramStatus: {
             /** @description El bot conoce el chat privado (el usuario envió /start). */
             chat_known: boolean;
             can_message: boolean;
             bot_username?: string | null;
             last_error?: string | null;
+        };
+        Transaction: {
+            /** Format: uuid */
+            id: string;
+            /** @description `expense | income | transfer | card_payment | debt_payment | loan_received | adjustment` */
+            kind: string;
+            /** @description `confirmed | pending_reconciliation | void` */
+            status: string;
+            /** @description `manual | recurring | import | llm | bot` */
+            origin: string;
+            /** Format: date */
+            occurred_on: string;
+            /** Format: date-time */
+            occurred_at?: string | null;
+            concept: string;
+            /** Format: int64 */
+            amount_cents: number;
+            currency: string;
+            /** Format: int64 */
+            original_amount_cents?: number | null;
+            original_currency?: string | null;
+            fx_rate?: string | null;
+            /** Format: date */
+            fx_date?: string | null;
+            fx_source?: string | null;
+            /** Format: uuid */
+            category_id?: string | null;
+            /** Format: uuid */
+            account_id?: string | null;
+            /** Format: uuid */
+            counter_account_id?: string | null;
+            /** Format: uuid */
+            debt_id?: string | null;
+            /** Format: uuid */
+            person_id?: string | null;
+            /** Format: uuid */
+            financed_by_person_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            /** Format: uuid */
+            budget_item_id?: string | null;
+            /** Format: uuid */
+            recurring_rule_id?: string | null;
+            recurrence_period?: string | null;
+            idempotency_key?: string | null;
+            /** Format: int32 */
+            adjustment_sign?: number | null;
+            notes_md: string;
+            /** Format: date-time */
+            confirmed_at?: string | null;
+            /** Format: int32 */
+            version: number;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        TxBody: {
+            /** @description `expense | income | transfer | card_payment | debt_payment | loan_received | adjustment` */
+            kind: string;
+            /**
+             * Format: date
+             * @description Fecha real del movimiento (local).
+             */
+            occurred_on: string;
+            /** Format: date-time */
+            occurred_at?: string | null;
+            concept: string;
+            /**
+             * Format: int64
+             * @description Centavos exactos; alternativa: `amount` en texto (`"1,250.50"`).
+             */
+            amount_cents?: number | null;
+            amount?: string | null;
+            /** @description Moneda del monto si no se da conversión; por defecto la base del usuario. */
+            currency?: string | null;
+            original?: components["schemas"]["FxBody"] | null;
+            /** Format: uuid */
+            category_id?: string | null;
+            /**
+             * Format: uuid
+             * @description Cuenta/tarjeta que paga (gasto), recibe (ingreso), origen (transferencia/pago).
+             */
+            account_id?: string | null;
+            /**
+             * Format: uuid
+             * @description Destino de transferencia o tarjeta que recibe un pago.
+             */
+            counter_account_id?: string | null;
+            /** Format: uuid */
+            debt_id?: string | null;
+            /** Format: uuid */
+            person_id?: string | null;
+            /**
+             * Format: uuid
+             * @description Gasto pagado por otra persona (préstamo familiar): cuenta como consumo una sola vez.
+             */
+            financed_by_person_id?: string | null;
+            /** Format: uuid */
+            project_id?: string | null;
+            /** Format: uuid */
+            area_id?: string | null;
+            /**
+             * Format: uuid
+             * @description Rubro explícito del presupuesto del proyecto (prevalece sobre palabras clave).
+             */
+            budget_item_id?: string | null;
+            /**
+             * Format: int32
+             * @description `adjustment`: 1 suma, -1 resta.
+             */
+            adjustment_sign?: number | null;
+            notes_md?: string;
+            /** @description Clave única del cliente para reintentos/sincronización offline. */
+            client_key?: string | null;
+            /** @description `loan_received`: crear también la deuda correspondiente. */
+            track_as_debt?: boolean;
+            /** @description `manual` (defecto) | `bot` | `llm` | `import`. */
+            origin?: string | null;
+            /** Format: int32 */
+            version?: number | null;
+        };
+        TxPage: {
+            items: components["schemas"]["Transaction"][];
+            /** Format: int64 */
+            total: number;
+            /** Format: int64 */
+            limit: number;
+            /** Format: int64 */
+            offset: number;
+            /** @description Totales del filtro (confirmados en moneda base; pendientes y otra moneda aparte). */
+            totals: components["schemas"]["TxTotals"];
+        };
+        /** @description Totales de una lista filtrada (confirmados en la moneda base; pendientes aparte). */
+        TxTotals: {
+            /** Format: int64 */
+            count: number;
+            /** Format: int64 */
+            expense_cents: number;
+            /** Format: int64 */
+            income_cents: number;
+            /** Format: int64 */
+            pending_cents: number;
+            /** Format: int64 */
+            foreign_count: number;
+        };
+        UpcomingReminder: {
+            /** @description `daily | weekly | monthly` */
+            kind: string;
+            occurrence_key: string;
+            /** Format: date */
+            local_date: string;
+            /** Format: date-time */
+            run_at: string;
         };
         User: {
             /** Format: uuid */
@@ -494,6 +3830,13 @@ export interface components {
             /** Format: int32 */
             version: number;
         };
+        VersionBody: {
+            /**
+             * Format: int32
+             * @description Opcional: si se envía, se valida contra la versión actual.
+             */
+            version?: number | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -519,6 +3862,282 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ActivityItem"][];
                 };
+            };
+        };
+    };
+    list_adrs: {
+        parameters: {
+            query?: {
+                project_id?: string | null;
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Adr"][];
+                };
+            };
+        };
+    };
+    create_adr: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdrBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Adr"];
+                };
+            };
+        };
+    };
+    get_adr: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Adr"];
+                };
+            };
+        };
+    };
+    update_adr: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdrBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Adr"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_range: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarEvent"][];
+                };
+            };
+        };
+    };
+    create_event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EventBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarEvent"];
+                };
+            };
+        };
+    };
+    day_agenda: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarEvent"][];
+                };
+            };
+        };
+    };
+    update_event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EventBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarEvent"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    delete_event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_archived: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntityRef"][];
+                };
+            };
+        };
+    };
+    archive_entity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity_type: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    restore_entity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity_type: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -789,6 +4408,1748 @@ export interface operations {
             };
         };
     };
+    list_class_notes: {
+        parameters: {
+            query?: {
+                subject_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassNote"][];
+                };
+            };
+        };
+    };
+    create_class_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClassNoteBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassNote"];
+                };
+            };
+        };
+    };
+    get_class_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassNoteDetail"];
+                };
+            };
+        };
+    };
+    update_class_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClassNoteBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassNote"];
+                };
+            };
+        };
+    };
+    add_deliverable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeliverableBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+        };
+    };
+    list_content: {
+        parameters: {
+            query?: {
+                status?: string | null;
+                q?: string | null;
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentView"][];
+                };
+            };
+        };
+    };
+    create_content: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContentBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentPiece"];
+                };
+            };
+        };
+    };
+    content_ai_context: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiContentContext"];
+                };
+            };
+        };
+    };
+    content_board: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardColumn"][];
+                };
+            };
+        };
+    };
+    content_published: {
+        parameters: {
+            query?: {
+                /** @description `views` (por defecto) o `retention`. */
+                sort?: string | null;
+                limit?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentPiece"][];
+                };
+            };
+        };
+    };
+    get_content: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentView"];
+                };
+            };
+        };
+    };
+    update_content: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContentBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentPiece"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update_session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevSession"];
+                };
+            };
+        };
+    };
+    delete_session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_devlogs: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Devlog"][];
+                };
+            };
+        };
+    };
+    import_text: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevSession"];
+                };
+            };
+        };
+    };
+    preview_import: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportPreview"];
+                };
+            };
+        };
+    };
+    get_devlog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevlogDay"];
+                };
+            };
+        };
+    };
+    set_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SummaryBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Devlog"];
+                };
+            };
+        };
+    };
+    add_session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevSession"];
+                };
+            };
+        };
+    };
+    list_drawings: {
+        parameters: {
+            query?: {
+                note_id?: string | null;
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DrawingSummary"][];
+                };
+            };
+        };
+    };
+    create_drawing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DrawingBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Drawing"];
+                };
+            };
+        };
+    };
+    get_drawing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Drawing"];
+                };
+            };
+        };
+    };
+    update_drawing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DrawingBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Drawing"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_favorites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntityRef"][];
+                };
+            };
+        };
+    };
+    add_favorite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity_type: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    remove_favorite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity_type: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_accounts: {
+        parameters: {
+            query?: {
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountView"][];
+                };
+            };
+        };
+    };
+    create_account: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountView"];
+                };
+            };
+        };
+    };
+    get_account: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountView"];
+                };
+            };
+        };
+    };
+    update_account: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountView"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_snapshots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BalanceSnapshot"][];
+                };
+            };
+        };
+    };
+    add_snapshot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SnapshotBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountView"];
+                };
+            };
+        };
+    };
+    get_budget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description YYYY-MM */
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetView"];
+                };
+            };
+        };
+    };
+    put_budget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description YYYY-MM */
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BudgetBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetView"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    card_suggestion: {
+        parameters: {
+            query?: {
+                /** @description Fecha local (por defecto, hoy). */
+                date?: string | null;
+                /** @description Gasto planeado en centavos. Sin monto la sugerencia es provisional. */
+                amount_cents?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CardSuggestionView"];
+                };
+            };
+        };
+    };
+    list_categories: {
+        parameters: {
+            query?: {
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Category"][];
+                };
+            };
+        };
+    };
+    create_category: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CategoryBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Category"];
+                };
+            };
+        };
+    };
+    update_category: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CategoryBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Category"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    get_plan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditPlan"];
+                };
+            };
+        };
+    };
+    put_plan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditPlan"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    dashboard: {
+        parameters: {
+            query?: {
+                /** @description `YYYY-MM` (por defecto, mes actual). */
+                month?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FinanceDashboard"];
+                };
+            };
+        };
+    };
+    list_debts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebtView"][];
+                };
+            };
+        };
+    };
+    create_debt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DebtBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebtView"];
+                };
+            };
+        };
+    };
+    get_debt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebtView"];
+                };
+            };
+        };
+    };
+    update_debt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DebtBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebtView"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    project_report: {
+        parameters: {
+            query?: {
+                /** @description `YYYY-MM` (por defecto, mes actual). */
+                month?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectReport"];
+                };
+            };
+        };
+    };
+    list_rules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurringRule"][];
+                };
+            };
+        };
+    };
+    create_rule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuleBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurringRule"];
+                };
+            };
+        };
+    };
+    materialize: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MaterializeResult"];
+                };
+            };
+        };
+    };
+    occurrences: {
+        parameters: {
+            query?: {
+                /** @description `YYYY-MM` (por defecto, mes actual). */
+                month?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OccurrenceView"][];
+                };
+            };
+        };
+    };
+    get_rule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurringRule"];
+                };
+            };
+        };
+    };
+    update_rule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuleBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurringRule"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_transactions: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+                kind?: string | null;
+                /** @description `confirmed | pending_reconciliation | void` (por defecto, todos menos anulados). */
+                status?: string | null;
+                category_id?: string | null;
+                account_id?: string | null;
+                project_id?: string | null;
+                person_id?: string | null;
+                debt_id?: string | null;
+                q?: string | null;
+                /** @description `date_desc` | `date_asc` | `amount_desc` | `amount_asc` */
+                sort?: string | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TxPage"];
+                };
+            };
+        };
+    };
+    create_transaction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TxBody"];
+            };
+        };
+        responses: {
+            /** @description reintento: ya existía */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedTransaction"];
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedTransaction"];
+                };
+            };
+        };
+    };
+    create_batch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchResult"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    get_transaction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Transaction"];
+                };
+            };
+        };
+    };
+    update_transaction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TxBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Transaction"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    confirm_transaction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Transaction"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    void_transaction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Transaction"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_inbox: {
+        parameters: {
+            query?: {
+                /** @description `pending` (por defecto), `processed`, `discarded`, `archived`, `all`. */
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxItem"][];
+                };
+            };
+        };
+    };
+    capture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaptureBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxItem"];
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxItem"];
+                };
+            };
+        };
+    };
+    edit_item: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxItem"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    apply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplyResult"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    propose: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxItem"];
+                };
+            };
+        };
+    };
+    reopen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxItem"];
+                };
+            };
+        };
+    };
+    list_interactions: {
+        parameters: {
+            query?: {
+                /** @description Fecha (sección "Personas" de la daily). */
+                date?: string | null;
+                person_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Interaction"][];
+                };
+            };
+        };
+    };
+    delete_interaction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_links: {
+        parameters: {
+            query: {
+                type: string;
+                id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntityLinks"];
+                };
+            };
+        };
+    };
+    add_link: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkBody"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    remove_link: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkBody"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     me: {
         parameters: {
             query?: never;
@@ -813,6 +6174,435 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
+            };
+        };
+    };
+    list_notes: {
+        parameters: {
+            query?: {
+                kind?: string | null;
+                tag?: string | null;
+                area_id?: string | null;
+                project_id?: string | null;
+                q?: string | null;
+                /** @description `true`: solo archivadas (para recuperarlas). */
+                archived?: boolean | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_Note"];
+                };
+            };
+        };
+    };
+    create_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Note"];
+                };
+            };
+        };
+    };
+    get_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NoteDetail"];
+                };
+            };
+        };
+    };
+    update_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Note"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_people: {
+        parameters: {
+            query?: {
+                /** @description Nombre o alias (sin acentos). */
+                q?: string | null;
+                area_id?: string | null;
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonView"][];
+                };
+            };
+        };
+    };
+    create_person: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"];
+                };
+            };
+        };
+    };
+    upcoming_birthdays: {
+        parameters: {
+            query?: {
+                /** @description Ventana en días (por defecto 30). */
+                days?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonView"][];
+                };
+            };
+        };
+    };
+    people_by_area: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PeopleGroup"][];
+                };
+            };
+        };
+    };
+    resolve_people: {
+        parameters: {
+            query: {
+                /** @description Nombre, nombre de pila o alias exacto (ej. "Juancho"). */
+                name: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"][];
+                };
+            };
+        };
+    };
+    get_person: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonDetail"];
+                };
+            };
+        };
+    };
+    update_person: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    add_interaction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InteractionBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Interaction"];
+                };
+            };
+        };
+    };
+    add_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonNote"];
+                };
+            };
+        };
+    };
+    delete_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                note_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_suggestions: {
+        parameters: {
+            query?: {
+                /** @description `pending` (por defecto), `accepted`, `dismissed`. */
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonSuggestion"][];
+                };
+            };
+        };
+    };
+    create_suggestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuggestionBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonSuggestion"];
+                };
+            };
+        };
+    };
+    accept_suggestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptSuggestion"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptResult"];
+                };
+            };
+        };
+    };
+    dismiss_suggestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -936,6 +6726,98 @@ export interface operations {
             };
         };
     };
+    status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderStatus"];
+                };
+            };
+        };
+    };
+    pause: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PauseBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderStatus"];
+                };
+            };
+        };
+    };
+    resume: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderStatus"];
+                };
+            };
+        };
+    };
+    search: {
+        parameters: {
+            query: {
+                /** @description Texto a buscar (sin importar acentos ni mayúsculas; admite prefijos). */
+                q: string;
+                /** @description Módulos separados por coma (`note,person,task,…`). */
+                types?: string | null;
+                area_id?: string | null;
+                status?: string | null;
+                from?: string | null;
+                to?: string | null;
+                /** @description Incluir archivados (por defecto no). */
+                archived?: boolean | null;
+                limit?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchHit"][];
+                };
+            };
+        };
+    };
     get_settings: {
         parameters: {
             query?: never;
@@ -982,6 +6864,547 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_subjects: {
+        parameters: {
+            query?: {
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subject"][];
+                };
+            };
+        };
+    };
+    create_subject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubjectBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subject"];
+                };
+            };
+        };
+    };
+    update_subject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubjectBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subject"];
+                };
+            };
+        };
+    };
+    list_swipe: {
+        parameters: {
+            query?: {
+                tag?: string | null;
+                q?: string | null;
+                archived?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwipeRef"][];
+                };
+            };
+        };
+    };
+    create_swipe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwipeBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwipeRef"];
+                };
+            };
+        };
+    };
+    get_swipe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwipeRef"];
+                };
+            };
+        };
+    };
+    update_swipe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwipeBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwipeRef"];
+                };
+            };
+        };
+    };
+    list_tags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagCount"][];
+                };
+            };
+        };
+    };
+    list_rules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurrenceRule"][];
+                };
+            };
+        };
+    };
+    create_rule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuleBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurrenceRule"];
+                };
+            };
+        };
+    };
+    materialize_rules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MaterializeResult"];
+                };
+            };
+        };
+    };
+    update_rule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuleBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecurrenceRule"];
+                };
+            };
+        };
+    };
+    list_tasks: {
+        parameters: {
+            query?: {
+                /** @description `open | done | cancelled` */
+                status?: string | null;
+                area_id?: string | null;
+                project_id?: string | null;
+                class_note_id?: string | null;
+                from?: string | null;
+                to?: string | null;
+                q?: string | null;
+                /** @description Solo externas (true) o solo locales (false). */
+                external?: boolean | null;
+                archived?: boolean | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_Task"];
+                };
+            };
+        };
+    };
+    create_task: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskBody"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+        };
+    };
+    carry_over: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CarryOverBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CarryOverResult"];
+                };
+            };
+        };
+    };
+    tasks_for_day: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DayTasks"];
+                };
+            };
+        };
+    };
+    get_task: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskDetail"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update_task: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    archive_task: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    cancel_task: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+        };
+    };
+    complete_task: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+        };
+    };
+    reopen_task: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionBody"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+        };
+    };
+    projects_view: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectsView"];
                 };
             };
         };
