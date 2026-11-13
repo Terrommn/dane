@@ -106,6 +106,7 @@ pub enum ProgressValue {
 
 /// Registra (o actualiza) el aporte de `source` al objetivo. Idempotente por `(goal_id, source_type, source_id)`.
 /// Falla con FK si el objetivo no es del mismo usuario.
+#[allow(clippy::too_many_arguments)] // Firma de contrato compartido entre agentes.
 pub async fn record_goal_progress(
     tx: &mut Tx<'_>,
     user_id: Uuid,

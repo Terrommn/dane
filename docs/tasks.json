@@ -127,9 +127,9 @@
       "deps": [
         "T11"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Tests state/nonce/iss/aud/exp/firma inválidos; misma identidad en ambas superficies",
-      "evidence": "auth/oidc.rs implementado (openidconnect, PKCE, claim id≠sub); falta prueba con IdP simulado"
+      "evidence": "tests/auth_oidc.rs (5): flujo válido + vínculo con Mini App (sub≠id), nonce/aud/iss/exp/firma/claim id inválidos, state único, allowlist, open redirect, rate limit"
     },
     {
       "id": "T13",
@@ -701,9 +701,9 @@
       "deps": [
         "T08"
       ],
-      "status": "in_progress",
+      "status": "completed",
       "acceptance": "Script probado sobre BD temporal",
-      "evidence": ""
+      "evidence": "scripts/{backup,restore,test-backup-restore}.sh: respaldo y restauración en BD temporal verificados (conteos, acentos, migraciones, search_index); restore se niega sobre BD con datos sin --force"
     },
     {
       "id": "T64",

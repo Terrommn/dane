@@ -5,7 +5,7 @@ Generado por `node scripts/tasks.mjs` desde `docs/tasks.json`. No editar a mano.
 
 Estados: ✅ completed · 🔄 in_progress · ⏳ pending · ⛔ blocked_external (en la herramienta queda `pending`).
 
-Resumen: 11 completadas · 49 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
+Resumen: 13 completadas · 47 en curso · 6 pendientes · 0 bloqueadas externamente · 66 total.
 
 | ID | Tarea | Responsable | Depende de | Estado | Criterio de aceptación | Evidencia |
 |---|---|---|---|---|---|---|
@@ -20,7 +20,7 @@ Resumen: 11 completadas · 49 en curso · 6 pendientes · 0 bloqueadas extername
 | T09 | Implementar API base, validación, errores y OpenAPI/cliente generado | lead | T08 | ✅ completed | /api/v1 con errores consistentes; openapi.json y packages/api-client generados y verificados | api/mod.rs (/api/v1, errores ErrorBody, límites, request-id, timeout), OpenAPI utoipa → packages/api-client (scripts/gen-api.sh, --check) |
 | T10 | Implementar zona horaria, fechas civiles, periodos ISO y reloj de pruebas | lead | T05 | ✅ completed | Tests ISO cruzando año, DST, medianoche y cambio de zona | crates/domain/src/time.rs: 9 pruebas (ISO W53/W01, DST hueco/ambiguo, 23h, medianoche, cambio de zona, días 29–31/último/penúltimo, FixedClock) |
 | T11 | Implementar auth Mini App y sesiones | lead | T09 | ✅ completed | Tests firma inválida, initData vencido, sesión revocable | auth/miniapp.rs (5 unit) + tests/auth_isolation.rs miniapp_login_validates_signature_freshness_and_allowlist, unauthenticated_and_revoked_sessions_are_rejected |
-| T12 | Implementar Telegram Login OIDC y vinculación de identidad PWA | lead | T11 | 🔄 in_progress | Tests state/nonce/iss/aud/exp/firma inválidos; misma identidad en ambas superficies | auth/oidc.rs implementado (openidconnect, PKCE, claim id≠sub); falta prueba con IdP simulado |
+| T12 | Implementar Telegram Login OIDC y vinculación de identidad PWA | lead | T11 | ✅ completed | Tests state/nonce/iss/aud/exp/firma inválidos; misma identidad en ambas superficies | tests/auth_oidc.rs (5): flujo válido + vínculo con Mini App (sub≠id), nonce/aud/iss/exp/firma/claim id inválidos, state único, allowlist, open redirect, rate limit |
 | T13 | Implementar allowlist, autorización, CSRF y aislamiento de usuarios | lead | T11 | ✅ completed | Tests allowlist, CSRF y acceso cruzado entre dos usuarios | tests/auth_isolation.rs: cookie_sessions_require_matching_csrf, users_cannot_read_or_link_each_others_data, allowlist 403; config.rs dev_login_is_impossible_in_production |
 | T14 | Crear shell frontend, componentes base y adaptación Telegram | frontend | T09 | 🔄 in_progress | Shell navegable, componentes accesibles, adaptador Telegram con detección | — |
 | T15 | Implementar onboarding y preferencias | frontend | T14, T19 | 🔄 in_progress | Onboarding completo con ejemplos editables; ajustes persistidos | — |
@@ -71,7 +71,7 @@ Resumen: 11 completadas · 49 en curso · 6 pendientes · 0 bloqueadas extername
 | T60 | Ejecutar pruebas de bot, scheduler y adaptadores externos | qa | T48, T51 | ⏳ pending | Suite verde | — |
 | T61 | Ejecutar flujos E2E y revisión visual de módulos y ambas superficies | qa | T57, T23 | ⏳ pending | Playwright verde + capturas responsive | — |
 | T62 | Preparar contenedores de producción, healthchecks, CI y despliegue | lead | T05 | 🔄 in_progress | Dockerfiles, compose prod, CI, runbook | — |
-| T63 | Preparar backup/restore y comprobar restauración en base temporal | lead | T08 | 🔄 in_progress | Script probado sobre BD temporal | — |
+| T63 | Preparar backup/restore y comprobar restauración en base temporal | lead | T08 | ✅ completed | Script probado sobre BD temporal | scripts/{backup,restore,test-backup-restore}.sh: respaldo y restauración en BD temporal verificados (conteos, acentos, migraciones, search_index); restore se niega sobre BD con datos sin --force |
 | T64 | Completar README, TEST_REPORT, USER_SETUP y matriz de cobertura | lead | T59, T60, T61 | ⏳ pending | Docs con resultados reales | — |
 | T65 | Auditar requisitos contra implementación; resolver omisiones y bugs | lead | T64 | ⏳ pending | Matriz recorrida sin huecos | — |
 | T66 | Reconciliar TodoWrite con evidencia y entregar estado final honesto | lead | T65 | ⏳ pending | Lista y TASKS.md coinciden | — |
