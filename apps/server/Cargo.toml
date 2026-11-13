@@ -49,5 +49,6 @@ async-trait.workspace = true
 cookie.workspace = true
 
 [dev-dependencies]
+jsonwebtoken.workspace = true
 wiremock.workspace = true
 tower = { workspace = true, features = ["util"] }

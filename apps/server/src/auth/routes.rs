@@ -194,7 +194,9 @@ async fn oidc_start(
     .bind(state.now() + Duration::minutes(10))
     .execute(&state.pool)
     .await?;
-    sqlx::query("DELETE FROM oauth_flows WHERE expires_at < now()")
+    // Limpieza con el reloj de la app (no `now()` de la BD) para ser coherente con `expires_at`.
+    sqlx::query("DELETE FROM oauth_flows WHERE expires_at < $1")
+        .bind(state.now())
         .execute(&state.pool)
         .await?;
     Ok(Redirect::to(&start.url).into_response())
