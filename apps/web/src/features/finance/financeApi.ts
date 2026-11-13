@@ -311,8 +311,7 @@ export function useBudgetMutation(month: string) {
 export function useRecurringMutations() {
   const invalidate = useInvalidateFinance();
   const create = useMutation({
-    mutationFn: async (body: FinanceRuleBody) =>
-      unwrap(await api.POST("/finance/recurring", { body })),
+    mutationFn: async (body: FinanceRuleBody) => unwrap(await api.POST("/finance/recurring", { body })),
     onSuccess: invalidate,
   });
   const update = useMutation({
