@@ -30,6 +30,47 @@ const SyncPage = lazy(() => import("../features/settings/SyncPage").then((m) => 
 const InstallPage = lazy(() =>
   import("../features/install/InstallPage").then((m) => ({ default: m.InstallPage })),
 );
+// Fase 2 · módulos (F2-modules).
+const TasksPage = lazy(() => import("../features/tasks/TasksPage").then((m) => ({ default: m.TasksPage })));
+const InboxPage = lazy(() => import("../features/inbox/InboxPage").then((m) => ({ default: m.InboxPage })));
+const PeoplePage = lazy(() =>
+  import("../features/people/PeoplePage").then((m) => ({ default: m.PeoplePage })),
+);
+const PersonDetailPage = lazy(() =>
+  import("../features/people/PersonDetailPage").then((m) => ({ default: m.PersonDetailPage })),
+);
+const ContentPage = lazy(() =>
+  import("../features/content/ContentPage").then((m) => ({ default: m.ContentPage })),
+);
+const ContentDetailPage = lazy(() =>
+  import("../features/content/ContentDetailPage").then((m) => ({ default: m.ContentDetailPage })),
+);
+const SwipePage = lazy(() => import("../features/swipe/SwipePage").then((m) => ({ default: m.SwipePage })));
+const SchoolPage = lazy(() =>
+  import("../features/school/SchoolPage").then((m) => ({ default: m.SchoolPage })),
+);
+const ClassNotePage = lazy(() =>
+  import("../features/school/SchoolPage").then((m) => ({ default: m.ClassNotePage })),
+);
+const DevPage = lazy(() => import("../features/dev/DevPage").then((m) => ({ default: m.DevPage })));
+const AdrPage = lazy(() => import("../features/dev/AdrPage").then((m) => ({ default: m.AdrPage })));
+const NotesPage = lazy(() => import("../features/notes/NotesPage").then((m) => ({ default: m.NotesPage })));
+const NoteDetailPage = lazy(() =>
+  import("../features/notes/NoteDetailPage").then((m) => ({ default: m.NoteDetailPage })),
+);
+const SearchPage = lazy(() =>
+  import("../features/search/SearchPage").then((m) => ({ default: m.SearchPage })),
+);
+const DrawingsPage = lazy(() =>
+  import("../features/drawings/DrawingsPage").then((m) => ({ default: m.DrawingsPage })),
+);
+const DrawingPage = lazy(() =>
+  import("../features/drawings/DrawingsPage").then((m) => ({ default: m.DrawingPage })),
+);
+const AgendaPage = lazy(() =>
+  import("../features/agenda/AgendaPage").then((m) => ({ default: m.AgendaPage })),
+);
+const ViewsPage = lazy(() => import("../features/views/ViewsPage").then((m) => ({ default: m.ViewsPage })));
 
 /** Pantallas registradas cuyo módulo se completa en la fase 2 (ver ModulePending). */
 const PENDING: { path: string; title: string; includes: string[] }[] = [
@@ -63,19 +104,6 @@ const PENDING: { path: string; title: string; includes: string[] }[] = [
     ],
   },
   {
-    path: "/tareas",
-    title: "Tareas",
-    includes: [
-      "Tareas por área/proyecto con arrastre y recurrentes",
-      "Tareas externas de ClickUp (solo lectura)",
-    ],
-  },
-  {
-    path: "/inbox",
-    title: "Inbox",
-    includes: ["Captura rápida (también sin conexión)", "Propuestas revisables antes de mover o descartar"],
-  },
-  {
     path: "/semanal",
     title: "Revisión semanal",
     includes: ["Resumen automático editable, paz 1–5 y tres prioridades", "Cierre de objetivos"],
@@ -94,11 +122,6 @@ const PENDING: { path: string; title: string; includes: string[] }[] = [
     includes: ["Gastos, ingresos, transferencias y pagos", "Filtros, totales e histórico"],
   },
   {
-    path: "/personas",
-    title: "Personas",
-    includes: ["Contactos con alias, cumpleaños e interacciones", "Días sin hablar y sugerencias"],
-  },
-  {
     path: "/devocionales",
     title: "Devocionales",
     includes: ["Pasaje, versículo/acción, aprendizaje, oración y canción", "Historial y búsqueda"],
@@ -107,25 +130,6 @@ const PENDING: { path: string; title: string; includes: string[] }[] = [
     path: "/lecturas",
     title: "Lecturas",
     includes: ["Libros y artículos por estado", "Aporte a objetivos de lectura"],
-  },
-  {
-    path: "/contenido",
-    title: "Contenido",
-    includes: ["Pipeline idea → publicado, hooks, guion y shot list", "Métricas de publicados"],
-  },
-  { path: "/swipe", title: "Swipe", includes: ["Referencias con URL, explicación y hook"] },
-  { path: "/escuela", title: "Escuela", includes: ["Materias, notas de clase y entregas"] },
-  { path: "/dev", title: "Desarrollo", includes: ["Devlog con sesiones, ADRs, runbooks, TILs y snippets"] },
-  {
-    path: "/notas",
-    title: "Notas",
-    includes: ["Editor Markdown, tags, alias, enlaces y backlinks", "Favoritos y archivados"],
-  },
-  { path: "/dibujos", title: "Dibujos", includes: ["Notas visuales con Excalidraw"] },
-  {
-    path: "/buscar",
-    title: "Buscar",
-    includes: ["Búsqueda global sin acentos con filtros por módulo, fecha, área y estado"],
   },
   {
     path: "/captura/:id",
@@ -205,6 +209,24 @@ export function App() {
                 <Route path="/onboarding" element={<OnboardingPage />} />
                 <Route path="/sincronizacion" element={<SyncPage />} />
                 <Route path="/instalar" element={<InstallPage />} />
+                <Route path="/tareas" element={<TasksPage />} />
+                <Route path="/inbox" element={<InboxPage />} />
+                <Route path="/personas" element={<PeoplePage />} />
+                <Route path="/personas/:id" element={<PersonDetailPage />} />
+                <Route path="/contenido" element={<ContentPage />} />
+                <Route path="/contenido/:id" element={<ContentDetailPage />} />
+                <Route path="/swipe" element={<SwipePage />} />
+                <Route path="/escuela" element={<SchoolPage />} />
+                <Route path="/escuela/clase/:id" element={<ClassNotePage />} />
+                <Route path="/dev" element={<DevPage />} />
+                <Route path="/dev/adr/:id" element={<AdrPage />} />
+                <Route path="/notas" element={<NotesPage />} />
+                <Route path="/notas/:id" element={<NoteDetailPage />} />
+                <Route path="/buscar" element={<SearchPage />} />
+                <Route path="/dibujos" element={<DrawingsPage />} />
+                <Route path="/dibujos/:id" element={<DrawingPage />} />
+                <Route path="/agenda" element={<AgendaPage />} />
+                <Route path="/vistas" element={<ViewsPage />} />
                 {PENDING.map((p) => (
                   <Route
                     key={p.path}

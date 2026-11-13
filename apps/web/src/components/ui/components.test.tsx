@@ -3,8 +3,8 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConflictDialog, diffFields } from "./ConflictDialog";
 import { DataTable } from "./DataTable";
-import { TextField } from "./Field";
 import { ProgressBar } from "./Display";
+import { TextField } from "./Field";
 import { SaveStatus } from "./SaveStatus";
 
 afterEach(cleanup);
@@ -53,12 +53,31 @@ describe("DataTable", () => {
   const rows = Array.from({ length: 25 }, (_, i) => ({ id: String(i), name: `Proyecto ${i}`, n: i }));
   rows.push({ id: "x", name: "Canción", n: 99 });
   const cols = [
-    { key: "name", header: "Nombre", render: (r: (typeof rows)[number]) => r.name, sortValue: (r: (typeof rows)[number]) => r.name },
-    { key: "n", header: "N", render: (r: (typeof rows)[number]) => r.n, sortValue: (r: (typeof rows)[number]) => r.n },
+    {
+      key: "name",
+      header: "Nombre",
+      render: (r: (typeof rows)[number]) => r.name,
+      sortValue: (r: (typeof rows)[number]) => r.name,
+    },
+    {
+      key: "n",
+      header: "N",
+      render: (r: (typeof rows)[number]) => r.n,
+      sortValue: (r: (typeof rows)[number]) => r.n,
+    },
   ];
 
   it("filtra sin acentos, ordena y pagina", () => {
-    render(<DataTable caption="Prueba" rows={rows} columns={cols} rowKey={(r) => r.id} searchText={(r) => r.name} pageSize={10} />);
+    render(
+      <DataTable
+        caption="Prueba"
+        rows={rows}
+        columns={cols}
+        rowKey={(r) => r.id}
+        searchText={(r) => r.name}
+        pageSize={10}
+      />,
+    );
     expect(screen.getByText(/Página 1 de 3/)).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Filtrar"), { target: { value: "cancion" } });
     const table = screen.getByRole("table");
@@ -74,21 +93,34 @@ describe("DataTable", () => {
   });
 
   it("muestra estado vacío", () => {
-    render(<DataTable caption="Vacía" rows={[]} columns={cols} rowKey={(r) => r.id} emptyTitle="Nada aquí" />);
+    render(
+      <DataTable caption="Vacía" rows={[]} columns={cols} rowKey={(r) => r.id} emptyTitle="Nada aquí" />,
+    );
     expect(screen.getByText("Nada aquí")).toBeTruthy();
   });
 });
 
 describe("ConflictDialog", () => {
   it("detecta campos distintos ignorando metadatos", () => {
-    expect(diffFields({ name: "A", version: 1, notes: "x" }, { name: "B", version: 2, notes: "x", updated_at: "t" })).toEqual(["name"]);
+    expect(
+      diffFields(
+        { name: "A", version: 1, notes: "x" },
+        { name: "B", version: 2, notes: "x", updated_at: "t" },
+      ),
+    ).toEqual(["name"]);
   });
 
   it("permite mezclar campo por campo", () => {
     const onResolve = vi.fn();
     render(
       <MemoryRouter>
-        <ConflictDialog open mine={{ name: "Mío", notes: "nota mía" }} theirs={{ name: "Suyo", notes: "nota suya", version: 5 }} onResolve={onResolve} onClose={() => {}} />
+        <ConflictDialog
+          open
+          mine={{ name: "Mío", notes: "nota mía" }}
+          theirs={{ name: "Suyo", notes: "nota suya", version: 5 }}
+          onResolve={onResolve}
+          onClose={() => {}}
+        />
       </MemoryRouter>,
     );
     const radios = screen.getAllByRole("radio", { hidden: true });
