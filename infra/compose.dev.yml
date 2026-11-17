@@ -1,19 +1,19 @@
 # Desarrollo con Docker (alternativa a scripts/dev-db.sh). Uso: USE_DOCKER_DB=1 pnpm dev
 # o todo en contenedores: docker compose -f infra/compose.dev.yml --profile app up --build
-name: vida-dev
+name: dane-dev
 services:
   db:
     image: postgres:17
     environment:
-      POSTGRES_USER: vida
-      POSTGRES_PASSWORD: vida
-      POSTGRES_DB: vida
+      POSTGRES_USER: dane
+      POSTGRES_PASSWORD: dane
+      POSTGRES_DB: dane
     ports: ["127.0.0.1:5433:5432"]
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./postgres-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vida -d vida"]
+      test: ["CMD-SHELL", "pg_isready -U dane -d dane"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -23,7 +23,7 @@ services:
     build: { context: .., dockerfile: infra/Dockerfile.server }
     env_file: ../.env
     environment:
-      DATABASE_URL: postgres://vida:vida@db:5432/vida
+      DATABASE_URL: postgres://dane:dane@db:5432/dane
       BIND_ADDR: 0.0.0.0:8080
       DEV_LOGIN_ENABLED: "false"
     depends_on: { db: { condition: service_healthy } }

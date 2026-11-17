@@ -122,7 +122,7 @@ export function isHttpUrl(u: string) {
 export function SafeMarkdown({ children, className = "" }: { children: string; className?: string }) {
   return (
     <div
-      className={`prose-vida space-y-2 break-words [&_a]:text-link [&_a]:underline [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_h1]:text-xl [&_h1]:font-bold [&_h2]:text-lg [&_h2]:font-semibold [&_h3]:font-semibold [&_li]:ml-5 [&_ol]:list-decimal [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-surface-2 [&_pre]:p-3 [&_ul]:list-disc ${className}`}
+      className={`prose-dane space-y-2 break-words [&_a]:text-link [&_a]:underline [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_h1]:text-xl [&_h1]:font-bold [&_h2]:text-lg [&_h2]:font-semibold [&_h3]:font-semibold [&_li]:ml-5 [&_ol]:list-decimal [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-surface-2 [&_pre]:p-3 [&_ul]:list-disc ${className}`}
     >
       <ReactMarkdown
         skipHtml

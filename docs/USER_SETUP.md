@@ -2,11 +2,11 @@
 
 Todo lo de esta página requiere tus cuentas, dispositivos o decisiones de gasto, por eso no está automatizado.
 El resto (código, migraciones, pruebas) ya está hecho y verificado con `pnpm verify`.
-Convención: `DOMAIN` es tu dominio público (ej. `vida.tudominio.com`); `PUBLIC_BASE_URL=https://DOMAIN`.
+Convención: `DOMAIN` es tu dominio público (ej. `dane.tudominio.com`); `PUBLIC_BASE_URL=https://DOMAIN`.
 
 ## 0. Probar todo localmente (sin cuentas externas)
 ```bash
-cd ~/Developer/Coding/vida
+cd ~/Developer/Coding/dane
 pnpm install
 pnpm dev            # PostgreSQL local :5433 + API :8080 + web :5180 (+ bot si pones token)
 ```

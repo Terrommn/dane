@@ -46,7 +46,7 @@ async fn send_batch_acks_each_outcome() {
     let jobs = vec![
         job(
             1,
-            json!([[{"type": "web_app", "text": "Abrir", "url": "https://vida.example.com/hoy?date=2026-11-12"}]]),
+            json!([[{"type": "web_app", "text": "Abrir", "url": "https://dane.example.com/hoy?date=2026-11-12"}]]),
         ),
         job(2, json!([])),
         job(3, json!([])),
@@ -108,7 +108,7 @@ async fn send_batch_acks_each_outcome() {
     let first = sent.iter().find(|b| b["chat_id"] == 1).unwrap();
     assert_eq!(
         first["reply_markup"]["inline_keyboard"][0][0]["web_app"]["url"],
-        "https://vida.example.com/hoy?date=2026-11-12"
+        "https://dane.example.com/hoy?date=2026-11-12"
     );
 
     // Un ack por job, con el lease_token correcto y el outcome clasificado.

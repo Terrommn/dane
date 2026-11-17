@@ -111,7 +111,7 @@ export function AppShell() {
       <div className="mx-auto flex max-w-7xl">
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 overflow-y-auto border-r border-line p-3 md:block">
           <Link to="/hoy" className="mb-4 block px-3 text-xl font-bold text-fg no-underline">
-            Vida
+            Dane
           </Link>
           <SideNav items={all} />
         </aside>
@@ -119,7 +119,7 @@ export function AppShell() {
           <header className="flex items-center justify-between gap-2 px-4 pt-3 md:px-6">
             {!isTelegram && (
               <Link to="/hoy" className="text-lg font-bold text-fg no-underline md:hidden">
-                Vida
+                Dane
               </Link>
             )}
             <div className="ml-auto">

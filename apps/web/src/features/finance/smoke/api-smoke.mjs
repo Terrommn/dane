@@ -21,13 +21,13 @@ async function call(method, path, body, headers = {}) {
   for (const c of set) {
     const kv = c.split(";")[0];
     const [k, v] = kv.split("=");
-    if (k === "vida_session" || k === "vida_csrf") {
+    if (k === "dane_session" || k === "dane_csrf") {
       cookie = cookie
         .split("; ")
         .filter((x) => x && !x.startsWith(`${k}=`))
         .concat(kv)
         .join("; ");
-      if (k === "vida_csrf") csrf = v;
+      if (k === "dane_csrf") csrf = v;
     }
   }
   const text = await r.text();

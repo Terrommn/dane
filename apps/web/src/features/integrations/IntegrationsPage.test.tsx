@@ -66,13 +66,13 @@ describe("IntegrationsPage", () => {
       google: conn("google", "disconnected"),
       clickup: conn("clickup", "disconnected"),
       google_available: false,
-      google_redirect_uri: "https://vida.example/api/v1/integrations/google/callback",
+      google_redirect_uri: "https://dane.example/api/v1/integrations/google/callback",
       llm: { configured: false, mode: "manual" },
       recent_runs: [],
     };
     renderPage();
     expect(await screen.findByText(/no tiene credenciales de Google/)).toBeTruthy();
-    expect(screen.getByText("https://vida.example/api/v1/integrations/google/callback")).toBeTruthy();
+    expect(screen.getByText("https://dane.example/api/v1/integrations/google/callback")).toBeTruthy();
     expect(screen.getByText("Modo manual")).toBeTruthy();
     expect(screen.getByText(/Marcar una tarea aquí no la cambia en ClickUp/)).toBeTruthy();
     expect(screen.getByRole("button", { name: "Conectar ClickUp" })).toBeTruthy();

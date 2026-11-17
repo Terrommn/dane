@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Vida API",
+    "title": "Dane API",
     "description": "API de la app personal de hábitos, objetivos y organización de vida.",
     "license": {
       "name": ""
@@ -2452,7 +2452,7 @@
         "tags": [
           "exports"
         ],
-        "summary": "ZIP con `vida-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault).",
+        "summary": "ZIP con `dane-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault).",
         "operationId": "get_exports_zip",
         "responses": {
           "200": {
@@ -19619,7 +19619,7 @@
       "cookie": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "vida_session"
+        "name": "dane_session"
       }
     }
   }

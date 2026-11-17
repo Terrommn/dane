@@ -11,7 +11,7 @@ scripts/dev-db.sh start                         # PostgreSQL local (raíz del re
 set -a; source .env; set +a; cargo run -p server  # API en 127.0.0.1:8080
 pnpm -C apps/web dev                             # http://localhost:5180 (proxy /api → 8080)
 ```
-`VIDA_API_URL=http://127.0.0.1:8099 pnpm -C apps/web dev -- --port 5174` para usar otro puerto de API/web.
+`DANE_API_URL=http://127.0.0.1:8099 pnpm -C apps/web dev -- --port 5174` para usar otro puerto de API/web.
 `PUBLIC_BASE_URL` del server debe ser el origen de la web (dev-login exige origen local).
 
 Comandos: `pnpm -C apps/web typecheck | lint | test | build | preview`. `pnpm -C apps/web icons` regenera los PNG
@@ -36,13 +36,13 @@ src/
 
 * **Sesión**: Mini App → `POST /auth/telegram/miniapp` con `Telegram.WebApp.initData` sin modificar; el Bearer vive
   solo en memoria y se renueva con initData ante un 401. Web/PWA → cookie HttpOnly + `X-CSRF-Token` leído de
-  `vida_csrf` en mutaciones. Nunca se guardan tokens en localStorage (solo el `user_id`, para detectar cambio de cuenta).
+  `dane_csrf` en mutaciones. Nunca se guardan tokens en localStorage (solo el `user_id`, para detectar cambio de cuenta).
 * **Telegram**: el script oficial se carga solo si la URL trae `tgWebAppData`/`tgWebAppStartParam`; sin initData
   firmado no hay modo Mini App. Tema (`themeParams` → `--tg-*`), safe areas (`safeAreaInset` + `contentSafeAreaInset`,
   eventos ≥ 8.0), BackButton (≥ 6.1). Fecha objetivo: `?date=` o `start_param` `checkin_YYYY-MM-DD` (validada).
 * **Idempotency-Key** automática en cada mutación; la cola offline reutiliza la misma clave al reintentar y genera
   una nueva solo cuando cambia el cuerpo (resolución de conflicto).
-* **Offline**: base IndexedDB `vida-offline-<user_id>` (borradores + cola). Estados: `draft` (solo dispositivo),
+* **Offline**: base IndexedDB `dane-offline-<user_id>` (borradores + cola). Estados: `draft` (solo dispositivo),
   `pending` (en cola), `saved` (confirmado por el servidor), `conflict` (409 con `current`), `error` (4xx de
   validación). Sincroniza al abrir, al reconectar y al volver a primer plano; no usa Background Sync. Orden estricto
   de la cola (marca de tiempo monotónica). Logout: avisa si hay pendientes, permite sincronizar antes y borra la base

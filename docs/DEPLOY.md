@@ -8,7 +8,7 @@ recordatorios (no uses planes que duermen los servicios).
 ```bash
 # En el VPS (Debian/Ubuntu)
 curl -fsSL https://get.docker.com | sh
-git clone <tu-repo> vida && cd vida
+git clone <tu-repo> dane && cd dane
 cp .env.example .env.prod   # completa según docs/USER_SETUP.md
 ```
 DNS: registro `A` (y `AAAA` si aplica) de `DOMAIN` → IP del VPS. Puertos 80 y 443 abiertos (Caddy obtiene HTTPS solo).
@@ -23,7 +23,7 @@ docker compose -f infra/compose.prod.yml --env-file .env.prod up -d --build
 docker compose -f infra/compose.prod.yml --env-file .env.prod ps        # server y bot "healthy"
 curl -fsS https://$DOMAIN/healthz                                        # → ok
 ```
-El server aplica migraciones al arrancar (`vida-server migrate` también existe para hacerlo explícitamente). El bot en
+El server aplica migraciones al arrancar (`dane-server migrate` también existe para hacerlo explícitamente). El bot en
 modo `webhook` registra `https://$DOMAIN/telegram/webhook` con el secreto y elimina cualquier polling.
 
 ## 3. Comprobaciones posteriores
@@ -46,10 +46,10 @@ interrumpido conserva su lease y se reintenta al vencer.
 ## 5. Respaldos
 ```bash
 # Respaldo diario (cron del host):
-0 3 * * * cd /ruta/vida && docker compose -f infra/compose.prod.yml --env-file .env.prod exec -T db pg_dump -U vida -Fc vida > backups/vida-$(date +\%F).dump
+0 3 * * * cd /ruta/dane && docker compose -f infra/compose.prod.yml --env-file .env.prod exec -T db pg_dump -U dane -Fc dane > backups/dane-$(date +\%F).dump
 # Restaurar en una BD nueva (nunca sobre datos sin --force):
-docker compose -f infra/compose.prod.yml --env-file .env.prod exec -T db createdb -U vida vida_restore
-docker compose -f infra/compose.prod.yml --env-file .env.prod exec -T db pg_restore -U vida --no-owner -d vida_restore < backups/vida-AAAA-MM-DD.dump
+docker compose -f infra/compose.prod.yml --env-file .env.prod exec -T db createdb -U dane dane_restore
+docker compose -f infra/compose.prod.yml --env-file .env.prod exec -T db pg_restore -U dane --no-owner -d dane_restore < backups/dane-AAAA-MM-DD.dump
 ```
 Copia los respaldos fuera del VPS. La prueba automatizada del procedimiento es `scripts/test-backup-restore.sh`
 (parte de `pnpm verify`). `ENCRYPTION_KEY` debe respaldarse aparte (gestor de contraseñas): sin ella las

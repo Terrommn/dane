@@ -9,7 +9,7 @@ publish.workspace = true
 path = "src/lib.rs"
 
 [[bin]]
-name = "vida-bot"
+name = "dane-bot"
 path = "src/main.rs"
 
 [dependencies]

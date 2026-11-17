@@ -1,6 +1,6 @@
 //! Sesiones propias, revocables y con expiración. Solo se guarda el hash SHA-256 del token.
 //!
-//! * Web/PWA: cookie `vida_session` (HttpOnly, Secure, SameSite=Lax) + cookie legible `vida_csrf` y header
+//! * Web/PWA: cookie `dane_session` (HttpOnly, Secure, SameSite=Lax) + cookie legible `dane_csrf` y header
 //!   `X-CSRF-Token` obligatorio en métodos no seguros (double submit; el hash del CSRF va ligado a la sesión).
 //! * Mini App: token Bearer en memoria del WebView (D-005), sin cookies.
 
@@ -18,8 +18,8 @@ use crate::crypto::{ct_eq, random_token, sha256};
 use crate::error::ApiError;
 use crate::state::AppState;
 
-pub const SESSION_COOKIE: &str = "vida_session";
-pub const CSRF_COOKIE: &str = "vida_csrf";
+pub const SESSION_COOKIE: &str = "dane_session";
+pub const CSRF_COOKIE: &str = "dane_csrf";
 pub const CSRF_HEADER: &str = "x-csrf-token";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

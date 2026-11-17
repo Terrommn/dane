@@ -4,7 +4,7 @@ Formato: ID · decisión · motivo · alternativas · estado. Se revisan al rean
 
 | ID | Decisión | Motivo | Alternativas | Estado |
 |---|---|---|---|---|
-| D-001 | Repositorio nuevo en `~/Developer/Coding/vida`, proyecto Obsidian **personal** | No había repositorio destino; la app es de vida personal | Otro nombre/ubicación | aceptada (reversible) |
+| D-001 | Repositorio nuevo en `~/Developer/Coding/dane`, proyecto Obsidian **personal** | No había repositorio destino; la app es de vida personal | Otro nombre/ubicación | aceptada (reversible) |
 | D-002 | Herramienta de tareas: `TaskCreate/TaskUpdate/TaskList` del entorno (equivalente a TodoWrite, que no está expuesto). Número de tarea `#N` = `TN`. `blocked_external` se mantiene `pending` allí y se documenta en `TASKS.md` | El entorno no expone TodoWrite | — | aceptada |
 | D-003 | Versiones fijadas (nov 2026): Rust 1.94 (Homebrew), axum 0.8, sqlx 0.9, teloxide 0.17, reqwest 0.13, utoipa 6, openidconnect 4.1, chrono-tz 0.10, Node 24, pnpm 12, PostgreSQL 17 | Verificadas con `cargo search`/`npm view`; lockfiles versionados | — | aceptada |
 | D-004 | Sin Docker en la máquina de desarrollo: `scripts/dev-db.sh` usa PostgreSQL nativo (Homebrew); Compose se entrega para quien tenga Docker y para producción | Docker no está instalado | Instalar Docker Desktop | aceptada |

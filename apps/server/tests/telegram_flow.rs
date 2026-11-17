@@ -154,7 +154,7 @@ async fn start_links_private_chat_and_replies_with_checkin_button(pool: PgPool) 
 #[sqlx::test(migrator = "persistence::MIGRATOR")]
 async fn web_app_buttons_on_https_origin(pool: PgPool) {
     let t = TestApp::with_config(pool, |c| {
-        c.public_base_url = "https://vida.example.com".parse().unwrap()
+        c.public_base_url = "https://dane.example.com".parse().unwrap()
     });
     ingest(&t, upd(1, 111, "private", "/checkin ayer")).await;
     processor::drain(&t.state).await.unwrap();
@@ -162,7 +162,7 @@ async fn web_app_buttons_on_https_origin(pool: PgPool) {
     let b = &jobs[0]["message"]["buttons"][0][0];
     assert_eq!(b["type"], "web_app");
     assert_eq!(
-        b["url"], "https://vida.example.com/hoy?date=2026-11-11",
+        b["url"], "https://dane.example.com/hoy?date=2026-11-11",
         "conserva la fecha objetivo"
     );
 }
@@ -245,7 +245,7 @@ async fn capture_commands_create_reviewable_proposals(pool: PgPool) {
     ingest(&t, upd(1, 111, "private", "/gasto ayer 250 gasolina")).await;
     ingest(&t, upd(2, 111, "private", "/weekly-review")).await;
     ingest(&t, upd(3, 111, "private", "comprar pilas")).await;
-    ingest(&t, upd(4, 111, "private", "/log_session vida main: bot listo")).await;
+    ingest(&t, upd(4, 111, "private", "/log_session dane main: bot listo")).await;
     processor::drain(&t.state).await.unwrap();
     let (id, text, date): (Uuid, String, chrono::NaiveDate) =
         sqlx::query_as("SELECT id, input_text, reference_date FROM capture_proposals WHERE intent = 'gasto'")

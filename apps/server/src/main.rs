@@ -1,4 +1,4 @@
-//! `vida-server [serve|migrate|openapi]`
+//! `dane-server [serve|migrate|openapi]`
 
 use std::sync::Arc;
 
@@ -18,7 +18,7 @@ async fn main() -> anyhow::Result<()> {
     }
     let config = Config::from_env().context("configuración inválida")?;
     init_tracing(config.log_json);
-    tracing::info!(config = ?config, "iniciando vida-server");
+    tracing::info!(config = ?config, "iniciando dane-server");
 
     let pool = persistence::connect(&config.database_url, config.database_max_connections)
         .await

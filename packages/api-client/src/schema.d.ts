@@ -820,7 +820,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ZIP con `vida-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault). */
+        /** ZIP con `dane-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault). */
         get: operations["get_exports_zip"];
         put?: never;
         post?: never;

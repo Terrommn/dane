@@ -15,7 +15,7 @@ pub type Tx<'a> = Transaction<'a, Postgres>;
 pub static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
 
 pub async fn connect(url: &str, max_connections: u32) -> Result<PgPool, sqlx::Error> {
-    let opts = PgConnectOptions::from_str(url)?.application_name("vida-server");
+    let opts = PgConnectOptions::from_str(url)?.application_name("dane-server");
     PgPoolOptions::new()
         .max_connections(max_connections)
         .acquire_timeout(Duration::from_secs(10))

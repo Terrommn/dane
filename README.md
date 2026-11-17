@@ -1,4 +1,4 @@
-# Vida
+# Dane
 
 Aplicación personal de hábitos, objetivos y organización de vida, derivada del vault de Obsidian
 "segundo cerebro" (`fixtures/vault-skeleton/`). Telegram es la entrada cotidiana (recordatorios y check-in en la Mini App)

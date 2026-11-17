@@ -13,7 +13,7 @@ Comando: `pnpm verify` → tabla de pasos con código de salida (logs en `.data/
 | contrato OpenAPI | ✅ aprobado | 160 rutas; sin schemas ni `operationId` duplicados; cliente TS al día |
 | web biome | ✅ aprobado | 141 archivos |
 | web typecheck | ✅ aprobado | TypeScript 7 estricto |
-| web unit tests | ✅ aprobado | **137 aprobadas**, 1 omitida (contrato en vivo, requiere `VIDA_LIVE_API`) |
+| web unit tests | ✅ aprobado | **137 aprobadas**, 1 omitida (contrato en vivo, requiere `DANE_LIVE_API`) |
 | web build | ✅ aprobado | un solo build Mini App/web/PWA; SW con 90 entradas precacheadas, sin `/api` |
 | web e2e (Playwright) | ✅ aprobado | **14 pruebas** en móvil (Pixel 7) y escritorio (1280×800) |
 | backup/restore | ✅ aprobado | respaldo y restauración en BD temporal con verificación de datos |

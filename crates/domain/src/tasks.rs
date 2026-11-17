@@ -422,9 +422,9 @@ mod tests {
 
     #[test]
     fn parses_log_session_text() {
-        let text = "### vida — 18:30\nrama: main\nproyectos: [[personal]]\n## Qué hice\n- Migraciones de [[negocio]]\n## Bloqueos / bugs raros\n- sqlx 0.9 exige AssertSqlSafe\n## Decisiones\n- Usar FK compuesta\n## Siguiente\n- [ ] Pruebas";
+        let text = "### dane — 18:30\nrama: main\nproyectos: [[personal]]\n## Qué hice\n- Migraciones de [[negocio]]\n## Bloqueos / bugs raros\n- sqlx 0.9 exige AssertSqlSafe\n## Decisiones\n- Usar FK compuesta\n## Siguiente\n- [ ] Pruebas";
         let p = parse_devlog_text(text);
-        assert_eq!(p.repo, "vida");
+        assert_eq!(p.repo, "dane");
         assert_eq!(p.at_time.as_deref(), Some("18:30"));
         assert_eq!(p.branch, "main");
         assert!(p.changes_md.contains("Migraciones"));

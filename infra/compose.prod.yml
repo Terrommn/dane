@@ -1,19 +1,19 @@
 # Producción portable en un VPS con Docker (sin servicios pagados específicos).
 # Uso: cp .env.example .env.prod  (completar)  →  docker compose -f infra/compose.prod.yml --env-file .env.prod up -d --build
-name: vida
+name: dane
 services:
   db:
     image: postgres:17
     restart: unless-stopped
     environment:
-      POSTGRES_USER: vida
+      POSTGRES_USER: dane
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD}
-      POSTGRES_DB: vida
+      POSTGRES_DB: dane
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./postgres-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vida -d vida"]
+      test: ["CMD-SHELL", "pg_isready -U dane -d dane"]
       interval: 10s
       timeout: 3s
       retries: 10
@@ -25,7 +25,7 @@ services:
     depends_on: { db: { condition: service_healthy } }
     environment:
       APP_ENV: production
-      DATABASE_URL: postgres://vida:${POSTGRES_PASSWORD}@db:5432/vida
+      DATABASE_URL: postgres://dane:${POSTGRES_PASSWORD}@db:5432/dane
       BIND_ADDR: 0.0.0.0:8080
       PUBLIC_BASE_URL: https://${DOMAIN:?define DOMAIN}
       ALLOWED_TELEGRAM_IDS: ${ALLOWED_TELEGRAM_IDS:?define ALLOWED_TELEGRAM_IDS}

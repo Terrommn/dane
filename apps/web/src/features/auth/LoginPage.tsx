@@ -91,7 +91,7 @@ export function LoginPage() {
       style={{ paddingTop: "calc(1rem + var(--safe-top))" }}
     >
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Vida</h1>
+        <h1 className="text-3xl font-bold">Dane</h1>
         <p className="mt-1 text-muted">Hábitos, objetivos y organización de tu vida.</p>
       </div>
       {(errCode || error) && (

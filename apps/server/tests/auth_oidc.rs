@@ -156,7 +156,7 @@ async fn valid_flow_creates_cookie_session_linked_to_miniapp_identity(pool: PgPo
     assert_eq!(loc, "/hoy");
     let session = cookies
         .iter()
-        .find(|c| c.starts_with("vida_session="))
+        .find(|c| c.starts_with("dane_session="))
         .expect("cookie de sesión");
     assert!(session.contains("HttpOnly"));
     let cookie = session.split(';').next().unwrap().to_string();
@@ -229,7 +229,7 @@ async fn invalid_tokens_are_rejected(pool: PgPool) {
         let (loc, cookies) = callback(&t, &state).await;
         assert_eq!(loc, "/login?error=invalid_token", "caso {name}");
         assert!(
-            cookies.iter().all(|c| !c.starts_with("vida_session=")),
+            cookies.iter().all(|c| !c.starts_with("dane_session=")),
             "caso {name} no debe crear sesión"
         );
     }

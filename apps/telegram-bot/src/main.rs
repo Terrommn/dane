@@ -1,4 +1,4 @@
-//! `vida-bot`: recibe updates (polling o webhook) y entrega mensajes del outbox del server.
+//! `dane-bot`: recibe updates (polling o webhook) y entrega mensajes del outbox del server.
 
 use std::time::Duration;
 
@@ -18,7 +18,7 @@ async fn main() -> anyhow::Result<()> {
     } else {
         tracing_subscriber::fmt().with_env_filter(filter).init();
     }
-    tracing::info!(config = ?cfg, "iniciando vida-bot");
+    tracing::info!(config = ?cfg, "iniciando dane-bot");
 
     let bot = telegram_bot::bot(&cfg);
     let api = ServerApi::new(
@@ -130,6 +130,6 @@ async fn main() -> anyhow::Result<()> {
         let _ = p.await;
     }
     let _ = http.await;
-    tracing::info!("vida-bot detenido");
+    tracing::info!("dane-bot detenido");
     Ok(())
 }

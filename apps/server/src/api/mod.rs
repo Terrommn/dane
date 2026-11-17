@@ -50,7 +50,7 @@ use crate::state::AppState;
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "Vida API", version = "1.0.0", description = "API de la app personal de hábitos, objetivos y organización de vida."),
+    info(title = "Dane API", version = "1.0.0", description = "API de la app personal de hábitos, objetivos y organización de vida."),
     servers((url = "/api/v1")),
     modifiers(&SecurityAddon),
     components(schemas(crate::error::ErrorBody))
@@ -104,7 +104,7 @@ fn v1() -> OpenApiRouter<AppState> {
         .merge(exports::router())
 }
 
-/// OpenAPI completo (para `vida-server openapi` y `/api/v1/openapi.json`).
+/// OpenAPI completo (para `dane-server openapi` y `/api/v1/openapi.json`).
 pub fn openapi() -> utoipa::openapi::OpenApi {
     let (_, mut api) = OpenApiRouter::<AppState>::with_openapi(ApiDoc::openapi())
         .merge(v1())

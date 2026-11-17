@@ -93,7 +93,7 @@ export function InstallPage() {
             <ol className="mt-2 list-decimal space-y-1 pl-5">
               <li>Abre la app en el navegador.</li>
               <li>
-                Haz clic en el ícono de instalar en la barra de direcciones o en el menú → «Instalar Vida».
+                Haz clic en el ícono de instalar en la barra de direcciones o en el menú → «Instalar Dane».
               </li>
             </ol>
           </details>

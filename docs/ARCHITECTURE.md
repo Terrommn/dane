@@ -42,8 +42,8 @@
 2. **Web/PWA**: `GET /api/v1/auth/oidc/start` → server crea `state`, `nonce`, PKCE (S256) en `oauth_flows` →
    `oauth.telegram.org/auth` → `GET /api/v1/auth/oidc/callback` → intercambio con Basic auth → validación del ID token
    con `openidconnect` (firma JWKS, `iss`, `aud`, `exp`, `nonce`) → claim `id` (ID Telegram, distinto de `sub`) →
-   allowlist → vínculo con la misma `users.id` de la Mini App → cookie `vida_session` HttpOnly Secure SameSite=Lax +
-   cookie `vida_csrf` (double submit; header `X-CSRF-Token` obligatorio en mutaciones con cookie).
+   allowlist → vínculo con la misma `users.id` de la Mini App → cookie `dane_session` HttpOnly Secure SameSite=Lax +
+   cookie `dane_csrf` (double submit; header `X-CSRF-Token` obligatorio en mutaciones con cookie).
 3. **Desarrollo**: `POST /api/v1/auth/dev-login` solo si `APP_ENV=development` y `DEV_LOGIN_ENABLED=true`; el arranque
    falla si se habilita con `APP_ENV=production`.
 

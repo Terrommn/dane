@@ -50,7 +50,7 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const LAST_USER_KEY = "vida:last-user"; // solo el ID (no es secreto); nunca tokens.
+const LAST_USER_KEY = "dane:last-user"; // solo el ID (no es secreto); nunca tokens.
 
 function lastUserId(): string | null {
   try {

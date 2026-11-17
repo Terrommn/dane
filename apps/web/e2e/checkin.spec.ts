@@ -64,12 +64,12 @@ test("los datos locales no se filtran entre usuarios", async ({ page, context })
 
   // Cambiar a otra cuenta sin cerrar sesión: el borrador de 111 no debe verse para 222.
   const before = await page.evaluate(async () => (await indexedDB.databases()).map((d) => d.name));
-  await page.request.post("/api/v1/auth/logout", { headers: { "x-csrf-token": (await context.cookies()).find((c) => c.name === "vida_csrf")?.value ?? "" } });
+  await page.request.post("/api/v1/auth/logout", { headers: { "x-csrf-token": (await context.cookies()).find((c) => c.name === "dane_csrf")?.value ?? "" } });
   await devLogin(page, 222);
   await page.goto(`/hoy?date=${date}`);
   await expect(page.locator("fieldset", { hasText: "Energía (1–5)" })).toBeVisible();
   await expect(page.locator("fieldset", { hasText: "Energía (1–5)" }).locator("input[type=radio]:checked")).toHaveCount(0);
   const other = await (await page.request.get(`/api/v1/checkins/${date}`)).json();
   expect(other.checkin?.energy ?? null).not.toBe(5);
-  expect(before.some((n) => n?.startsWith("vida-offline-"))).toBeTruthy();
+  expect(before.some((n) => n?.startsWith("dane-offline-"))).toBeTruthy();
 });

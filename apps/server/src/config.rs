@@ -19,7 +19,7 @@ pub struct Config {
     pub bind_addr: SocketAddr,
     pub database_url: String,
     pub database_max_connections: u32,
-    /// Origen público único de web + API (ej. `https://vida.ejemplo.com`).
+    /// Origen público único de web + API (ej. `https://dane.ejemplo.com`).
     pub public_base_url: url::Url,
     pub telegram_bot_token: Option<String>,
     pub telegram_bot_username: Option<String>,
@@ -248,7 +248,7 @@ impl Config {
             database_max_connections: 5,
             public_base_url: "http://localhost:5173".parse().unwrap(),
             telegram_bot_token: Some("123456:TEST-TOKEN".into()),
-            telegram_bot_username: Some("vida_test_bot".into()),
+            telegram_bot_username: Some("dane_test_bot".into()),
             miniapp_max_age_secs: 3600,
             allowed_telegram_ids: [111, 222].into_iter().collect(),
             cookie_secure: false,
@@ -279,7 +279,7 @@ mod tests {
     fn dev_login_is_impossible_in_production() {
         let mut c = Config::for_tests("postgres://x");
         c.env = AppEnv::Production;
-        c.public_base_url = "https://vida.example.com".parse().unwrap();
+        c.public_base_url = "https://dane.example.com".parse().unwrap();
         c.cookie_secure = true;
         c.demo_enabled = false;
         assert!(c.validate().is_err(), "dev login en producción debe fallar");
@@ -292,7 +292,7 @@ mod tests {
     #[test]
     fn dev_login_requires_local_origin() {
         let mut c = Config::for_tests("postgres://x");
-        c.public_base_url = "https://vida.example.com".parse().unwrap();
+        c.public_base_url = "https://dane.example.com".parse().unwrap();
         assert!(c.validate().is_err());
     }
 }

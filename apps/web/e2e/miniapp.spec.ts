@@ -12,7 +12,7 @@ test("Mini App: initData firmado autentica con Bearer en memoria y conserva la f
   await expect(page.getByText(/10 de noviembre|2026-11-10/).first()).toBeVisible();
   // Sin cookies de sesión: el token Bearer vive solo en memoria.
   const cookies = await context.cookies();
-  expect(cookies.find((c) => c.name === "vida_session")).toBeUndefined();
+  expect(cookies.find((c) => c.name === "dane_session")).toBeUndefined();
   const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
   expect(stored).not.toMatch(/token|bearer/i);
 });

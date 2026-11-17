@@ -1,4 +1,4 @@
-// IndexedDB particionado por usuario: una base por user_id (`vida-offline-<userId>`), así los borradores y la cola de
+// IndexedDB particionado por usuario: una base por user_id (`dane-offline-<userId>`), así los borradores y la cola de
 // una cuenta nunca son visibles para otra y cerrar sesión borra la base completa.
 import { type DBSchema, deleteDB, type IDBPDatabase, openDB } from "idb";
 
@@ -54,7 +54,7 @@ interface OfflineSchema extends DBSchema {
   snapshots: { key: string; value: SnapshotRecord };
 }
 
-const DB_PREFIX = "vida-offline-";
+const DB_PREFIX = "dane-offline-";
 const cache = new Map<string, Promise<IDBPDatabase<OfflineSchema>>>();
 
 export function dbName(userId: string) {

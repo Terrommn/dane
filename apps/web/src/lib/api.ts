@@ -1,5 +1,5 @@
-// Cliente de la API sobre @vida/api-client (tipos generados del OpenAPI del servidor).
-import { createApiClient, type Schemas } from "@vida/api-client";
+// Cliente de la API sobre @dane/api-client (tipos generados del OpenAPI del servidor).
+import { createApiClient, type Schemas } from "@dane/api-client";
 import { getSession, notifyUnauthorized, readCookie, type SessionState } from "./session";
 
 export type { Schemas };
@@ -28,7 +28,7 @@ export function applyAuthHeaders(
   }
   if (MUTATIONS.has(m)) {
     if (session.mode !== "bearer") {
-      const csrf = readCookie("vida_csrf", cookieString);
+      const csrf = readCookie("dane_csrf", cookieString);
       if (csrf) headers.set("X-CSRF-Token", csrf);
     }
     if (!headers.has("Idempotency-Key")) headers.set("Idempotency-Key", newIdempotencyKey());

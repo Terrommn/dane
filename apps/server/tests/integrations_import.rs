@@ -439,7 +439,7 @@ async fn export_excludes_secrets_and_round_trips_links(pool: PgPool) {
         .map(|i| archive.by_index(i).unwrap().name().unwrap().to_string())
         .collect();
     for expected in [
-        "vida-export.json",
+        "dane-export.json",
         "csv/transacciones.csv",
         "csv/habitos.csv",
         "csv/tareas.csv",

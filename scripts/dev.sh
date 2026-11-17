@@ -19,12 +19,12 @@ cleanup() { echo; echo "Deteniendo…"; for p in "${pids[@]}"; do kill "$p" 2>/d
 trap cleanup EXIT INT TERM
 
 cargo build -p server -p telegram-bot
-./target/debug/vida-server serve & pids+=($!)
+./target/debug/dane-server serve & pids+=($!)
 for _ in $(seq 1 60); do curl -fsS "http://${BIND_ADDR}/readyz" >/dev/null 2>&1 && break; sleep 1; done
 echo "✓ API en http://${BIND_ADDR} (OpenAPI: /api/v1/openapi.json)"
 
 if [ -n "${TELEGRAM_BOT_TOKEN:-}" ]; then
-  env -u DATABASE_URL -u TEST_DATABASE_URL ./target/debug/vida-bot & pids+=($!)
+  env -u DATABASE_URL -u TEST_DATABASE_URL ./target/debug/dane-bot & pids+=($!)
   echo "✓ Bot en modo ${TELEGRAM_MODE:-polling}"
 else
   echo "• Bot omitido: define TELEGRAM_BOT_TOKEN en .env para probarlo"

@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 OUT=packages/api-client
 # utoipa fusiona en silencio schemas con el mismo nombre: se prohíben duplicados.
 python3 scripts/check-schema-names.py
-cargo run -q -p server --bin vida-server -- openapi > "$OUT/openapi.json.tmp"
+cargo run -q -p server --bin dane-server -- openapi > "$OUT/openapi.json.tmp"
 mv "$OUT/openapi.json.tmp" "$OUT/openapi.json"
 python3 - "$OUT/openapi.json" <<'PY'
 import collections, json, sys

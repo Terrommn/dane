@@ -31,7 +31,7 @@ export function subscribeSession(fn: () => void): () => void {
   return () => listeners.delete(fn);
 }
 
-/** Lee una cookie no HttpOnly (solo `vida_csrf`). */
+/** Lee una cookie no HttpOnly (solo `dane_csrf`). */
 export function readCookie(
   name: string,
   cookieString: string = typeof document === "undefined" ? "" : document.cookie,

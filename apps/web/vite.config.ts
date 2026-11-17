@@ -3,9 +3,9 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vitest/config";
 
-// Destino del proxy de la API en desarrollo (VIDA_API_URL para usar otro puerto).
+// Destino del proxy de la API en desarrollo (DANE_API_URL para usar otro puerto).
 const apiTarget =
-  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VIDA_API_URL ??
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.DANE_API_URL ??
   "http://127.0.0.1:8080";
 
 /** Chunk que pertenece solo al editor de dibujos: el lienzo o dependencias exclusivas de Excalidraw. */
@@ -27,8 +27,8 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ["icons/*.png", "favicon.svg"],
       manifest: {
-        name: "Vida — hábitos, objetivos y organización",
-        short_name: "Vida",
+        name: "Dane — hábitos, objetivos y organización",
+        short_name: "Dane",
         description: "Check-in diario, hábitos, objetivos, finanzas y notas.",
         lang: "es-MX",
         start_url: "/hoy",

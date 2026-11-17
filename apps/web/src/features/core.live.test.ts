@@ -1,4 +1,4 @@
-// Contrato en vivo contra un servidor real (opcional): VIDA_LIVE_API=http://127.0.0.1:8097 pnpm -C apps/web exec vitest run core.live
+// Contrato en vivo contra un servidor real (opcional): DANE_LIVE_API=http://127.0.0.1:8097 pnpm -C apps/web exec vitest run core.live
 // Usa las mismas funciones que la UI para armar los cuerpos (buildPatch, valuesToBody, fixedBody, cleanFrequency…)
 // y verifica que el servidor los acepta y que los datos regresan iguales (ida y vuelta).
 // Requiere DEV_LOGIN_ENABLED=true y el ID 111 en ALLOWED_TELEGRAM_IDS.
@@ -13,7 +13,7 @@ import { buildPatch, formFromFull, serverAsPatch } from "./today/checkin";
 import { formFromReview } from "./weekly/WeeklyPage";
 
 const BASE = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env
-  .VIDA_LIVE_API;
+  .DANE_LIVE_API;
 const live = BASE ? describe : describe.skip;
 
 live("contrato en vivo de la UI núcleo", () => {

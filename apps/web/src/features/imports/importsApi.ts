@@ -65,7 +65,7 @@ export async function downloadExport(kind: "json" | "zip"): Promise<string> {
   if (!r.ok) throw toApiError(r.status, await r.json().catch(() => null));
   const blob = await r.blob();
   const cd = r.headers.get("content-disposition") ?? "";
-  const name = /filename="([^"]+)"/.exec(cd)?.[1] ?? `vida-export.${kind}`;
+  const name = /filename="([^"]+)"/.exec(cd)?.[1] ?? `dane-export.${kind}`;
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

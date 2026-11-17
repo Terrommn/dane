@@ -24,7 +24,7 @@ impl AppState {
     pub fn new(pool: PgPool, config: Config, clock: Arc<dyn Clock>) -> Self {
         let http = reqwest::Client::builder()
             .timeout(std::time::Duration::from_secs(20))
-            .user_agent("vida-server/0.1")
+            .user_agent("dane-server/0.1")
             .build()
             .expect("cliente HTTP");
         let cipher = Cipher::new(&config.encryption_key);

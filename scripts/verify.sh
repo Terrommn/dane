@@ -9,7 +9,7 @@ LOG_DIR="${VERIFY_LOG_DIR:-$ROOT/.data/verify}"
 mkdir -p "$LOG_DIR"
 if [ -z "${CI:-}" ]; then
   bash scripts/dev-db.sh start >/dev/null
-  export DATABASE_URL="${TEST_DATABASE_URL:-postgres://vida:vida@127.0.0.1:5433/vida_test}"
+  export DATABASE_URL="${TEST_DATABASE_URL:-postgres://dane:dane@127.0.0.1:5433/dane_test}"
 fi
 export DATABASE_URL="${DATABASE_URL:?DATABASE_URL de pruebas}"
 export SQLX_OFFLINE=true

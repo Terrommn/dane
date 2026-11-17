@@ -6,7 +6,7 @@
 //! | `SERVER_INTERNAL_URL` | sí | URL interna del server (ej. `http://server:8080`), nunca pública |
 //! | `INTERNAL_API_TOKEN` | sí | ≥ 32 caracteres; el mismo que el server |
 //! | `TELEGRAM_MODE` | no | `polling` (por defecto, desarrollo) o `webhook` (producción). Exclusivos |
-//! | `WEBHOOK_PUBLIC_URL` | webhook | URL HTTPS pública que Telegram llamará, ej. `https://vida.ejemplo.com/telegram/webhook` |
+//! | `WEBHOOK_PUBLIC_URL` | webhook | URL HTTPS pública que Telegram llamará, ej. `https://dane.ejemplo.com/telegram/webhook` |
 //! | `WEBHOOK_SECRET` | webhook | 16–256 caracteres `[A-Za-z0-9_-]`; Telegram lo manda en `X-Telegram-Bot-Api-Secret-Token` |
 //! | `BOT_BIND_ADDR` | no | Escucha HTTP del bot (webhook + `/healthz`), por defecto `0.0.0.0:8081` |
 //! | `TELEGRAM_API_URL` | no | Base de la Bot API (por defecto `https://api.telegram.org`; útil para pruebas) |

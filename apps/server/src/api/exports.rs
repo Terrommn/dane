@@ -27,7 +27,7 @@ async fn export_json(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Jso
     Ok(Json(v))
 }
 
-/// ZIP con `vida-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault).
+/// ZIP con `dane-export.json`, CSV (transacciones, hábitos, tareas) y Markdown reimportable (formato del vault).
 #[utoipa::path(get, path = "/exports/zip", tag = "exports", responses((status = 200, content_type = "application/zip", body = Vec<u8>)))]
 async fn export_zip(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Response> {
     let bytes = exporter::export_zip(&s, auth.user_id).await?;
@@ -41,7 +41,7 @@ async fn export_zip(State(s): State<AppState>, auth: AuthUser) -> ApiResult<Resp
     )
     .await;
     let name = format!(
-        "vida-export-{}.zip",
+        "dane-export-{}.zip",
         crate::integrations::today(&s, auth.user_id).await
     );
     Ok((

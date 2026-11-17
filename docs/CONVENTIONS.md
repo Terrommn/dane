@@ -53,8 +53,8 @@ requisito, no reflejar la implementación.
 
 Comandos (en tu worktree):
 ```bash
-cp -cR /Users/neilrodriguez/Developer/Coding/vida/target ./target 2>/dev/null || true   # reutiliza dependencias compiladas (APFS clone)
-export DATABASE_URL=postgres://vida:vida@127.0.0.1:5433/vida_test CARGO_BUILD_JOBS=3
+cp -cR /Users/neilrodriguez/Developer/Coding/dane/target ./target 2>/dev/null || true   # reutiliza dependencias compiladas (APFS clone)
+export DATABASE_URL=postgres://dane:dane@127.0.0.1:5433/dane_test CARGO_BUILD_JOBS=3
 cargo test -p server --test <tu_archivo>       # y cargo test -p domain
 cargo clippy -p server --all-targets -- -D warnings && cargo fmt --all
 ```

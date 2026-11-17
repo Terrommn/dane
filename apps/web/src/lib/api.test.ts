@@ -8,16 +8,16 @@ const bearer = { mode: "bearer" as const, token: "tok-123", userId: "u" };
 
 describe("cabeceras de autenticación", () => {
   it("Mini App: Bearer en memoria, sin CSRF", () => {
-    const h = applyAuthHeaders("POST", new Headers(), bearer, "vida_csrf=abc");
+    const h = applyAuthHeaders("POST", new Headers(), bearer, "dane_csrf=abc");
     expect(h.get("Authorization")).toBe("Bearer tok-123");
     expect(h.get("X-CSRF-Token")).toBeNull();
   });
 
   it("web: CSRF desde la cookie solo en mutaciones y nunca Authorization", () => {
-    const post = applyAuthHeaders("POST", new Headers(), cookie, "other=1; vida_csrf=abc%3D");
+    const post = applyAuthHeaders("POST", new Headers(), cookie, "other=1; dane_csrf=abc%3D");
     expect(post.get("X-CSRF-Token")).toBe("abc=");
     expect(post.get("Authorization")).toBeNull();
-    const get = applyAuthHeaders("GET", new Headers(), cookie, "vida_csrf=abc");
+    const get = applyAuthHeaders("GET", new Headers(), cookie, "dane_csrf=abc");
     expect(get.get("X-CSRF-Token")).toBeNull();
   });
 

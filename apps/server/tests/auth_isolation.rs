@@ -194,11 +194,11 @@ async fn cookie_sessions_require_matching_csrf(pool: PgPool) {
     assert!(
         cookies
             .iter()
-            .any(|c| c.starts_with("vida_session=") && c.contains("HttpOnly") && c.contains("SameSite=Lax"))
+            .any(|c| c.starts_with("dane_session=") && c.contains("HttpOnly") && c.contains("SameSite=Lax"))
     );
     let session = cookies
         .iter()
-        .find(|c| c.starts_with("vida_session="))
+        .find(|c| c.starts_with("dane_session="))
         .unwrap()
         .split(';')
         .next()
@@ -206,13 +206,13 @@ async fn cookie_sessions_require_matching_csrf(pool: PgPool) {
         .to_string();
     let csrf_cookie = cookies
         .iter()
-        .find(|c| c.starts_with("vida_csrf="))
+        .find(|c| c.starts_with("dane_csrf="))
         .unwrap()
         .split(';')
         .next()
         .unwrap()
         .to_string();
-    let csrf2 = csrf_cookie.trim_start_matches("vida_csrf=").to_string();
+    let csrf2 = csrf_cookie.trim_start_matches("dane_csrf=").to_string();
     assert_ne!(csrf, csrf2, "cada sesión tiene su propio CSRF");
     let cookie_header = format!("{session}; {csrf_cookie}");
 

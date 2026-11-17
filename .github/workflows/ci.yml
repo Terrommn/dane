@@ -12,25 +12,25 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: vida
-          POSTGRES_PASSWORD: vida
-          POSTGRES_DB: vida_test
+          POSTGRES_USER: dane
+          POSTGRES_PASSWORD: dane
+          POSTGRES_DB: dane_test
         ports: ["5433:5432"]
         options: >-
-          --health-cmd "pg_isready -U vida" --health-interval 5s --health-timeout 3s --health-retries 20
+          --health-cmd "pg_isready -U dane" --health-interval 5s --health-timeout 3s --health-retries 20
     env:
       CI: "1"
-      DATABASE_URL: postgres://vida:vida@127.0.0.1:5433/vida_test
-      ADMIN_DATABASE_URL: postgres://vida:vida@127.0.0.1:5433/postgres
-      E2E_ADMIN_DATABASE_URL: postgres://vida:vida@127.0.0.1:5433/postgres
+      DATABASE_URL: postgres://dane:dane@127.0.0.1:5433/dane_test
+      ADMIN_DATABASE_URL: postgres://dane:dane@127.0.0.1:5433/postgres
+      E2E_ADMIN_DATABASE_URL: postgres://dane:dane@127.0.0.1:5433/postgres
     steps:
       - uses: actions/checkout@v4
       - name: Extensiones y rol con CREATEDB
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql-common && sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y && sudo apt-get install -y postgresql-client-17
           echo /usr/lib/postgresql/17/bin >> $GITHUB_PATH
-          PGPASSWORD=vida psql -h 127.0.0.1 -p 5433 -U vida -d vida_test -c "CREATE EXTENSION IF NOT EXISTS unaccent; CREATE EXTENSION IF NOT EXISTS pg_trgm;"
-          PGPASSWORD=vida psql -h 127.0.0.1 -p 5433 -U vida -d template1 -c "CREATE EXTENSION IF NOT EXISTS unaccent; CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+          PGPASSWORD=dane psql -h 127.0.0.1 -p 5433 -U dane -d dane_test -c "CREATE EXTENSION IF NOT EXISTS unaccent; CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+          PGPASSWORD=dane psql -h 127.0.0.1 -p 5433 -U dane -d template1 -c "CREATE EXTENSION IF NOT EXISTS unaccent; CREATE EXTENSION IF NOT EXISTS pg_trgm;"
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.94"
@@ -43,7 +43,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C apps/web exec playwright install --with-deps chromium
       - name: pnpm verify
-        run: PGPASSWORD=vida pnpm verify
+        run: PGPASSWORD=dane pnpm verify
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: verify-logs, path: .data/verify }

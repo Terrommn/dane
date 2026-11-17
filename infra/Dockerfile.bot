@@ -8,15 +8,15 @@ COPY apps/telegram-bot apps/telegram-bot
 COPY crates crates
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/src/target \
-    cargo build --release -p telegram-bot --locked && cp target/release/vida-bot /vida-bot
+    cargo build --release -p telegram-bot --locked && cp target/release/dane-bot /dane-bot
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl && rm -rf /var/lib/apt/lists/* \
     && useradd --system --uid 10002 bot
-COPY --from=build /vida-bot /usr/local/bin/vida-bot
+COPY --from=build /dane-bot /usr/local/bin/dane-bot
 USER bot
 ENV BOT_BIND_ADDR=0.0.0.0:8090 LOG_FORMAT=json
 EXPOSE 8090
 HEALTHCHECK --interval=15s --timeout=3s --start-period=20s --retries=5 CMD curl -fsS http://127.0.0.1:8090/healthz || exit 1
 STOPSIGNAL SIGTERM
-ENTRYPOINT ["vida-bot"]
+ENTRYPOINT ["dane-bot"]

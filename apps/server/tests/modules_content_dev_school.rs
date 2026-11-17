@@ -173,7 +173,7 @@ async fn devlog_sessions_and_pasted_text_import(pool: PgPool) {
     let (st, s1) = a
         .post(
             "/devlogs/2026-11-12/sessions",
-            json!({ "repo": "vida", "branch": "main", "at_time": "09:15", "changes_md": "- migraciones" }),
+            json!({ "repo": "dane", "branch": "main", "at_time": "09:15", "changes_md": "- migraciones" }),
         )
         .await;
     assert_eq!(st, StatusCode::CREATED, "{s1}");
@@ -196,7 +196,7 @@ async fn devlog_sessions_and_pasted_text_import(pool: PgPool) {
         2,
         "varias sesiones el mismo día"
     );
-    assert_eq!(day["sessions"][0]["repo"], "vida");
+    assert_eq!(day["sessions"][0]["repo"], "dane");
     let (_, list) = a.get("/devlogs").await;
     assert_eq!(list[0]["session_count"], 2);
     // Actividad del proyecto Negocio incluye la sesión.

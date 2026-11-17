@@ -42,7 +42,7 @@ pub fn parse_incoming(payload: &Value) -> Option<Incoming> {
     })
 }
 
-/// `/Weekly-Review@vida_bot  texto` → (`weekly_review`, `texto`). Acepta los nombres con guion del vault.
+/// `/Weekly-Review@dane_bot  texto` → (`weekly_review`, `texto`). Acepta los nombres con guion del vault.
 pub fn parse_command(text: &str) -> Option<(String, String)> {
     let t = text.trim_start();
     let rest = t.strip_prefix('/')?;
@@ -403,7 +403,7 @@ mod tests {
     fn parses_commands_with_bot_suffix_and_vault_hyphens() {
         assert_eq!(parse_command("/start"), Some(("start".into(), "".into())));
         assert_eq!(
-            parse_command("/Gasto@vida_bot 250 gasolina"),
+            parse_command("/Gasto@dane_bot 250 gasolina"),
             Some(("gasto".into(), "250 gasolina".into()))
         );
         assert_eq!(
@@ -411,8 +411,8 @@ mod tests {
             Some(("weekly_review".into(), "".into()))
         );
         assert_eq!(
-            parse_command("/log-session repo vida"),
-            Some(("log_session".into(), "repo vida".into()))
+            parse_command("/log-session repo dane"),
+            Some(("log_session".into(), "repo dane".into()))
         );
         assert_eq!(parse_command("hola"), None);
         assert_eq!(parse_command("/"), None);

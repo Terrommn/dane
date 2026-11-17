@@ -81,7 +81,7 @@ pub async fn export_json(state: &AppState, user_id: Uuid) -> anyhow::Result<Valu
         .fetch_one(&state.pool)
         .await?;
     Ok(json!({
-        "format": "vida-export",
+        "format": "dane-export",
         "version": 1,
         "exported_at": state.now(),
         "user": { "id": user["id"], "display_name": user["display_name"], "created_at": user["created_at"] },
@@ -128,7 +128,7 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
             Ok(())
         };
     let json = export_json(state, user_id).await?;
-    add(&mut zip, "vida-export.json", &serde_json::to_vec_pretty(&json)?)?;
+    add(&mut zip, "dane-export.json", &serde_json::to_vec_pretty(&json)?)?;
 
     // ---- CSV
     let tx: Vec<(chrono::NaiveDate, String, String, String, i64, String, Option<String>, Option<String>)> = sqlx::query_as(
