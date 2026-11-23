@@ -71,7 +71,7 @@ async fn goal_reminder_checkin_dashboard_round_trip(pool: PgPool) {
 
     // 2. El usuario abre el bot (/start) y conoce el chat privado.
     internal(&t, "/telegram/updates", json!({"update_id": 1, "payload": {"update_id": 1, "message": {"message_id": 1, "date": 0,
-        "chat": {"id": 111, "type": "private"}, "from": {"id": 111, "is_bot": false, "first_name": "Neil"}, "text": "/start"}}})).await;
+        "chat": {"id": 111, "type": "private"}, "from": {"id": 111, "is_bot": false, "first_name": "Usuario"}, "text": "/start"}}})).await;
     processor::drain(&t.state).await.unwrap();
     assert_eq!(claim_all(&t).await.len(), 1, "respuesta de bienvenida");
 

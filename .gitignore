@@ -14,3 +14,15 @@ test-results/
 .claude/worktrees/
 apps/web/playwright-report/
 apps/web/test-results/
+
+# Secretos y credenciales: nunca al repo (ver CLAUDE.md §3). .env.example es la única excepción.
+*.p12
+*.pfx
+*.keystore
+credentials*.json
+service-account*.json
+client_secret*.json
+.railway/
+.claude/settings.local.json
+# Llaves y JWKS de prueba generados por scripts/gen-test-keys.mjs
+apps/server/tests/fixtures/oidc_jwks.json

@@ -142,7 +142,10 @@ mod tests {
             &[
                 ("auth_date", &auth_date.to_string()),
                 ("query_id", "AAE"),
-                ("user", r#"{"id":111,"first_name":"Neil","username":"neil"}"#),
+                (
+                    "user",
+                    r#"{"id":111,"first_name":"Usuario","username":"usuario"}"#,
+                ),
                 ("signature", "abc"),
             ],
             token,
@@ -153,7 +156,7 @@ mod tests {
     fn accepts_valid_fresh_init_data() {
         let u = validate_init_data(&signed(1_800_000_000 - 30, TOKEN), TOKEN, now(), 3600).unwrap();
         assert_eq!(u.id, 111);
-        assert_eq!(u.username.as_deref(), Some("neil"));
+        assert_eq!(u.username.as_deref(), Some("usuario"));
     }
 
     #[test]

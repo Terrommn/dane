@@ -15,7 +15,7 @@ const INTERNAL: &str = "Bearer internal-test-token-0123456789abcdef";
 
 fn upd(id: i64, from: i64, chat_type: &str, text: &str) -> Value {
     json!({"update_id": id, "message": {"message_id": id, "date": 0,
-        "chat": {"id": from, "type": chat_type}, "from": {"id": from, "is_bot": false, "first_name": "Neil"}, "text": text}})
+        "chat": {"id": from, "type": chat_type}, "from": {"id": from, "is_bot": false, "first_name": "Usuario"}, "text": text}})
 }
 
 async fn internal(t: &TestApp, path: &str, body: Value) -> (StatusCode, Value) {
@@ -574,7 +574,7 @@ async fn greeting_opens_menu_instead_of_inbox(pool: PgPool) {
     let jobs = claim(&t, 5).await;
     assert_eq!(jobs.len(), 1);
     let msg = &jobs[0]["message"];
-    assert!(msg["text"].as_str().unwrap().starts_with("¡Hola, Neil!"));
+    assert!(msg["text"].as_str().unwrap().starts_with("¡Hola, Usuario!"));
     assert_eq!(
         msg["buttons"][0][0]["url"],
         "http://localhost:5173/hoy?date=2026-11-12&guiado=manana"

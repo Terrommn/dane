@@ -59,6 +59,17 @@ Comando: `pnpm verify` → tabla de pasos con código de salida (logs en `.data/
   | **revisión responsive de 29 pantallas**: sin errores, sin "pendiente", sin scroll horizontal (capturas en `apps/web/test-results/screens/`) | ✅ | ✅ |
   | espacio demo poblado y aislado en 12 módulos | ✅ | ✅ |
 
+## Actualización 2026-11-23 (Railway, rediseño y asistente diario)
+* Rust: pruebas nuevas del asistente (`telegram_flow.rs`: menú por saludo, resumen de la mañana, mañana omitida si
+  ya hay check-in, aviso de evento; `scheduler.rs`: texto de la mañana; `reminders.rs`: tipo `Morning`). Las llaves
+  RSA de `auth_oidc.rs` ya no viven solo en una máquina: `scripts/gen-test-keys.mjs` las genera (lo llama
+  `pnpm verify`). Hasta este cambio CI fallaba al compilar `auth_oidc` porque esos archivos no estaban en el repo.
+* Web: 140 pruebas unitarias pasan (incluye `home.test.ts`: saludo por zona horaria, racha, resumen del día).
+* Verificado en producción: login web OIDC, Mini App, `/start` y menú, check-in guiado de la mañana (energía, peso,
+  marcar como hecho) e interruptores de hábitos en Inicio.
+* Animación de Inicio medida con `requestAnimationFrame` (9.5 s de ciclo): mediana 5.6 ms por cuadro, p99 11.2 ms,
+  0 cuadros > 50 ms.
+
 ## Bugs encontrados por las pruebas y corregidos
 * Limpieza de flujos OIDC con `now()` de la BD en vez del reloj de la app (borraba el flujo recién creado).
 * Schemas OpenAPI homónimos y `operationId` duplicados que tipaban mal el cliente (ahora `pnpm verify` lo impide).
@@ -67,14 +78,14 @@ Comando: `pnpm verify` → tabla de pasos con código de salida (logs en `.data/
 * Rubros de presupuesto perdían el vínculo con gastos al editarse (IDs nuevos) — agente de finanzas.
 * Orden de la cola offline con dos operaciones en el mismo milisegundo — agente web.
 * Hoy mostraba "Borrador" aunque hubiera conflicto/error — agente web.
+* Login OIDC en producción fallaba con "Failed to parse server response": Telegram envía el JWKS con gzip (D-035).
+* Tirones en Inicio al reiniciar la animación y por `backdrop-filter` sobre el fondo animado (D-037).
 
 ## No ejecutado / requiere cuentas o dispositivos reales (ver `USER_SETUP.md`)
 | Prueba | Motivo |
 |---|---|
-| Bot real de Telegram, webhook en producción, 429/403 reales | requiere token de bot y dominio HTTPS |
-| Mini App en clientes reales de Telegram | requiere bot + HTTPS; se probó con initData firmado y un stub del SDK |
-| Telegram Login OIDC real | requiere credenciales de BotFather; se probó con IdP simulado |
+| Webhook y 429/403 reales | producción usa polling; el bot real (comandos, menú, recordatorios) sí se verificó en Railway |
 | PWA instalada en iOS/Android | requiere dispositivo; se probó SW/offline en Chrome de escritorio y emulación móvil |
 | Google, Gmail, ClickUp, Anthropic reales | requieren tus cuentas; probados con servidores HTTP simulados (wiremock) |
-| Imágenes Docker / Compose / Caddy | Docker no está instalado en esta Mac; los Dockerfiles y Compose no se construyeron aquí (CI de GitHub Actions corre `pnpm verify`, no construye imágenes) |
+| Compose / Caddy (VPS) | No probado. Las imágenes de producción sí se construyen en Railway (`Dockerfile.railway`, `Dockerfile.railway.bot`); CI corre `pnpm verify`, no construye imágenes |
 | WebKit/Firefox | Playwright 1.65 en macOS 13 solo con Chrome del sistema |

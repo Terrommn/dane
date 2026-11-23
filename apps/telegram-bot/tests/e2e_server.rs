@@ -48,7 +48,7 @@ async fn start_command_round_trip(pool: PgPool) {
 
     // Telegram → webhook del bot → server.
     let update = json!({"update_id": 5000, "message": {"message_id": 1, "date": 0, "chat": {"id": 111, "type": "private"},
-        "from": {"id": 111, "is_bot": false, "first_name": "Neil"}, "text": "/start"}});
+        "from": {"id": 111, "is_bot": false, "first_name": "Usuario"}, "text": "/start"}});
     let hook = webhook::router(webhook::WebhookState {
         api: api.clone(),
         secret: Some("abcdefghijklmnop_123".into()),

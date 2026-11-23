@@ -13,7 +13,7 @@ fn init_data(t: &TestApp, user_id: i64, age_secs: i64, token: &str) -> String {
     sign_init_data_for_tests(
         &[
             ("auth_date", &auth_date),
-            ("user", &format!(r#"{{"id":{user_id},"first_name":"Neil"}}"#)),
+            ("user", &format!(r#"{{"id":{user_id},"first_name":"Usuario"}}"#)),
             ("start_param", "checkin_2026-11-11"),
         ],
         token,

@@ -4,7 +4,7 @@ Formato: ID · decisión · motivo · alternativas · estado. Se revisan al rean
 
 | ID | Decisión | Motivo | Alternativas | Estado |
 |---|---|---|---|---|
-| D-001 | Repositorio nuevo en `~/Developer/Coding/dane`, proyecto Obsidian **personal** | No había repositorio destino; la app es de vida personal | Otro nombre/ubicación | aceptada (reversible) |
+| D-001 | Repositorio nuevo `dane`, proyecto Obsidian **personal** | No había repositorio destino; la app es de vida personal | Otro nombre/ubicación | aceptada (reversible) |
 | D-002 | Herramienta de tareas: `TaskCreate/TaskUpdate/TaskList` del entorno (equivalente a TodoWrite, que no está expuesto). Número de tarea `#N` = `TN`. `blocked_external` se mantiene `pending` allí y se documenta en `TASKS.md` | El entorno no expone TodoWrite | — | aceptada |
 | D-003 | Versiones fijadas (nov 2026): Rust 1.94 (Homebrew), axum 0.8, sqlx 0.9, teloxide 0.17, reqwest 0.13, utoipa 6, openidconnect 4.1, chrono-tz 0.10, Node 24, pnpm 12, PostgreSQL 17 | Verificadas con `cargo search`/`npm view`; lockfiles versionados | — | aceptada |
 | D-004 | Sin Docker en la máquina de desarrollo: `scripts/dev-db.sh` usa PostgreSQL nativo (Homebrew); Compose se entrega para quien tenga Docker y para producción | Docker no está instalado | Instalar Docker Desktop | aceptada |
@@ -36,3 +36,8 @@ Formato: ID · decisión · motivo · alternativas · estado. Se revisan al rean
 | D-030 | Suscripciones, ingresos fijos y pendientes recurrentes importados empiezan el mes siguiente | El vault ya registró las ocurrencias pasadas | Recalcular históricos | aceptada |
 | D-031 | Calendar sincroniza por ventana (ayer → +7 días) con paginación; sin `syncToken` porque Google no lo combina con `timeMin/timeMax` | Limitación del proveedor | syncToken global | aceptada |
 | D-032 | LLM vía HTTP directo a Messages API (no hay SDK oficial de Rust) con salida restringida por JSON Schema y validación posterior en Rust | Adaptador real y validado | — | aceptada |
+| D-033 | Producción en Railway con un contenedor `server` que sirve web + API (`WEB_DIST_DIR`) en el mismo origen; `bot` aparte por red privada | Cookie + CSRF y Mini App exigen mismo origen; sin dominio propio ni Caddy; servicios siempre encendidos | VPS con Compose + Caddy (sigue documentado en DEPLOY §B) | aceptada |
+| D-034 | Bot en modo polling en producción | Un servicio menos que exponer y sin `WEBHOOK_SECRET`; latencia suficiente para uso personal | Webhook | aceptada |
+| D-035 | `reqwest` 0.12 con feature `gzip` (la usa `openidconnect`) | Telegram entrega el JWKS comprimido aunque no se pida y el login OIDC fallaba al parsearlo | Proxy/descarga manual del JWKS | aceptada |
+| D-036 | Asistente diario (mañana, cierre, avisos de eventos, menú) con plantillas fijas, sin LLM | Gratis, predecible y sin enviar datos a terceros; reutiliza el outbox de jobs | Mensajes generados con IA | aceptada |
+| D-037 | Fondo de Inicio: planos isométricos en SVG animados con Web Animations API, ciclo reversible (abrir → dispersar → regresar → cerrar) sin redibujar; sin `backdrop-filter` sobre la capa animada; oculto en móvil y con `prefers-reduced-motion` | Sin video pesado ni aspecto "generado por IA"; 0 cuadros > 50 ms medidos | Video de fondo | aceptada |

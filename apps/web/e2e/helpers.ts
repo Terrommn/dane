@@ -20,7 +20,7 @@ export function signedInitData(userId: number, startParam?: string): string {
   const fields: [string, string][] = [
     ["auth_date", String(Math.floor(Date.now() / 1000))],
     ["query_id", "AAE2E"],
-    ["user", JSON.stringify({ id: userId, first_name: "Neil", language_code: "es" })],
+    ["user", JSON.stringify({ id: userId, first_name: "Usuario", language_code: "es" })],
   ];
   if (startParam) fields.push(["start_param", startParam]);
   const check = [...fields].sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}=${v}`).join("\n");

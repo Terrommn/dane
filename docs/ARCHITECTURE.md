@@ -19,6 +19,12 @@
                                                               PostgreSQL 17 (fuente de verdad)
 ```
 
+**Producción (Railway)**: no hay Caddy. El servicio `server` sirve la web compilada (`WEB_DIST_DIR`) y `/api` en el
+mismo origen `*.up.railway.app`. El servicio `bot` (polling) llama a `/internal/*` por la red privada
+(`server.railway.internal`). Ojo: sin Caddy, `/internal/*` **también es alcanzable desde el dominio público**; lo
+protege únicamente `INTERNAL_API_TOKEN` (sin él responde 401), así que ese token debe ser largo y aleatorio. El diagrama de arriba con Caddy corresponde al despliegue en VPS
+(`infra/compose.prod.yml`). Ver `DEPLOY.md`.
+
 * **apps/server** concentra reglas de negocio y acceso a datos: API `/api/v1`, autenticación (Mini App, OIDC, sesiones),
   scheduler de recordatorios/recurrencias, procesamiento de updates de Telegram, integraciones (Google, ClickUp, LLM),
   importación/exportación. Expone OpenAPI en `/api/v1/openapi.json`.
@@ -41,7 +47,8 @@
    se re-autentica con `initData`. No se usa `initDataUnsafe`.
 2. **Web/PWA**: `GET /api/v1/auth/oidc/start` → server crea `state`, `nonce`, PKCE (S256) en `oauth_flows` →
    `oauth.telegram.org/auth` → `GET /api/v1/auth/oidc/callback` → intercambio con Basic auth → validación del ID token
-   con `openidconnect` (firma JWKS, `iss`, `aud`, `exp`, `nonce`) → claim `id` (ID Telegram, distinto de `sub`) →
+   con `openidconnect` (firma JWKS, `iss`, `aud`, `exp`, `nonce`; Telegram sirve el JWKS con gzip aunque no se pida,
+   por eso `reqwest` 0.12 lleva la feature `gzip`, D-035) → claim `id` (ID Telegram, distinto de `sub`) →
    allowlist → vínculo con la misma `users.id` de la Mini App → cookie `dane_session` HttpOnly Secure SameSite=Lax +
    cookie `dane_csrf` (double submit; header `X-CSRF-Token` obligatorio en mutaciones con cookie).
 3. **Desarrollo**: `POST /api/v1/auth/dev-login` solo si `APP_ENV=development` y `DEV_LOGIN_ENABLED=true`; el arranque
@@ -65,8 +72,21 @@ expiran los vencidos. Ack con `lease_token`: `sent` (idempotente), `retry` (back
 `failed` (permanente, p. ej. 403 bot bloqueado → `telegram_chats.can_message=false`). Ack con token obsoleto → 409.
 Entrega *al menos una vez*: un timeout tras el envío puede duplicar excepcionalmente.
 
+### Asistente diario en Telegram (sin IA)
+Todo es texto armado con plantillas en `apps/server/src/telegram/scheduler.rs`; no usa LLM.
+* **Mañana** (`reminder_morning`, `user_settings.morning_enabled/morning_time`, 07:00 por defecto, gracia 3 h):
+  resumen con tareas abiertas cuya fecha (`COALESCE(planned_on, due_on)`) es hoy o anterior y eventos con hora del
+  día; botón a `/hoy?date=…&guiado=manana`. Se omite/cancela si `daily_checkins.morning_done_at` ya está puesto.
+* **Cierre del día** (recordatorio diario existente, `daily_time`, 21:00): botón a `/hoy?date=…&guiado=noche`; se
+  omite si `evening_done_at` está puesto.
+* **Avisos de eventos**: cada ciclo busca eventos que empiezan en `now..now+event_reminder_minutes(+5 min)` y encola
+  un job con `occurrence_key = "<id>@<starts_at>"` (idempotente; si el evento cambia de hora hay un aviso nuevo).
+  Respeta `/pause`.
+* **Menú**: `hola`, `menú` o `/menu` responden con botones (check-in, mi día, gasto…), en `telegram/commands.rs`.
+Todos usan el mismo outbox de jobs descrito arriba.
+
 ### Updates de Telegram
-Bot (polling o webhook, nunca ambos) → `POST /internal/v1/telegram/updates` → `INSERT … ON CONFLICT (update_id) DO NOTHING`
+Bot (polling en Railway o webhook en VPS, nunca ambos; un solo proceso por token) → `POST /internal/v1/telegram/updates` → `INSERT … ON CONFLICT (update_id) DO NOTHING`
 (estado `pending`) → 200 solo tras commit. El webhook responde a Telegram solo después de ese 200. Un procesador en el
 server toma updates `pending` (`SKIP LOCKED`), aplica efectos y encola respuestas **en la misma transacción** en que marca
 `processed`. Un update repetido no reemplaza ni descarta uno pendiente.

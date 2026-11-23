@@ -1,0 +1,25 @@
+# Configuración del escaneo de secretos (CI, job "secrets"). Usa las reglas por defecto de gitleaks.
+# Solo se permiten valores de desarrollo que son públicos a propósito; nunca agregues aquí un secreto real para
+# "callar" el escaneo: quítalo del repo y rótalo (CLAUDE.md §3).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Valores falsos de desarrollo y fixtures de prueba"
+paths = [
+  # Plantilla de variables: solo valores de desarrollo (token interno y llave de cifrado de ejemplo).
+  '''^\.env\.example$''',
+  # Pruebas: tokens, initData y llaves ficticias construidas para los tests.
+  '''^apps/server/tests/''',
+  '''^apps/telegram-bot/tests/''',
+  '''^apps/web/e2e/''',
+  '''^apps/web/src/.*\.test\.tsx?$''',
+  '''^infra/compose\.dev\.yml$''',
+  '''^\.github/workflows/ci\.yml$''',
+  '''^scripts/test-backup-restore\.sh$''',
+]
+# Valores de prueba exactos que aparecen fuera de las carpetas de tests (pruebas unitarias en src/).
+regexes = [
+  '''MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=''',  # base64("0123456789abcdef0123456789abcdef")
+  '''abcdefghijklmnop_123''',
+]

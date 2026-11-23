@@ -302,8 +302,8 @@ mod tests {
             open_tasks: 3,
             events: vec![("09:00".into(), "Junta con cliente".into())],
         };
-        let t = morning_text("David", d, &s);
-        assert!(t.starts_with("☀️ Buenos días, David. Hoy es lunes 23 de noviembre."));
+        let t = morning_text("Usuario", d, &s);
+        assert!(t.starts_with("☀️ Buenos días, Usuario. Hoy es lunes 23 de noviembre."));
         assert!(t.contains("Tienes 3 tareas pendientes."));
         assert!(t.contains("• 09:00 Junta con cliente"));
         let empty = morning_text("", d, &MorningSummary::default());

@@ -777,7 +777,7 @@ mod tests {
         assert!(excluded_calendar(
             "addressbook#contacts@group.v.calendar.google.com"
         ));
-        assert!(!excluded_calendar("neil@gmail.com"));
+        assert!(!excluded_calendar("usuario@example.com"));
     }
 
     #[test]

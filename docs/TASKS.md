@@ -76,17 +76,22 @@ Resumen: 65 completadas · 0 en curso · 0 pendientes · 1 bloqueadas externamen
 | T65 | Auditar requisitos contra implementación; resolver omisiones y bugs | lead | T64 | ✅ completed | Matriz recorrida sin huecos | Auditoría: corregidos contrato OpenAPI duplicado, PWA sin red, aviso offline, puerto dev, hábitos sugeridos en captura |
 | T66 | Reconciliar TodoWrite con evidencia y entregar estado final honesto | lead | T65 | ✅ completed | Lista y TASKS.md coinciden | TaskList y docs/TASKS.md reconciliados |
 
-## Verificaciones externas pendientes
+## Trabajo posterior (2026-11-23)
 
-| ID | Qué falta | Cómo retomarlo |
+| Tarea | Estado | Evidencia |
 |---|---|---|
-| X1 | Bot real: setMyCommands, /start y recordatorio en tu chat | USER_SETUP §1–2 |
-| X2 | Mini App en clientes reales con initData real | USER_SETUP §3 |
-| X3 | Webhook en producción y 429/403 reales | USER_SETUP §2 y §9 |
-| X4 | Telegram Login OIDC real | USER_SETUP §4 |
-| X5 | PWA instalada en iOS/Android sin red | USER_SETUP §5 |
-| X6 | Google Calendar/Gmail con tu cuenta | USER_SETUP §6 |
-| X7 | ClickUp con tu vista | USER_SETUP §7 |
-| X8 | Extracción con API real de Anthropic | USER_SETUP §8 |
-| X9 | Construir imágenes Docker y levantar compose.prod con Caddy/HTTPS (T62) | USER_SETUP §9 / DEPLOY.md |
-| X10 | Importar tu vault real | USER_SETUP §10 |
+| Despliegue en Railway (server + web, bot en polling, Postgres) conectado a `main` | ✅ completed | `infra/Dockerfile.railway*`, `docs/DEPLOY.md` §A; deploys en `SUCCESS`, `/readyz` 200 |
+| Login web con Telegram OIDC en producción (JWKS con gzip) | ✅ completed | D-035; login verificado en producción |
+| Rediseño Ámbar: barra superior, Inicio nuevo, vista móvil mínima | ✅ completed | `AppShell.tsx`, `HomePage.tsx`, `home.test.ts` |
+| Check-in guiado mañana/noche | ✅ completed | `GuidedCheckin.tsx`; verificado en producción |
+| Asistente diario en Telegram sin IA (mañana, cierre, avisos de eventos, menú) | ✅ completed | migración `0502_morning_assistant.sql`, `telegram_flow.rs` (4 pruebas nuevas) |
+| Fondo de planos animado en Inicio | ✅ completed | `Blueprint.tsx`, D-037 |
+| Llaves de prueba OIDC generadas (CI fallaba al compilar `auth_oidc`) | ✅ completed | `scripts/gen-test-keys.mjs`, paso en `verify.sh` |
+| Escaneo de secretos en CI (gitleaks) | ✅ completed | job `secrets` en `.github/workflows/ci.yml`, `.gitleaks.toml` |
+| Usabilidad de configuración de hábitos y objetivos | ⏳ pending | — |
+| Integrar el bot externo de gastos por audio | ⏳ pending | Documentar el mapeo de campos antes de escribir código |
+| Credenciales de Google en producción | ⏳ pending | USER_SETUP §6 |
+
+## Verificaciones externas
+Estado actualizado en [`USER_SETUP.md`](USER_SETUP.md) → "Verificaciones con cuentas o dispositivos reales".
+X1, X2, X4 y X9 (vía Railway) ya están verificadas; X3 no aplica en Railway (polling).

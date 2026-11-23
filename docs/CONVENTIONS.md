@@ -53,7 +53,8 @@ requisito, no reflejar la implementación.
 
 Comandos (en tu worktree):
 ```bash
-cp -cR /Users/neilrodriguez/Developer/Coding/dane/target ./target 2>/dev/null || true   # reutiliza dependencias compiladas (APFS clone)
+cp -cR <ruta-del-checkout-principal>/target ./target 2>/dev/null || true   # reutiliza dependencias compiladas (APFS clone)
+node scripts/gen-test-keys.mjs                   # llaves RSA de prueba para auth_oidc (no se suben al repo)
 export DATABASE_URL=postgres://dane:dane@127.0.0.1:5433/dane_test CARGO_BUILD_JOBS=3
 cargo test -p server --test <tu_archivo>       # y cargo test -p domain
 cargo clippy -p server --all-targets -- -D warnings && cargo fmt --all

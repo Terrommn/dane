@@ -95,7 +95,7 @@ fn id_token(iss: &str, claims_patch: Value, key: &str) -> String {
     let now = chrono::Utc::now().timestamp();
     let mut claims = json!({
         "iss": iss, "aud": CLIENT_ID, "sub": "1234123412341234123", "id": 111,
-        "iat": now, "exp": now + 300, "nonce": "", "preferred_username": "neil", "name": "Neil"
+        "iat": now, "exp": now + 300, "nonce": "", "preferred_username": "usuario", "name": "Usuario"
     });
     for (k, v) in claims_patch.as_object().unwrap() {
         if v.is_null() {

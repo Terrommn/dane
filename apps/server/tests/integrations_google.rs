@@ -115,7 +115,7 @@ async fn calendar_and_gmail_sync_without_duplicates_or_silent_people(pool: PgPoo
     Mock::given(method("GET"))
         .and(path("/calendar/v3/users/me/calendarList"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "items": [
-            { "id": "neil@gmail.com", "summary": "Neil", "primary": true },
+            { "id": "usuario@example.com", "summary": "Usuario", "primary": true },
             { "id": "en.mexican#holiday@group.v.calendar.google.com", "summary": "Festivos" }
         ]})))
         .mount(&mock)
@@ -123,13 +123,13 @@ async fn calendar_and_gmail_sync_without_duplicates_or_silent_people(pool: PgPoo
     let events = |start: &str| {
         json!({ "items": [
             { "id": "ev1", "status": "confirmed", "summary": "Comida con Ana", "start": { "dateTime": start }, "end": { "dateTime": "2026-11-12T17:00:00Z" },
-              "attendees": [ { "email": "neil@gmail.com", "self": true }, { "email": "ana@x.com" }, { "email": "beto@y.com", "displayName": "Beto" }, { "email": "sala@resource.calendar.google.com", "resource": true } ] },
+              "attendees": [ { "email": "usuario@example.com", "self": true }, { "email": "ana@x.com" }, { "email": "beto@y.com", "displayName": "Beto" }, { "email": "sala@resource.calendar.google.com", "resource": true } ] },
             { "id": "ev2", "status": "confirmed", "summary": "Viaje", "start": { "date": "2026-11-13" }, "end": { "date": "2026-11-14" } },
             { "id": "ev3", "status": "cancelled" }
         ]})
     };
     Mock::given(method("GET"))
-        .and(path("/calendar/v3/calendars/neil%40gmail.com/events"))
+        .and(path("/calendar/v3/calendars/usuario%40example.com/events"))
         .and(query_param("singleEvents", "true"))
         .respond_with(ResponseTemplate::new(200).set_body_json(events("2026-11-12T16:00:00Z")))
         .mount(&mock)
@@ -231,7 +231,7 @@ async fn calendar_and_gmail_sync_without_duplicates_or_silent_people(pool: PgPoo
     // Cambio de hora: se actualiza el mismo evento. Desaparición: se quita.
     mock.reset().await;
     Mock::given(method("GET"))
-        .and(path("/calendar/v3/calendars/neil%40gmail.com/events"))
+        .and(path("/calendar/v3/calendars/usuario%40example.com/events"))
         .respond_with(ResponseTemplate::new(200).set_body_json(events("2026-11-12T15:00:00Z")))
         .mount(&mock)
         .await;
@@ -239,7 +239,7 @@ async fn calendar_and_gmail_sync_without_duplicates_or_silent_people(pool: PgPoo
         .and(path("/calendar/v3/users/me/calendarList"))
         .respond_with(
             ResponseTemplate::new(200)
-                .set_body_json(json!({ "items": [ { "id": "neil@gmail.com", "primary": true } ] })),
+                .set_body_json(json!({ "items": [ { "id": "usuario@example.com", "primary": true } ] })),
         )
         .mount(&mock)
         .await;
@@ -261,12 +261,12 @@ async fn calendar_and_gmail_sync_without_duplicates_or_silent_people(pool: PgPoo
         .and(path("/calendar/v3/users/me/calendarList"))
         .respond_with(
             ResponseTemplate::new(200)
-                .set_body_json(json!({ "items": [ { "id": "neil@gmail.com", "primary": true } ] })),
+                .set_body_json(json!({ "items": [ { "id": "usuario@example.com", "primary": true } ] })),
         )
         .mount(&mock)
         .await;
     Mock::given(method("GET"))
-        .and(path("/calendar/v3/calendars/neil%40gmail.com/events"))
+        .and(path("/calendar/v3/calendars/usuario%40example.com/events"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "items": [] })))
         .mount(&mock)
         .await;

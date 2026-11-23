@@ -19,14 +19,14 @@ async fn setup(mock: &MockServer, a: &common::Client) {
         .and(path("/api/v2/user"))
         .and(header("Authorization", "pk_test_token"))
         .respond_with(
-            ResponseTemplate::new(200).set_body_json(json!({ "user": { "id": 7, "username": "neil" } })),
+            ResponseTemplate::new(200).set_body_json(json!({ "user": { "id": 7, "username": "usuario" } })),
         )
         .mount(mock)
         .await;
     let (st, body) = a.put("/integrations/clickup", json!({ "token": "pk_test_token", "view_id": "2ky4g3c0-10613", "endpoints_override": mock.uri() })).await;
     assert_eq!(st, StatusCode::OK, "{body}");
     assert_eq!(body["status"], "connected");
-    assert_eq!(body["account_label"], "neil");
+    assert_eq!(body["account_label"], "usuario");
     assert_eq!(body["config"]["clickup_user_id"], 7);
 }
 

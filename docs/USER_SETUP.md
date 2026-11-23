@@ -6,45 +6,54 @@ Convención: `DOMAIN` es tu dominio público (ej. `dane.tudominio.com`); `PUBLIC
 
 ## 0. Probar todo localmente (sin cuentas externas)
 ```bash
-cd ~/Developer/Coding/dane
+cd dane            # raíz del repo
 pnpm install
 pnpm dev            # PostgreSQL local :5433 + API :8080 + web :5180 (+ bot si pones token)
 ```
 * Abre http://localhost:5180 → **Entrar en modo desarrollo** con el ID `111` (tu cuenta de pruebas), o
   **Explorar con datos demo** para ver todos los módulos poblados con datos ficticios marcados `[DEMO]`.
 * Para usar tu ID real de Telegram en local, ponlo en `.env` → `ALLOWED_TELEGRAM_IDS=111,<tu_id>`.
+* Bot en local: usa un **bot de pruebas propio** (otro token). Con el token de producción, el bot local y el de
+  Railway se pelean los mensajes (Telegram permite un solo lector por bot en modo polling).
 * Verificación completa: `pnpm verify` (Rust, contrato, web, E2E con Chrome, backup/restore).
-* Sin Docker: `brew install postgresql@17` (ya hecho en esta Mac). Con Docker: `USE_DOCKER_DB=1 pnpm dev`.
+* Sin Docker: `brew install postgresql@17`. Con Docker: `USE_DOCKER_DB=1 pnpm dev`.
 
 Comprobación: la pantalla **Hoy** guarda un check-in ("✓ Guardado"), **Dashboard** lo refleja y `/ajustes` muestra
 "Telegram: chat no conectado" hasta completar el paso 2.
 
 ## 1. Tu ID de Telegram (allowlist)
-1. En Telegram, escribe a `@userinfobot` (o `@getmyid_bot`) y copia tu **Id** numérico.
-2. `ALLOWED_TELEGRAM_IDS=<tu_id>` (separa varios con comas). En producción no puede quedar vacío.
+1. En Telegram, escribe a `@userinfobot` (o `@RawDataBot`) y copia tu **Id** numérico (no es tu @usuario).
+   En Telegram Desktop también: Ajustes → Avanzado → Experimental → "Show Peer IDs in Profile".
+2. `ALLOWED_TELEGRAM_IDS=<tu_id>`; varios, separados por comas **sin espacios ni llaves**: `111111111,222222222`.
+   En producción no puede quedar vacío. En Railway se edita en el servicio `server` → Variables (redepliega solo).
+3. Cada ID de la lista es una persona con **su propia cuenta y datos separados**. No necesita su propio bot: comparte
+   el enlace `https://t.me/<usuario_del_bot>`, la persona toca **Start** y la cuenta se crea sola. Nunca compartas el
+   token del bot. Alguien fuera de la lista recibe "Este bot es privado.".
 
 Comprobación: con un ID fuera de la lista, la Mini App y el login web responden "Esta cuenta de Telegram no tiene acceso".
 
 ## 2. Bot de Telegram
 1. `@BotFather` → `/newbot` → nombre y usuario (termina en `bot`). Copia el token.
 2. Variables: `TELEGRAM_BOT_TOKEN=<token>`, `TELEGRAM_BOT_USERNAME=<usuario_sin_@>`.
-3. Los comandos (`/start`, `/daily`, `/checkin`, `/objetivos`, `/dump`, `/gasto`, `/ingreso`, `/weekly_review`,
-   `/log_session`, `/dashboard`, `/settings`, `/help`, `/pause`, `/resume`) los registra el bot solo al arrancar
-   (`setMyCommands`).
+3. Los comandos (`/start`, `/menu`, `/daily`, `/checkin`, `/objetivos`, `/dump`, `/gasto`, `/ingreso`,
+   `/weekly_review`, `/log_session`, `/dashboard`, `/settings`, `/help`, `/pause`, `/resume`) los registra el bot solo
+   al arrancar (`setMyCommands`). Escribir `hola` o `menú` también abre el menú de botones.
 4. **Local (polling):** `TELEGRAM_MODE=polling` en `.env` y `pnpm dev`. Escribe `/start` al bot.
    Los botones serán enlaces normales a `http://localhost:5180/...` (Telegram solo abre Mini Apps con **https**).
-5. **Producción (webhook):** lo configura `infra/compose.prod.yml` (`TELEGRAM_MODE=webhook`,
+5. **Producción en Railway (polling):** el servicio `bot` corre con `TELEGRAM_MODE=polling`; no hay webhook que
+   configurar (ver `DEPLOY.md` §A).
+6. **Producción en VPS (webhook):** lo configura `infra/compose.prod.yml` (`TELEGRAM_MODE=webhook`,
    `WEBHOOK_PUBLIC_URL=https://DOMAIN/telegram/webhook`, `WEBHOOK_SECRET=$(openssl rand -hex 24)`). El bot borra el
    webhook en modo polling y lo registra en modo webhook; nunca ambos.
 
-Comprobación: `/start` responde con un botón **Abrir check-in**; en `/ajustes` aparece "chat conectado".
+Comprobación: `/start` responde con el menú de botones; en `/ajustes` aparece "chat conectado".
 Webhook: `curl https://api.telegram.org/bot<TOKEN>/getWebhookInfo` → `url` correcta y sin `last_error_message`.
 
 ## 3. Mini App (dentro de Telegram)
 Requiere HTTPS público (producción o túnel).
 1. `@BotFather` → tu bot → **Bot Settings → Configure Mini App** → URL `https://DOMAIN/hoy`.
 2. Opcional: **Menu Button** → `https://DOMAIN/hoy` con texto "Check-in".
-3. Para probar desde tu Mac sin servidor: túnel HTTPS (p. ej. `cloudflared tunnel --url http://localhost:5180`),
+3. Para probar desde tu computadora sin servidor: túnel HTTPS (p. ej. `cloudflared tunnel --url http://localhost:5180`),
    pon `PUBLIC_BASE_URL=<url del túnel>` y `COOKIE_SECURE=true`, desactiva `DEV_LOGIN_ENABLED` (el arranque lo exige
    con un origen no local) y reinicia `pnpm dev`.
 
@@ -59,6 +68,16 @@ Telegram. Un botón de un recordatorio viejo abre ese día y muestra "Estás edi
 
 Comprobación: en el navegador, `https://DOMAIN/login` → **Iniciar sesión con Telegram** → vuelves autenticado y
 `/ajustes` muestra las dos identidades (Mini App y web) en el **mismo** usuario.
+
+## 4b. Asistente diario en Telegram
+En la app: **Ajustes → Recordatorios en Telegram**.
+* **Mensaje de la mañana** (activado, 07:00 por defecto): tareas de hoy y vencidas, eventos con hora y un botón al
+  check-in guiado de la mañana. No se envía si ya completaste el check-in de la mañana.
+* **Cierre del día** (21:00 por defecto): botón al check-in guiado de la noche; se omite si ya lo cerraste.
+* **Avisos de eventos**: 5, 10, 15, 30 o 60 minutos antes de cada evento con hora de la agenda.
+* `/pause` y `/resume` pausan y reanudan todos los mensajes automáticos.
+
+Comprobación: al día siguiente llega el mensaje a la hora configurada; su botón abre `/hoy?guiado=manana`.
 
 ## 5. PWA instalada
 * iPhone (Safari): Compartir → **Agregar a inicio**. Android (Chrome): menú → **Instalar app**. Escritorio (Chrome/Edge):
@@ -97,29 +116,24 @@ Sin clave todo funciona en modo manual. Comprobación: `/gasto 250 gasolina ayer
 propuesta extraída con monto y fecha; nada se guarda hasta **Aplicar**.
 
 ## 9. Producción
-Sigue [`docs/DEPLOY.md`](DEPLOY.md): VPS con Docker, DNS `A` de `DOMAIN`, puertos 80/443, `.env.prod` con
-`DOMAIN`, `ACME_EMAIL`, `POSTGRES_PASSWORD`, `ALLOWED_TELEGRAM_IDS`, `INTERNAL_API_TOKEN` (`openssl rand -hex 32`),
-`ENCRYPTION_KEY` (`openssl rand -base64 32`, respáldala en tu gestor de contraseñas), `TELEGRAM_BOT_TOKEN`,
-`TELEGRAM_BOT_USERNAME`, `WEBHOOK_SECRET` y las opcionales de los pasos 4, 6 y 8. Luego:
-```bash
-docker compose -f infra/compose.prod.yml --env-file .env.prod up -d --build
-```
-Coste: necesitas un VPS siempre encendido (los recordatorios dependen de que API y bot estén activos) y un dominio.
+Producción corre en Railway: sigue [`docs/DEPLOY.md`](DEPLOY.md) §A (servicios, variables y cómo se publica).
+Las credenciales de los pasos 2, 4, 6 y 8 se guardan en Railway → servicio → **Variables**, nunca en el repo.
+Si prefieres un VPS con Docker Compose, el runbook está en `DEPLOY.md` §B.
 
 ## 10. Importar tu vault real (opcional)
-**Importar** → sube un ZIP de `~/Obsidian` → revisa la simulación (qué se crea, advertencias, conflictos) → **Aplicar**.
+**Importar** → sube un ZIP de tu vault de Obsidian → revisa la simulación (qué se crea, advertencias, conflictos) → **Aplicar**.
 Plantillas, comandos, scripts y valores de ejemplo no se importan. Puedes repetirla sin duplicar.
 
-## Verificaciones pendientes que requieren tus cuentas o dispositivos
-| ID | Qué falta | Cómo hacerlo |
+## Verificaciones con cuentas o dispositivos reales
+| ID | Qué | Estado |
 |---|---|---|
-| X1 | Bot real: `setMyCommands`, `/start`, recordatorio a las 21:00 en tu chat | Pasos 1–2 y esperar el horario (o cambiar la hora en Ajustes) |
-| X2 | Mini App en cliente real (iOS/Android/Desktop) con initData real, tema y safe areas | Paso 3 |
-| X3 | Webhook en producción (`getWebhookInfo` sin errores) y 429/403 reales | Pasos 2 y 9 |
-| X4 | Telegram Login OIDC real (consentimiento, redirect, misma identidad) | Paso 4 |
-| X5 | PWA instalada en tu iPhone/Android: abrir sin red y sincronizar | Paso 5 |
-| X6 | Google Calendar/Gmail con tu cuenta | Paso 6 |
-| X7 | ClickUp con tu vista | Paso 7 |
-| X8 | Extracción con la API real de Anthropic | Paso 8 |
-| X9 | Construir y levantar las imágenes Docker (`compose.prod.yml`) y HTTPS de Caddy | Paso 9 (esta Mac no tiene Docker) |
-| X10 | Importar tu vault real | Paso 10 |
+| X1 | Bot real: `setMyCommands`, `/start`, menú y recordatorios en el chat | ✅ verificado en producción (Railway) |
+| X2 | Mini App en cliente real con initData real | ✅ verificado en producción |
+| X3 | Webhook en producción | ➖ no aplica en Railway (polling); sigue vigente solo para el despliegue en VPS |
+| X4 | Telegram Login OIDC real (consentimiento, redirect, misma identidad) | ✅ verificado en producción |
+| X5 | PWA instalada en iPhone/Android: abrir sin red y sincronizar | ⏳ pendiente (paso 5) |
+| X6 | Google Calendar/Gmail con tu cuenta | ⏳ pendiente: faltan credenciales de Google en producción (paso 6) |
+| X7 | ClickUp con tu vista | ⏳ pendiente (paso 7) |
+| X8 | Extracción con la API real de Anthropic | ⏳ pendiente (paso 8) |
+| X9 | Construir imágenes y levantar producción | ✅ Railway construye `Dockerfile.railway` y `Dockerfile.railway.bot`; Compose + Caddy en VPS no se ha probado |
+| X10 | Importar tu vault real | ⏳ pendiente (paso 10) |

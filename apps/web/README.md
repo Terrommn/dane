@@ -22,15 +22,34 @@ de la PWA (Node puro, sin dependencias).
 ```
 src/
   app/          App (rutas), nav, queryClient
-  layout/       AppShell (barra inferior móvil / lateral escritorio, BackButton de Telegram), aviso de actualización
+  layout/       AppShell (barra superior con menús en escritorio; barra inferior Hoy · ＋ · Menú en móvil, oculta en el
+                check-in guiado; BackButton de Telegram), NavIcons, aviso de actualización
   components/ui Button, Field (Text/TextArea/Select/Checkbox/Radio), Dialog/ConfirmDialog, States (vacío/carga/error/QueryState),
                 DataTable (filtro sin acentos, orden, paginación; tarjetas en móvil), Display (ProgressBar, KpiCard, Card,
                 PageHeader, Badge), DatePicker, Toast, SaveStatus, ConflictDialog
   lib/          api (openapi-fetch + Bearer/CSRF/Idempotency-Key), session (solo memoria), errors, telegram, format
   lib/offline/  db (IndexedDB por usuario), store (borradores + cola), hooks (useDraft, useSyncQueue)
-  features/     auth, daily, goals, habits, tasks, reviews, finance, people, content, readings, projects, notes,
-                settings, install, more, dashboard
+  features/     home (Inicio + fondo Blueprint), today (Hoy + GuidedCheckin), auth, daily, goals, habits, tasks,
+                reviews, finance, people, content, readings, projects, notes, settings, install, more, dashboard
 ```
+
+## Inicio y check-in guiado
+
+* **Inicio** (`features/home/HomePage.tsx`, ruta `/`): saludo por hora local, resumen del día (`dayBrief`), botón al
+  check-in guiado y tarjetas (objetivo del mes, hábitos de hoy, racha, peso) con interruptores de hábitos
+  (`PUT`/`DELETE /habits/{id}/entries/{date}`). Las funciones puras (`greeting`, `recordStreak`, `dayBrief`…) tienen
+  pruebas en `home.test.ts`.
+* **Fondo de planos** (`features/home/Blueprint.tsx`): edificio isométrico en SVG; cada arista es un `<path>` con
+  `pathLength=1`. Web Animations API: dibuja una vez y luego repite abrir pisos → líneas hacia fuera en la dirección
+  de su pared → regreso → cerrar, sin redibujar. Clic en el fondo: onda y "respiro" de la cuadrícula (se ignora sobre
+  controles y elementos con `data-card`). Solo escritorio (`md:`), `prefers-reduced-motion` lo deja estático.
+  Rendimiento: nada de `backdrop-filter` encima de esta capa (trababa los cuadros), `contain:strict` y
+  `will-change:transform`.
+* **Check-in guiado** (`features/today/GuidedCheckin.tsx`, `/hoy?guiado=manana|noche`): pasos con Atrás/Siguiente;
+  reutiliza `useDraft`, la cola offline y el diálogo de conflicto del formulario completo. Al terminar marca
+  `morning_done` / `evening_done` y vuelve a Inicio.
+* **Tema Ámbar**: variables en `src/index.css` bajo `:root:not([data-telegram])`; dentro de Telegram se usa el tema
+  del cliente (`--tg-*`).
 
 ## Decisiones
 

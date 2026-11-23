@@ -28,6 +28,8 @@ step() {
 }
 
 [ -d node_modules ] || pnpm install --frozen-lockfile >/dev/null 2>&1
+# Llaves RSA desechables para las pruebas OIDC: no se suben al repo (ver scripts/gen-test-keys.mjs).
+node scripts/gen-test-keys.mjs
 
 step "rust fmt"            cargo fmt --all -- --check
 step "rust clippy"         cargo clippy --workspace --all-targets -- -D warnings
