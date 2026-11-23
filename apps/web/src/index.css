@@ -22,22 +22,37 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-telegram]) {
-    --c-bg: #0b1220;
-    --c-surface: #111a2e;
-    --c-surface-2: #172238;
-    --c-text: #e2e8f0;
-    --c-muted: #a3b1c6;
-    --c-border: #2d3a52;
-    --c-accent: #2dd4bf;
-    --c-accent-text: #042f2e;
-    --c-link: #5eead4;
-    --c-danger: #f87171;
-    --c-ok: #4ade80;
-    --c-warn: #facc15;
-    color-scheme: dark;
-  }
+/* Tema "Medianoche" (elegido por el usuario en la maqueta de estilos): la web/PWA siempre usa esta paleta oscura,
+   sin depender de prefers-color-scheme, porque se eligió como identidad visual y no como modo nocturno.
+   La Mini App NO la usa ([data-telegram]): ahí manda el tema de Telegram para verse nativa dentro del chat.
+   Contrastes AA medidos (texto normal): text/surface 15.0, muted/surface 6.0, muted/surface-2 5.5,
+   link/surface 7.7, accent-text/accent 5.8, sidebar-muted/sidebar 5.0. */
+:root:not([data-telegram]) {
+  --c-bg: #0b0d14;
+  --c-surface: #12151f;
+  --c-surface-2: #191d2a;
+  --c-text: #e7e9f2;
+  --c-muted: #8d93a8;
+  --c-border: #232838;
+  --c-accent: #8b7cf6;
+  --c-accent-2: #c084fc;
+  --c-accent-soft: #221f3d;
+  --c-accent-text: #0b0d14;
+  /* Más claro que --c-accent: el violeta base no llega a 7:1 como texto y los enlaces abundan. */
+  --c-link: #a99df9;
+  --c-danger: #f87171;
+  --c-ok: #4ade80;
+  --c-warn: #fbbf24;
+  --c-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px rgb(0 0 0 / 0.35);
+  /* Barra lateral: un tono más oscuro que las tarjetas para que flote como pieza separada. */
+  --c-sb-bg: #0e1019;
+  --c-sb-text: #c3c7d6;
+  --c-sb-muted: #7c829a;
+  --c-sb-hover: #171a26;
+  --c-sb-active: #221f3d;
+  --c-sb-active-text: #c4bbff;
+  --c-sb-border: #1c2030;
+  color-scheme: dark;
 }
 :root[data-telegram][data-theme="dark"] {
   --c-border: #3b4a63;
@@ -59,6 +74,17 @@
   --color-danger: var(--c-danger);
   --color-ok: var(--c-ok);
   --color-warn: var(--c-warn);
+  /* Tokens nuevos del tema Medianoche. Los fallbacks mantienen la Mini App (que no los define) igual que antes. */
+  --color-accent-2: var(--c-accent-2, var(--c-accent));
+  --color-accent-soft: var(--c-accent-soft, var(--c-surface-2));
+  --color-sb: var(--c-sb-bg, var(--c-surface));
+  --color-sb-fg: var(--c-sb-text, var(--c-text));
+  --color-sb-muted: var(--c-sb-muted, var(--c-muted));
+  --color-sb-hover: var(--c-sb-hover, var(--c-surface-2));
+  --color-sb-active: var(--c-sb-active, var(--c-surface-2));
+  --color-sb-active-fg: var(--c-sb-active-text, var(--c-text));
+  --color-sb-line: var(--c-sb-border, var(--c-border));
+  --shadow-float: var(--c-shadow, 0 1px 2px rgb(0 0 0 / 0.06));
 }
 
 html,
@@ -82,8 +108,12 @@ body {
   border-radius: 6px;
 }
 
-a {
-  color: var(--c-link);
+/* En @layer base para que las utilidades de Tailwind (text-fg, text-accent-fg…) puedan sobrescribirlo: una regla sin
+   capa gana siempre a las utilidades de v4 y pintaba de violeta los enlaces de la barra lateral y el botón de captura. */
+@layer base {
+  a {
+    color: var(--c-link);
+  }
 }
 
 dialog::backdrop {

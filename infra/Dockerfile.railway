@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1.7
+# Imagen "todo en uno" para Railway: servidor + web compilada en el mismo contenedor. Contexto: raíz del repo.
+#
+# Por qué no usamos Dockerfile.server + Dockerfile.web como en compose.prod.yml: allí Caddy une ambos bajo un mismo
+# dominio. En Railway no hay Caddy ni dominio propio, y la sesión (cookie + CSRF) y la Mini App exigen que la web y
+# /api compartan origen. El servidor ya sabe servir la SPA con WEB_DIST_DIR, así que un solo servicio con un solo
+# dominio *.up.railway.app resuelve el mismo problema sin un proxy extra.
+#
+# Sin --mount=type=cache: Railway exige ids de caché ligados al servicio (s/<id>-…) y no queremos acoplar el
+# Dockerfile a un id concreto; el build tarda más, pero es reproducible en cualquier proyecto.
+
+FROM node:24-bookworm-slim AS web
+WORKDIR /src
+RUN npm i -g pnpm@12.18.0
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages packages
+COPY apps/web apps/web
+RUN pnpm install --frozen-lockfile && pnpm -C apps/web build
+
+FROM rust:1.94-bookworm AS server
+WORKDIR /src
+COPY Cargo.toml Cargo.lock rust-toolchain.toml rustfmt.toml ./
+COPY apps/server apps/server
+COPY apps/telegram-bot apps/telegram-bot
+COPY crates crates
+RUN cargo build --release -p server --locked && cp target/release/dane-server /dane-server
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl tzdata && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10001 dane
+COPY --from=server /dane-server /usr/local/bin/dane-server
+COPY --from=web /src/apps/web/dist /srv/web
+USER dane
+# [::] y no 0.0.0.0: la red privada de Railway (bot -> server.railway.internal) va por IPv6; escuchando en [::]
+# el socket acepta también IPv4, que es por donde entra el dominio público.
+ENV BIND_ADDR=[::]:8080 LOG_FORMAT=json WEB_DIST_DIR=/srv/web
+EXPOSE 8080
+STOPSIGNAL SIGTERM
+ENTRYPOINT ["dane-server"]
+CMD ["serve"]
