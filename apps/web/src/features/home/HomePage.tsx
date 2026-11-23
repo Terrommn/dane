@@ -1,18 +1,20 @@
-// Inicio: el dashboard principal (rediseño "Ámbar"). Muestra poco y bien: saludo, cuatro lecturas rápidas, el botón del
-// check-in y "Objetivos de hoy" con interruptores. Las métricas completas siguen en /dashboard (menú Objetivos →
-// Estadísticas) para no saturar la pantalla que abres cada mañana.
+// Inicio: el dashboard principal (rediseño "Ámbar", versión "planos"). Escritorio: planos de un edificio animados de
+// fondo, saludo grande con el resumen del día en una frase, cuatro tarjetas y "Objetivos de hoy". Teléfono: solo lo de
+// hoy (saludo, botón del check-in, casillas y el objetivo del mes), sin fondo animado.
+// Las métricas completas siguen en /dashboard (Objetivos → Estadísticas) para no saturar la pantalla de cada mañana.
 import { useState } from "react";
 import { Link } from "react-router";
 import { ErrorState, LoadingState } from "../../components/ui/States";
 import { useToast } from "../../components/ui/Toast";
 import type { Schemas } from "../../lib/api";
-import { formatLongDate, formatMoney, todayIso } from "../../lib/format";
+import { formatLongDate, todayIso } from "../../lib/format";
 import { useAuth } from "../auth/AuthProvider";
 import { useDashboard } from "../dashboard/DashboardPage";
+import { asProgress, describeProgress } from "../goals/goalsApi";
 import { asToday, useHabitMutations } from "../habits/habitsApi";
 import { formatNumber } from "../today/numbers";
 import { useDayView } from "../today/TodayPage";
-import { HeroScene, PILLARS, type PillarKey } from "./HeroScene";
+import { Blueprint } from "./Blueprint";
 
 type Dashboard = Schemas["Dashboard"];
 type DayView = Schemas["DayView"];
@@ -41,7 +43,7 @@ export function recordStreak(days: Schemas["HeatDay"][], today: string): number 
   return n;
 }
 
-/** Hábitos que tocan hoy (los de los cuatro grupos, sin repetir) y cuántos están hechos. */
+/** Hábitos que tocan hoy (los de los cuatro grupos, sin repetir). */
 export function todaysHabits(view: DayView): HabitDay[] {
   const all = [...view.habits.fixed, ...view.habits.month, ...view.habits.week, ...view.habits.other];
   const seen = new Set<string>();
@@ -51,6 +53,40 @@ export function todaysHabits(view: DayView): HabitDay[] {
     return asToday(h.progress).shown !== false;
   });
 }
+
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+/**
+ * El día en una frase ("Día 23 de «Volver a mi prime». Hoy tienes 3 hábitos, 2 tareas y Junta a las 11:00.").
+ * Por qué una frase y no más tarjetas: el usuario quería que Inicio se sintiera menos "panel de control".
+ */
+export function dayBrief(opts: {
+  goalTitle?: string;
+  dayOfMonth: number;
+  habits: number;
+  tasks: number;
+  nextEvent?: { title: string; time: string };
+  events: number;
+}): string {
+  const lead = opts.goalTitle ? `Día ${opts.dayOfMonth} de «${opts.goalTitle}». ` : "";
+  const bits = [
+    opts.habits ? plural(opts.habits, "hábito", "hábitos") : null,
+    opts.tasks ? plural(opts.tasks, "tarea", "tareas") : null,
+    opts.nextEvent
+      ? `${opts.nextEvent.title} a las ${opts.nextEvent.time}`
+      : opts.events
+        ? plural(opts.events, "evento", "eventos")
+        : null,
+  ].filter((b): b is string => !!b);
+  if (!bits.length) return `${lead}Hoy no tienes nada agendado: buen día para avanzar en lo importante.`;
+  const list = bits.length > 1 ? `${bits.slice(0, -1).join(", ")} y ${bits.at(-1)}` : bits[0];
+  return `${lead}Hoy tienes ${list}.`;
+}
+
+/** Brillo ámbar al pasar el mouse (el usuario lo pidió para todas las tarjetas de Inicio). */
+const HOVER =
+  "transition duration-300 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_0_0_1px_rgb(240_122_46/0.15),0_0_40px_rgb(240_122_46/0.18)]";
+const CARD = `rounded-[20px] border border-line bg-surface/80 p-4 backdrop-blur-md ${HOVER}`;
 
 export function HomePage() {
   const { me } = useAuth();
@@ -62,108 +98,176 @@ export function HomePage() {
   const first = me?.user.display_name?.trim().split(/\s+/)[0];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+    <>
+      <Blueprint />
+      <div className="relative z-10 space-y-8 md:pt-10">
+        <div className="max-w-xl">
           <p className="font-serif text-[15px] text-muted first-letter:uppercase">{formatLongDate(today)}</p>
-          <h1 className="mt-1 font-serif text-3xl font-normal tracking-tight md:text-[40px]">
+          <h1 className="mt-2 font-serif text-[34px] font-normal leading-[1.05] tracking-tight md:text-[56px]">
             {greeting(hour)}
             {first ? `, ${first}` : ""}
           </h1>
+          {dash.data && day.data && <Brief d={dash.data} view={day.data} today={today} tz={tz} />}
+          {day.data && <CheckinCta view={day.data} today={today} hour={hour} />}
         </div>
-      </div>
 
-      {(dash.isPending || day.isPending) && <LoadingState rows={5} label="Preparando tu día…" />}
-      {dash.isError && <ErrorState error={dash.error} onRetry={() => dash.refetch()} />}
-      {dash.data && day.data && <Body d={dash.data} view={day.data} today={today} hour={hour} />}
-    </div>
+        {(dash.isPending || day.isPending) && <LoadingState rows={4} label="Preparando tu día…" />}
+        {dash.isError && <ErrorState error={dash.error} onRetry={() => dash.refetch()} />}
+        {dash.data && day.data && <Body d={dash.data} view={day.data} today={today} />}
+      </div>
+    </>
   );
 }
 
-function Body({ d, view, today, hour }: { d: Dashboard; view: DayView; today: string; hour: number }) {
-  const { me } = useAuth();
-  const currency = me?.settings.currency ?? "MXN";
+function Brief({ d, view, today, tz }: { d: Dashboard; view: DayView; today: string; tz: string }) {
+  const goal = d.month_goals.find((g) => g.goal.status === "active")?.goal.title;
+  const habits = todaysHabits(view).filter((h) => asToday(h.progress).required_today).length;
+  const tasks = view.tasks_by_area.flatMap((a) => a.tasks).filter((t) => t.status !== "done").length;
+  const now = Date.now();
+  const timed = view.agenda.filter((e) => !e.all_day && e.starts_at);
+  const next = timed.find((e) => e.starts_at && new Date(e.starts_at).getTime() > now);
+  const text = dayBrief({
+    goalTitle: goal,
+    dayOfMonth: Number(today.slice(8, 10)),
+    habits,
+    tasks,
+    events: view.agenda.length,
+    nextEvent: next?.starts_at
+      ? {
+          title: next.title,
+          time: new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit", timeZone: tz }).format(
+            new Date(next.starts_at),
+          ),
+        }
+      : undefined,
+  });
+  return <p className="mt-4 text-[15px] leading-relaxed text-[#d6cdc5]">{text}</p>;
+}
+
+/** Botón principal: sugiere la parte del check-in según la hora y avisa si ya está hecha. */
+function CheckinCta({ view, today, hour }: { view: DayView; today: string; hour: number }) {
+  const morningDone = !!view.checkin?.morning_done_at;
+  const eveningDone = !!view.checkin?.evening_done_at;
+  const evening = hour >= 15 || morningDone;
+  if (morningDone && eveningDone)
+    return (
+      <p className="mt-6 text-sm text-muted">
+        Check-in de hoy completo ✓ <Link to={`/hoy?date=${today}`}>Ver</Link>
+      </p>
+    );
+  return (
+    <Link
+      to={`/hoy?date=${today}&guiado=${evening ? "noche" : "manana"}`}
+      className="mt-6 flex w-full items-center justify-between gap-4 rounded-[18px] bg-accent px-5 py-4 font-semibold text-accent-fg no-underline shadow-glow hover:brightness-105 md:inline-flex md:w-auto md:rounded-full md:px-6 md:py-3.5"
+    >
+      <span>{evening ? "Cerrar el día" : "Empezar el día"}</span>
+      <span className="text-[13px] font-normal opacity-75">2 min →</span>
+    </Link>
+  );
+}
+
+function Body({ d, view, today }: { d: Dashboard; view: DayView; today: string }) {
   const habits = todaysHabits(view);
   const required = habits.filter((h) => asToday(h.progress).required_today);
   const doneReq = required.filter((h) => h.entry?.status === "done").length;
-  const last7 = d.energy.slice(-7);
-  const energyAvg = last7.length ? last7.reduce((a, p) => a + p.energy, 0) / last7.length : null;
   const streak = recordStreak(d.last_30_days, today);
-
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
-      {/* En el teléfono lo primero es la acción del día (check-in y objetivos); las lecturas van después. */}
-      <div className="order-2 space-y-3 lg:order-1">
-        <EnergyGauge avg={energyAvg} days={last7.length} />
-        <div className="grid grid-cols-2 gap-3">
-          <Panel
-            title="Hábitos de hoy"
-            sub={required.length ? `${doneReq} de ${required.length} exigibles` : "Nada exigible hoy"}
-          >
-            <Ring done={doneReq} total={required.length} />
-          </Panel>
-          <Panel title="Racha" sub="Días seguidos con registro">
-            <p className="mt-4 text-center text-[40px] font-light leading-none tabular-nums">{streak}</p>
-            <p className="mt-1 text-center text-xs text-muted">{streak === 1 ? "día" : "días"}</p>
-          </Panel>
-        </div>
-        <Last7 days={d.last_30_days.filter((x) => x.date <= today).slice(-7)} />
-        <CheckinCta view={view} today={today} hour={hour} className="hidden lg:flex" />
+    <div className="space-y-8">
+      {/* En el teléfono solo va el objetivo del mes; las otras tres lecturas son de escritorio. */}
+      <div className="grid max-w-[860px] gap-3 md:grid-cols-4">
+        <GoalGauge d={d} />
+        <Panel
+          title="Hábitos de hoy"
+          sub={required.length ? `${doneReq} de ${required.length} exigibles` : "Nada exigible hoy"}
+          desktop
+        >
+          <Ring done={doneReq} total={required.length} />
+        </Panel>
+        <Panel title="Racha" sub="Días seguidos con registro" desktop>
+          <p className="mt-5 text-center text-[44px] font-light leading-none tabular-nums">{streak}</p>
+          <p className="mt-1.5 text-center text-xs text-muted">{streak === 1 ? "día" : "días"}</p>
+        </Panel>
+        <WeightCard w={d.weight} />
       </div>
-
-      <div className="order-1 space-y-6 lg:order-2">
-        <CheckinCta view={view} today={today} hour={hour} className="lg:hidden" />
-        <Hero d={d} energyAvg={energyAvg} currency={currency} />
+      <div className="max-w-[760px] md:order-none">
         <TodayGoals habits={habits} today={today} />
       </div>
     </div>
   );
 }
 
-function Panel({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  sub,
+  desktop,
+  children,
+}: {
+  title: string;
+  sub?: string;
+  desktop?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <section className="rounded-[20px] border border-line bg-linear-to-b from-white/[0.035] to-white/[0.01] p-4">
+    <section className={`${CARD} ${desktop ? "hidden md:block" : ""}`}>
       <h2 className="text-[13px] font-medium">{title}</h2>
-      {sub && <p className="mt-0.5 text-[11px] text-muted">{sub}</p>}
+      {sub && <p className="mt-0.5 truncate text-[11px] text-muted">{sub}</p>}
       {children}
     </section>
   );
 }
 
-/** Medidor semicircular de energía (escala 1–5), como el control de clima de la referencia. */
-function EnergyGauge({ avg, days }: { avg: number | null; days: number }) {
-  const t = avg === null ? 0 : (avg - 1) / 4;
-  const angle = Math.PI * (1 - t);
-  const x = 150 + 120 * Math.cos(angle);
-  const y = 130 - 120 * Math.sin(angle);
+/** Medidor semicircular (como el control de clima de la referencia) con el avance del objetivo del mes. */
+function GoalGauge({ d }: { d: Dashboard }) {
+  const view = d.month_goals.find((g) => g.goal.status === "active") ?? d.month_goals[0];
+  if (!view)
+    return (
+      <Panel title="Objetivo del mes" sub="Aún no defines uno">
+        <p className="mt-6 text-sm text-muted">
+          ¿Qué quieres lograr este mes? <Link to="/objetivos/planificar">Defínelo</Link> y aquí verás tu
+          avance.
+        </p>
+      </Panel>
+    );
+  const p = asProgress(view.progress);
+  const measured = view.goal.progress_type !== "none";
+  const ratio = Math.min(1, Math.max(0, p.ratio ?? (p.achieved ? 1 : 0)));
+  const angle = Math.PI * (1 - ratio);
+  const x = 100 + 80 * Math.cos(angle);
+  const y = 92 - 80 * Math.sin(angle);
   return (
-    <Panel title="Energía" sub={days ? `Promedio de tus últimos ${days} registros` : "Aún sin registros"}>
-      <svg
-        viewBox="0 0 300 145"
-        className="mx-auto mt-1 block w-full max-w-[300px]"
-        role="img"
-        aria-label={avg === null ? "Sin datos de energía" : `Energía promedio ${formatNumber(avg, 1)} de 5`}
+    <Panel title="Objetivo del mes" sub={view.goal.title}>
+      <Link
+        to={`/objetivos/${view.goal.id}`}
+        className="block no-underline"
+        aria-label={`Ver ${view.goal.title}`}
       >
-        <path d="M30 130 A120 120 0 0 1 270 130" fill="none" stroke="var(--c-border)" strokeWidth="2" />
-        {avg !== null && (
-          <>
-            <path
-              d={`M30 130 A120 120 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}`}
-              fill="none"
-              stroke="var(--c-accent)"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-            <circle cx={x} cy={y} r="8" fill="var(--c-accent)" />
-          </>
-        )}
-        <text x="150" y="108" textAnchor="middle" fill="var(--c-text)" fontSize="34" fontWeight="300">
-          {avg === null ? "—" : formatNumber(avg, 1)}
-        </text>
-        <text x="150" y="128" textAnchor="middle" fill="var(--c-muted)" fontSize="11">
-          de 5
-        </text>
-      </svg>
+        <svg
+          viewBox="0 0 200 104"
+          className="mx-auto mt-2 block w-full max-w-[190px]"
+          role="img"
+          aria-label={measured ? `Avance ${Math.round(ratio * 100)}%` : "Sin medición"}
+        >
+          <path d="M20 92 A80 80 0 0 1 180 92" fill="none" stroke="var(--c-border)" strokeWidth="2" />
+          {measured && ratio > 0 && (
+            <>
+              <path
+                d={`M20 92 A80 80 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}`}
+                fill="none"
+                stroke="var(--c-accent)"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              <circle cx={x} cy={y} r="6" fill="var(--c-accent)" />
+            </>
+          )}
+          <text x="100" y="80" textAnchor="middle" fill="var(--c-text)" fontSize="26" fontWeight="300">
+            {measured ? `${Math.round(ratio * 100)}%` : "—"}
+          </text>
+        </svg>
+        <p className="mt-1 truncate text-center text-[11px] text-muted">
+          {measured ? describeProgress(view.goal, p) : "Objetivo sin medición"}
+        </p>
+      </Link>
     </Panel>
   );
 }
@@ -199,151 +303,45 @@ function Ring({ done, total }: { done: number; total: number }) {
   );
 }
 
-const WEEKDAY = ["D", "L", "M", "M", "J", "V", "S"];
-
-/** Barras de cumplimiento de los últimos 7 días (la barra de hoy se resalta). */
-function Last7({ days }: { days: Schemas["HeatDay"][] }) {
+/** Peso: último valor grande y las últimas mediciones como barras (en vez del gasto, que ya está en Finanzas). */
+function WeightCard({ w }: { w: Dashboard["weight"] }) {
+  const pts = w.points.slice(-8);
+  // Siempre 8 ranuras: con pocas mediciones las vacías quedan tenues en vez de estirar una sola barra a todo lo ancho.
+  const empty = Math.max(0, 8 - pts.length);
+  const kgs = pts.map((p) => p.kg);
+  const min = Math.min(...kgs);
+  const max = Math.max(...kgs);
+  const change = w.change_week;
   return (
-    <Panel title="Últimos 7 días" sub="Hábitos cumplidos de los exigibles">
-      <div
-        className="mt-4 flex h-24 items-end gap-2"
-        role="img"
-        aria-label={days.map((d) => `${d.date}: ${d.done}/${d.required}`).join(", ")}
-      >
-        {days.map((d, i) => {
-          const ratio = d.required ? d.done / d.required : 0;
-          const isLast = i === days.length - 1;
-          return (
-            <div key={d.date} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
-              <div
-                className={`w-full rounded-t-lg rounded-b ${isLast ? "bg-accent" : "bg-surface-2"}`}
-                style={{ height: `${Math.max(8, ratio * 100)}%` }}
-              />
-              <span className="text-[10px] text-muted">
-                {WEEKDAY[new Date(`${d.date}T12:00:00`).getDay()]}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </Panel>
-  );
-}
-
-/** Botón principal: sugiere la parte del check-in según la hora y avisa si ya está hecha. */
-function CheckinCta({
-  view,
-  today,
-  hour,
-  className = "",
-}: {
-  view: DayView;
-  today: string;
-  hour: number;
-  className?: string;
-}) {
-  const morningDone = !!view.checkin?.morning_done_at;
-  const eveningDone = !!view.checkin?.evening_done_at;
-  const evening = hour >= 15 || morningDone;
-  if (morningDone && eveningDone)
-    return (
-      <div
-        className={`flex items-center justify-between gap-3 rounded-[18px] border border-line bg-surface p-4 ${className}`}
-      >
-        <span className="text-sm">Check-in de hoy completo ✓</span>
-        <Link to={`/hoy?date=${today}`} className="text-sm">
-          Ver →
-        </Link>
-      </div>
-    );
-  return (
-    <Link
-      to={`/hoy?date=${today}&guiado=${evening ? "noche" : "manana"}`}
-      className={`flex items-center justify-between gap-3 rounded-[18px] bg-accent px-5 py-4 font-semibold text-accent-fg no-underline shadow-glow hover:brightness-105 ${className}`}
+    <Panel
+      title="Peso"
+      sub={
+        change !== null && change !== undefined
+          ? `${change > 0 ? "+" : ""}${formatNumber(change, 1)} kg esta semana`
+          : w.goal_kg
+            ? `Meta ${formatNumber(w.goal_kg, 1)} kg`
+            : "Anótalo en tu check-in"
+      }
+      desktop
     >
-      <span>{evening ? "Cerrar el día" : "Empezar check-in de la mañana"}</span>
-      <span className="text-right text-xs font-normal opacity-80">4 pasos · 2 min →</span>
-    </Link>
-  );
-}
-
-function Hero({ d, energyAvg, currency }: { d: Dashboard; energyAvg: number | null; currency: string }) {
-  const [pillar, setPillar] = useState<PillarKey>("cuerpo");
-  const w = d.weight;
-  const dev = d.devotional;
-  const lastPeace = d.peace.at(-1);
-  const habits30 = d.last_30_days.reduce((a, x) => ({ done: a.done + x.done, req: a.req + x.required }), {
-    done: 0,
-    req: 0,
-  });
-  const chips: Record<PillarKey, string[]> = {
-    cuerpo: [
-      w.last ? `⚖ ${formatNumber(w.last.kg, 1)} kg` : "⚖ Sin peso",
-      w.change_week !== null && w.change_week !== undefined
-        ? `Semana ${w.change_week > 0 ? "+" : ""}${formatNumber(w.change_week, 1)} kg`
-        : null,
-      energyAvg !== null ? `⚡ Energía ${formatNumber(energyAvg, 1)}/5` : null,
-    ].filter((x): x is string => !!x),
-    mente: [
-      `${d.month_goals.length} objetivos del mes`,
-      `${d.week_goals.length} de la semana`,
-      habits30.req
-        ? `Hábitos 30 días ${Math.round((habits30.done / habits30.req) * 100)}%`
-        : "Sin hábitos exigibles",
-    ],
-    dinero: [
-      `Semana ${formatMoney(d.finance.week.consumption_cents, currency)}`,
-      `Mes ${formatMoney(d.finance.month.consumption_cents, currency)}`,
-      `Ingreso ${formatMoney(d.finance.month.earned_income_cents, currency)}`,
-    ],
-    espiritu: [
-      dev
-        ? `Devocional: ${dev.failures_total}${dev.max_allowed !== null && dev.max_allowed !== undefined ? `/${dev.max_allowed}` : ""} fallas`
-        : "Sin hábito devocional",
-      lastPeace ? `Paz ${lastPeace.peace}/10` : "Paz sin registrar",
-    ],
-  };
-  // PILLARS es una lista fija con las cuatro claves, así que siempre hay coincidencia; el respaldo calma a TS.
-  const p = PILLARS.find((x) => x.key === pillar) ?? { label: "", sub: "", route: "/" };
-  return (
-    <HeroScene pillar={pillar}>
-      <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Áreas de tu vida">
-        {PILLARS.map((x) => (
-          <button
-            key={x.key}
-            type="button"
-            role="tab"
-            aria-selected={x.key === pillar}
-            onClick={() => setPillar(x.key)}
-            className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs backdrop-blur-md ${x.key === pillar ? "border-accent bg-black/50 text-fg" : "border-line bg-black/40 text-muted hover:text-fg"}`}
-          >
-            {x.label}
-          </button>
+      <p className="mt-3 text-[30px] font-light leading-none tabular-nums">
+        {w.last ? formatNumber(w.last.kg, 1) : "—"}
+        <span className="ml-1 text-sm text-muted">kg</span>
+      </p>
+      <div className="mt-3 flex h-10 items-end gap-1.5" aria-hidden>
+        {Array.from({ length: empty }, (_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: ranuras vacías sin identidad propia
+          <div key={`e${i}`} className="h-[12%] flex-1 rounded-t bg-surface-2/60" />
+        ))}
+        {pts.map((p, i) => (
+          <div
+            key={p.date}
+            className={`flex-1 rounded-t ${i === pts.length - 1 ? "bg-accent" : "bg-surface-2"}`}
+            style={{ height: `${max > min ? 25 + ((p.kg - min) / (max - min)) * 75 : 60}%` }}
+          />
         ))}
       </div>
-      <div className="mt-auto flex flex-wrap items-end justify-between gap-4" role="tabpanel">
-        <div>
-          <h2 className="text-[28px] font-normal leading-tight md:text-[32px]">{p.label}</h2>
-          <p className="mt-1 text-sm text-muted">{p.sub}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {chips[pillar].map((c) => (
-            <span
-              key={c}
-              className="rounded-full border border-line bg-black/55 px-3 py-1.5 text-xs backdrop-blur-md"
-            >
-              {c}
-            </span>
-          ))}
-          <Link
-            to={p.route}
-            className="rounded-full border border-accent/60 bg-black/55 px-3 py-1.5 text-xs text-link no-underline backdrop-blur-md"
-          >
-            Abrir →
-          </Link>
-        </div>
-      </div>
-    </HeroScene>
+    </Panel>
   );
 }
 
@@ -387,12 +385,14 @@ function TodayGoals({ habits, today }: { habits: HabitDay[]; today: string }) {
         </Link>
       </div>
       {habits.length === 0 ? (
-        <div className="rounded-[18px] border border-dashed border-line p-5 text-sm text-muted">
+        <div className="rounded-[20px] border border-dashed border-line bg-surface/60 p-5 text-sm text-muted backdrop-blur-md">
           Aún no tienes hábitos para hoy. <Link to="/objetivos/planificar">Planifica tus objetivos</Link> y
           aquí aparecerán con un interruptor para marcarlos.
         </div>
       ) : (
-        <ul className="divide-y divide-line rounded-[18px] border border-line bg-surface/60">
+        <ul
+          className={`divide-y divide-line rounded-[20px] border border-line bg-surface/80 backdrop-blur-md ${HOVER}`}
+        >
           {habits.map((h) => {
             const t = asToday(h.progress);
             const isDone = h.entry?.status === "done";

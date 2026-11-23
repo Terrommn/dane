@@ -1,5 +1,5 @@
 // Shell mobile-first. Escritorio: barra superior con Inicio y menús por tema (rediseño premium "Ámbar"); el menú del
-// perfil agrupa lo de Sistema. Móvil: barra inferior (Inicio, Objetivos, Capturar, Finanzas, Más).
+// perfil agrupa lo de Sistema. Móvil: barra inferior mínima (Hoy, Capturar, Menú).
 // En Telegram usa el BackButton nativo (si la versión lo soporta) y respeta las safe areas.
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useId, useRef, useState } from "react";
@@ -323,44 +323,41 @@ function TopBar({ items }: { items: NavItem[] }) {
   );
 }
 
-function BottomNav({ finance }: { finance: boolean }) {
-  // Capturar va al centro y resaltado: es la acción más frecuente en el teléfono.
-  const tabs = [
-    { to: "/", label: "Inicio", icon: "/" },
-    { to: "/objetivos", label: "Objetivos", icon: "/objetivos" },
-    { to: "/captura/nueva", label: "Capturar", icon: "/captura/nueva", main: true },
-    finance
-      ? { to: "/finanzas", label: "Finanzas", icon: "/finanzas" }
-      : { to: "/hoy", label: "Check-in", icon: "/hoy" },
-    { to: "/mas", label: "Más", icon: "/mas" },
-  ];
+/**
+ * Barra inferior del teléfono: solo Hoy, Capturar y Menú. Por qué tan corta: en el teléfono se usa Dane para el día
+ * (check-in, casillas, capturar algo); todo lo demás, incluido el dashboard completo, vive en "Menú".
+ */
+function BottomNav() {
+  const tab = ({ isActive }: { isActive: boolean }) =>
+    `flex min-h-15 flex-col items-center justify-center gap-1 text-[11px] no-underline ${isActive ? "font-semibold text-link" : "text-muted"}`;
   return (
     <nav
       aria-label="Navegación inferior"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 backdrop-blur md:hidden"
       style={{ paddingBottom: "var(--safe-bottom)" }}
     >
-      <ul className="grid grid-cols-5">
-        {tabs.map((t) => (
-          <li key={t.to}>
-            <NavLink
-              to={t.to}
-              end={t.to === "/" || t.to === "/finanzas"}
-              className={({ isActive }) =>
-                `flex min-h-15 flex-col items-center justify-center gap-1 text-[11px] no-underline ${isActive ? "font-semibold text-link" : "text-muted"}`
-              }
-            >
-              {t.main ? (
-                <span className="grid size-9 place-items-center rounded-xl bg-accent text-accent-fg">
-                  <NavIcon name={t.icon} className="size-5" />
-                </span>
-              ) : (
-                <NavIcon name={t.icon} className="size-5" />
-              )}
-              {t.label}
-            </NavLink>
-          </li>
-        ))}
+      <ul className="mx-auto grid max-w-sm grid-cols-3 items-center">
+        <li>
+          <NavLink to="/" end className={tab}>
+            <NavIcon name="/" className="size-5" />
+            Hoy
+          </NavLink>
+        </li>
+        <li className="flex justify-center">
+          <NavLink
+            to="/captura/nueva"
+            aria-label="Capturar"
+            className="grid size-12 place-items-center rounded-2xl bg-accent text-accent-fg no-underline shadow-glow"
+          >
+            <NavIcon name="/captura/nueva" className="size-6" />
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/mas" className={tab}>
+            <NavIcon name="/mas" className="size-5" />
+            Menú
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );
@@ -423,7 +420,7 @@ export function AppShell() {
         </Suspense>
       </main>
       {/* Durante el check-in guiado se oculta: sus botones Atrás/Siguiente van fijos abajo y competirían con ella. */}
-      {!guided && <BottomNav finance={modules?.finance !== false} />}
+      {!guided && <BottomNav />}
       <UpdatePrompt />
     </div>
   );

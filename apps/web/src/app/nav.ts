@@ -1,6 +1,6 @@
 // Mapa de navegación. En escritorio: barra superior con Inicio y menús por tema (Objetivos, Organizar, Finanzas, Vida,
-// Conocimiento); "Sistema" vive en el menú del perfil. En móvil: barra inferior (Inicio, Objetivos, Capturar, Finanzas,
-// Más) y el resto en "Más". `module` liga la entrada al interruptor de módulos de las preferencias.
+// Conocimiento); "Sistema" vive en el menú del perfil. En móvil: barra inferior (Hoy, Capturar, Menú) y todo lo demás
+// en "Menú" (/mas). `module` liga la entrada al interruptor de módulos de las preferencias.
 
 export type NavGroup =
   | "principal"
