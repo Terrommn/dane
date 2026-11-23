@@ -33,6 +33,10 @@ reqwest.workspace = true
 utoipa.workspace = true
 utoipa-axum.workspace = true
 openidconnect.workspace = true
+# No se usa directamente: activa "gzip" en el reqwest 0.12 que openidconnect/oauth2 usan por dentro (unificación de
+# features de Cargo). Por qué: oauth.telegram.org a veces responde jwks.json comprimido con gzip aunque no se pida, y
+# sin descompresión el descubrimiento OIDC falla con "Failed to parse server response" (login web caído al azar).
+reqwest-oidc = { package = "reqwest", version = "0.12", default-features = false, features = ["gzip"] }
 hmac.workspace = true
 sha2.workspace = true
 hex.workspace = true
