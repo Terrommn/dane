@@ -5530,6 +5530,14 @@ export interface components {
             /** Format: int32 */
             habit_warn_total?: number | null;
             track_family_loans?: boolean | null;
+            morning_enabled?: boolean | null;
+            /** @example 07:00 */
+            morning_time?: string | null;
+            /**
+             * Format: int32
+             * @description 0–240 minutos; 0 desactiva los avisos de eventos.
+             */
+            event_reminder_minutes?: number | null;
             daily_enabled?: boolean | null;
             /** @example 21:00 */
             daily_time?: string | null;
@@ -6010,7 +6018,7 @@ export interface components {
             version: number;
         };
         UpcomingReminder: {
-            /** @description `daily | weekly | monthly` */
+            /** @description `morning | daily | weekly | monthly` */
             kind: string;
             occurrence_key: string;
             /** Format: date */
@@ -6058,6 +6066,15 @@ export interface components {
             /** Format: int32 */
             habit_warn_total: number;
             track_family_loans: boolean;
+            /** @description Mensaje de la mañana (check-in guiado); `daily_*` es el cierre de la noche. */
+            morning_enabled: boolean;
+            /** @example 07:00:00 */
+            morning_time: string;
+            /**
+             * Format: int32
+             * @description Minutos de anticipación para avisar de un evento con hora (0 = sin avisos).
+             */
+            event_reminder_minutes: number;
             daily_enabled: boolean;
             /** @example 21:00:00 */
             daily_time: string;

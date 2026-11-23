@@ -91,7 +91,7 @@ async fn start_command_round_trip(pool: PgPool) {
     assert_eq!(sent[0]["chat_id"], 111);
     assert_eq!(
         sent[0]["reply_markup"]["inline_keyboard"][0][0]["url"],
-        "http://localhost:5173/hoy?date=2026-11-12"
+        "http://localhost:5173/hoy?date=2026-11-12&guiado=manana"
     );
     let (status, msg_id): (String, Option<i64>) =
         sqlx::query_as("SELECT status, telegram_message_id FROM jobs WHERE kind = 'reply'")

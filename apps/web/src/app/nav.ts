@@ -1,28 +1,59 @@
-// Mapa de navegación. Principal: Hoy, Objetivos, Dashboard, Más. El resto se alcanza desde "Más" (o la barra lateral
-// en escritorio). `module` liga la entrada al interruptor de módulos de las preferencias.
+// Mapa de navegación. En escritorio: barra superior con Inicio y menús por tema (Objetivos, Organizar, Finanzas, Vida,
+// Conocimiento); "Sistema" vive en el menú del perfil. En móvil: barra inferior (Hoy, Capturar, Menú) y todo lo demás
+// en "Menú" (/mas). `module` liga la entrada al interruptor de módulos de las preferencias.
+
+export type NavGroup =
+  | "principal"
+  | "objetivos"
+  | "organizar"
+  | "finanzas"
+  | "vida"
+  | "conocimiento"
+  | "sistema";
 
 export interface NavItem {
   to: string;
   label: string;
   icon: string;
-  group: "principal" | "organizar" | "finanzas" | "vida" | "conocimiento" | "sistema";
+  group: NavGroup;
   module?: "devotional" | "finance" | "content" | "school" | "dev" | "readings" | "people";
+  /** Texto corto bajo la etiqueta en los menús desplegables: explica para qué sirve la pantalla. */
+  hint?: string;
 }
 
-export const PRIMARY_NAV: NavItem[] = [
-  { to: "/hoy", label: "Hoy", icon: "☀️", group: "principal" },
-  { to: "/objetivos", label: "Objetivos", icon: "🎯", group: "principal" },
-  { to: "/dashboard", label: "Dashboard", icon: "📊", group: "principal" },
-];
+/** Inicio ES el dashboard: por eso ya no hay una pestaña "Dashboard" aparte (sus métricas completas están en Objetivos). */
+export const PRIMARY_NAV: NavItem[] = [{ to: "/", label: "Inicio", icon: "⌂", group: "principal" }];
 
 export const MORE_NAV: NavItem[] = [
+  { to: "/objetivos", label: "Objetivos", icon: "🎯", group: "objetivos", hint: "Del mes y de la semana" },
+  {
+    to: "/objetivos/planificar",
+    label: "Planificar",
+    icon: "🧭",
+    group: "objetivos",
+    hint: "Define tus metas del periodo",
+  },
+  {
+    to: "/dashboard",
+    label: "Estadísticas",
+    icon: "📊",
+    group: "objetivos",
+    hint: "Tendencias y comparaciones",
+  },
+  {
+    to: "/hoy",
+    label: "Check-in del día",
+    icon: "☀️",
+    group: "organizar",
+    hint: "Formulario completo de hoy",
+  },
   { to: "/habitos", label: "Hábitos", icon: "✅", group: "organizar" },
   { to: "/tareas", label: "Tareas", icon: "☑️", group: "organizar" },
-  { to: "/inbox", label: "Inbox", icon: "📥", group: "organizar" },
+  { to: "/inbox", label: "Inbox", icon: "📥", group: "organizar", hint: "Lo que capturaste sin ordenar" },
   { to: "/agenda", label: "Agenda", icon: "📅", group: "organizar" },
   { to: "/semanal", label: "Revisión semanal", icon: "🗓️", group: "organizar" },
   { to: "/proyectos", label: "Áreas y proyectos", icon: "🗂️", group: "organizar" },
-  { to: "/finanzas", label: "Finanzas", icon: "💰", group: "finanzas", module: "finance" },
+  { to: "/finanzas", label: "Resumen", icon: "💰", group: "finanzas", module: "finance" },
   { to: "/finanzas/movimientos", label: "Movimientos", icon: "🧾", group: "finanzas", module: "finance" },
   { to: "/personas", label: "Personas", icon: "👥", group: "vida", module: "people" },
   { to: "/devocionales", label: "Devocionales", icon: "🙏", group: "vida", module: "devotional" },
@@ -43,14 +74,18 @@ export const MORE_NAV: NavItem[] = [
   { to: "/ajustes", label: "Ajustes", icon: "⚙️", group: "sistema" },
 ];
 
-export const GROUP_LABEL: Record<NavItem["group"], string> = {
+export const GROUP_LABEL: Record<NavGroup, string> = {
   principal: "Principal",
+  objetivos: "Objetivos",
   organizar: "Organizar",
   finanzas: "Finanzas",
   vida: "Vida",
   conocimiento: "Conocimiento",
   sistema: "Sistema",
 };
+
+/** Menús de la barra superior, en orden. "Sistema" no aparece: va en el menú del perfil para no saturar la barra. */
+export const TOP_GROUPS: NavGroup[] = ["objetivos", "organizar", "finanzas", "vida", "conocimiento"];
 
 /** Filtra módulos desactivados en las preferencias (`modules`). Ausente = activo. */
 export function visibleItems(

@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile:1.7
+# Bot de Telegram para Railway. Igual que Dockerfile.bot pero sin --mount=type=cache: Railway rechaza las cachés
+# sin un id ligado al servicio (s/<id>-…) y no queremos atar el archivo a un id concreto. Contexto: raíz del repo.
+# Sigue sin recibir DATABASE_URL: habla con el server por la red privada (SERVER_INTERNAL_URL).
+FROM rust:1.94-bookworm AS build
+WORKDIR /src
+COPY Cargo.toml Cargo.lock rust-toolchain.toml rustfmt.toml ./
+COPY apps/server apps/server
+COPY apps/telegram-bot apps/telegram-bot
+COPY crates crates
+RUN cargo build --release -p telegram-bot --locked && cp target/release/dane-bot /dane-bot
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10002 bot
+COPY --from=build /dane-bot /usr/local/bin/dane-bot
+USER bot
+# [::] para escuchar en la red privada IPv6 de Railway (y también IPv4).
+ENV BOT_BIND_ADDR=[::]:8090 LOG_FORMAT=json
+EXPOSE 8090
+STOPSIGNAL SIGTERM
+ENTRYPOINT ["dane-bot"]

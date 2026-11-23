@@ -119,6 +119,19 @@ pub async fn housekeeping(pool: &PgPool, now: DateTime<Utc>) -> RepoResult<()> {
     .bind(now)
     .execute(pool)
     .await?;
+    // Igual para la mañana: si ya hiciste el check-in de la mañana antes de la hora, el mensaje sobra.
+    sqlx::query(crate::sqlf!(
+        "UPDATE jobs SET status = 'cancelled', last_error = 'check-in de la mañana ya hecho'
+         WHERE id IN (
+           SELECT j.id FROM jobs j JOIN daily_checkins c
+             ON c.user_id = j.user_id AND c.on_date = (j.payload ->> 'date')::date AND c.morning_done_at IS NOT NULL
+           WHERE j.kind = 'reminder_morning' AND {}
+           FOR UPDATE OF j SKIP LOCKED)",
+        reclaimable.replace("status", "j.status").replace("lease_expires_at", "j.lease_expires_at")
+    ))
+    .bind(now)
+    .execute(pool)
+    .await?;
     sqlx::query(crate::sqlf!(
         "UPDATE jobs SET status = 'cancelled', last_error = 'recordatorios pausados o chat no disponible'
          WHERE id IN (

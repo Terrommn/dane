@@ -3,7 +3,7 @@
 //! Reglas:
 //! * La ocurrencia se calcula por **fecha local** y hora local → UTC con la regla DST de `time::local_to_utc`
 //!   (nunca sumando 24 h UTC).
-//! * Diario: cada día a `daily_time` (clave `YYYY-MM-DD`). Semanal: el día ISO `weekly_weekday` a `weekly_time`
+//! * Mañana: cada día a `morning_time` (clave `YYYY-MM-DD`); abre el check-in guiado. Diario: cada día a `daily_time` (clave `YYYY-MM-DD`). Semanal: el día ISO `weekly_weekday` a `weekly_time`
 //!   (clave `GGGG-Www`). Mensual: el día 1 a `monthly_time` (clave `YYYY-MM`).
 //! * No se generan ocurrencias vencidas: si `now` ya pasó `run_at + gracia`, se omite (sin recordatorios históricos
 //!   acumulados). La gracia también es la caducidad del job.
@@ -18,6 +18,8 @@ use crate::time::{iso_week_key, local_date, local_to_utc, month_key};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ReminderKind {
+    /// Mensaje de la mañana (check-in guiado). Va aparte de `Daily`, que es el cierre de la noche.
+    Morning,
     Daily,
     Weekly,
     Monthly,
@@ -27,6 +29,7 @@ impl ReminderKind {
     /// Valor de `jobs.kind`.
     pub fn job_kind(&self) -> &'static str {
         match self {
+            Self::Morning => "reminder_morning",
             Self::Daily => "reminder_daily",
             Self::Weekly => "reminder_weekly",
             Self::Monthly => "reminder_monthly",
@@ -35,7 +38,7 @@ impl ReminderKind {
     /// Ventana durante la cual aún tiene sentido enviar el recordatorio.
     pub fn grace(&self) -> Duration {
         match self {
-            Self::Daily => Duration::hours(3),
+            Self::Morning | Self::Daily => Duration::hours(3),
             Self::Weekly | Self::Monthly => Duration::hours(12),
         }
     }
@@ -43,6 +46,8 @@ impl ReminderKind {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReminderPrefs {
+    pub morning_enabled: bool,
+    pub morning_time: NaiveTime,
     pub daily_enabled: bool,
     pub daily_time: NaiveTime,
     pub weekly_enabled: bool,
@@ -73,6 +78,7 @@ pub struct Occurrence {
 
 fn occurrence_on(prefs: &ReminderPrefs, kind: ReminderKind, date: NaiveDate, tz: Tz) -> Option<Occurrence> {
     let (enabled, time, applies, key) = match kind {
+        ReminderKind::Morning => (prefs.morning_enabled, prefs.morning_time, true, date.to_string()),
         ReminderKind::Daily => (prefs.daily_enabled, prefs.daily_time, true, date.to_string()),
         ReminderKind::Weekly => (
             prefs.weekly_enabled,
@@ -100,7 +106,13 @@ fn occurrence_on(prefs: &ReminderPrefs, kind: ReminderKind, date: NaiveDate, tz:
     })
 }
 
-const KINDS: [ReminderKind; 3] = [ReminderKind::Daily, ReminderKind::Weekly, ReminderKind::Monthly];
+// Morning al final para conservar el orden histórico (diario, semanal, mensual) en quien lea la primera ocurrencia.
+const KINDS: [ReminderKind; 4] = [
+    ReminderKind::Daily,
+    ReminderKind::Weekly,
+    ReminderKind::Monthly,
+    ReminderKind::Morning,
+];
 
 /// Ocurrencias que el scheduler debe asegurar ahora: las de la fecha local de hoy que no han caducado.
 /// Incluye las futuras de hoy (el bot solo las reclama cuando llega `run_at`).
@@ -138,6 +150,8 @@ mod tests {
 
     fn prefs() -> ReminderPrefs {
         ReminderPrefs {
+            morning_enabled: true,
+            morning_time: NaiveTime::from_hms_opt(7, 0, 0).unwrap(),
             daily_enabled: true,
             daily_time: NaiveTime::from_hms_opt(21, 0, 0).unwrap(),
             weekly_enabled: true,
@@ -178,7 +192,10 @@ mod tests {
         // 01:30 local del 13 → la del 12 caducó a las 00:00 del 13 (21:00 + 3 h); la del 13 aún no toca pero se asegura.
         let occ = due_occurrences(&prefs(), tz, utc(2026, 11, 13, 7, 30));
         assert_eq!(
-            occ.iter().map(|o| o.key.as_str()).collect::<Vec<_>>(),
+            occ.iter()
+                .filter(|o| o.kind == ReminderKind::Daily)
+                .map(|o| o.key.as_str())
+                .collect::<Vec<_>>(),
             vec!["2026-11-13"]
         );
         // Un servidor apagado varios días no produce recordatorios atrasados: solo el de hoy.
@@ -266,5 +283,31 @@ mod tests {
         assert!(u.windows(2).all(|w| w[0].run_at <= w[1].run_at));
         assert_eq!(u.iter().filter(|o| o.kind == ReminderKind::Daily).count(), 7);
         assert_eq!(u.iter().filter(|o| o.kind == ReminderKind::Weekly).count(), 1);
+    }
+
+    #[test]
+    fn morning_at_local_7_and_independent_switch() {
+        let tz = parse_tz("America/Monterrey").unwrap();
+        // 05:00 local del 12 (11:00 UTC): la mañana del 12 aún no llega pero ya se asegura.
+        let now = utc(2026, 11, 12, 11, 0);
+        let m: Vec<_> = due_occurrences(&prefs(), tz, now)
+            .into_iter()
+            .filter(|o| o.kind == ReminderKind::Morning)
+            .collect();
+        assert_eq!(m.len(), 1);
+        assert_eq!(m[0].key, "2026-11-12");
+        assert_eq!(m[0].run_at, utc(2026, 11, 12, 13, 0)); // 07:00 −06:00
+        let mut p = prefs();
+        p.morning_enabled = false;
+        assert!(
+            !due_occurrences(&p, tz, now)
+                .iter()
+                .any(|o| o.kind == ReminderKind::Morning)
+        );
+        assert!(
+            due_occurrences(&p, tz, now)
+                .iter()
+                .any(|o| o.kind == ReminderKind::Daily)
+        );
     }
 }

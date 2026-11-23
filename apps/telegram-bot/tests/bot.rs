@@ -297,9 +297,10 @@ async fn webhook_verifies_secret_and_answers_after_server_acceptance() {
 }
 
 #[tokio::test]
-async fn commands_cover_all_fourteen_with_valid_names() {
+async fn commands_cover_all_fifteen_with_valid_names() {
     let cmds = telegram_bot::commands();
-    assert_eq!(cmds.len(), 14);
+    // 14 originales + /menu (menú rápido del asistente diario).
+    assert_eq!(cmds.len(), 15);
     assert!(cmds.iter().all(|c| {
         c.command
             .chars()

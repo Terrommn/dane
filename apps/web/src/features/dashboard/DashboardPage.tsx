@@ -69,7 +69,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Dashboard"
+        title="Estadísticas"
         subtitle={
           date === today
             ? "Hoy cuenta aparte; lo cerrado no incluye el día abierto"

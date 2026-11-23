@@ -6,6 +6,7 @@ import { ErrorState, LoadingState } from "../components/ui/States";
 import { ToastProvider } from "../components/ui/Toast";
 import { AuthProvider, useAuth } from "../features/auth/AuthProvider";
 import { LoginPage } from "../features/auth/LoginPage";
+import { HomePage } from "../features/home/HomePage";
 import { ModulePending } from "../features/more/ModulePending";
 import { MorePage } from "../features/more/MorePage";
 import { TodayPage } from "../features/today/TodayPage";
@@ -13,7 +14,7 @@ import { AppShell } from "../layout/AppShell";
 import { startTargetPath } from "../lib/telegram";
 import { queryClient } from "./queryClient";
 
-// Pantallas secundarias cargadas bajo demanda (el app shell y Hoy quedan en el bundle inicial).
+// Pantallas secundarias cargadas bajo demanda (el app shell, Inicio y Hoy quedan en el bundle inicial).
 const ProjectsPage = lazy(() =>
   import("../features/projects/ProjectsPage").then((m) => ({ default: m.ProjectsPage })),
 );
@@ -164,7 +165,7 @@ function StartParamRedirect() {
 }
 
 function NotFound() {
-  return <ModulePending title="Página no encontrada" includes={["Revisa la dirección o vuelve a Hoy"]} />;
+  return <ModulePending title="Página no encontrada" includes={["Revisa la dirección o vuelve a Inicio"]} />;
 }
 
 export function App() {
@@ -183,7 +184,7 @@ export function App() {
                   </RequireAuth>
                 }
               >
-                <Route index element={<Navigate to="/hoy" replace />} />
+                <Route index element={<HomePage />} />
                 <Route path="/hoy" element={<TodayPage />} />
                 <Route path="/objetivos" element={<GoalsPage />} />
                 <Route path="/objetivos/planificar" element={<PlanningPage />} />

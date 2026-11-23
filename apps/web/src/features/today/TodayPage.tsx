@@ -2,7 +2,7 @@
 // cola offline con Idempotency-Key y versión base, y resolución explícita de conflictos (409).
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Button } from "../../components/ui/Button";
 import { ConflictDialog } from "../../components/ui/ConflictDialog";
 import { DatePicker } from "../../components/ui/DatePicker";
@@ -33,6 +33,7 @@ import {
   patchView,
   serverAsPatch,
 } from "./checkin";
+import { GuidedCheckin, type GuidedPart } from "./GuidedCheckin";
 import { ListEditor } from "./ListEditor";
 import { parsePesosToCents } from "./numbers";
 
@@ -102,6 +103,23 @@ export function TodayPage() {
   const date = isValidIsoDate(requested) && requested <= today ? requested : today;
   const fromOldMessage = isValidIsoDate(requested) && requested !== today;
   const view = useDayView(date);
+  // ?guiado=manana|noche (botones del bot y de Inicio): una pregunta por pantalla en vez del formulario completo.
+  const g = params.get("guiado");
+  const guided: GuidedPart | null = g === "manana" || g === "noche" ? g : null;
+
+  if (guided)
+    return (
+      <div className="space-y-4">
+        {fromOldMessage && (
+          <p role="status" className="rounded-xl border border-warn bg-surface p-3 text-sm">
+            Es el check-in del <strong>{formatLongDate(date)}</strong>, no el de hoy.
+          </p>
+        )}
+        {view.isPending && <LoadingState rows={4} label="Cargando el día…" />}
+        {view.isError && <ErrorState error={view.error} onRetry={() => view.refetch()} />}
+        {view.data && <CheckinEditor key={date} date={date} view={view.data} tz={tz} guided={guided} />}
+      </div>
+    );
 
   return (
     <div className="space-y-4">
@@ -138,8 +156,19 @@ export function TodayPage() {
   );
 }
 
-function CheckinEditor({ date, view, tz }: { date: string; view: DayView; tz: string }) {
+function CheckinEditor({
+  date,
+  view,
+  tz,
+  guided = null,
+}: {
+  date: string;
+  view: DayView;
+  tz: string;
+  guided?: GuidedPart | null;
+}) {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const toast = useToast();
   const { me } = useAuth();
   const draftApi = useDraft<unknown>("checkin", date);
@@ -218,6 +247,42 @@ function CheckinEditor({ date, view, tz }: { date: string; view: DayView; tz: st
   const habits = view.habits;
   const modules = (me?.settings.modules ?? {}) as Record<string, unknown>;
   const finance = modules.finance !== false;
+
+  const conflictDialog = conflict && (
+    <ConflictDialog
+      open
+      mine={patchView(conflict.body as Record<string, unknown>)}
+      theirs={serverAsPatch(conflict.current as Schemas["CheckinFull"])}
+      labels={CONFLICT_LABELS}
+      onClose={() => undefined}
+      onResolve={(r) => {
+        void queue.resolve(conflict.id, r).then(() => {
+          if (r.choice === "theirs") void qc.invalidateQueries({ queryKey: ["day", date] });
+        });
+      }}
+    />
+  );
+
+  if (guided)
+    return (
+      <>
+        <GuidedCheckin
+          part={guided}
+          date={date}
+          view={view}
+          form={form}
+          update={update}
+          setHabit={setHabit}
+          save={save}
+          saving={saving}
+          finance={finance}
+          error={error}
+          timeIn={(i) => timeIn(tz, i)}
+          onDone={() => navigate("/")}
+        />
+        {conflictDialog}
+      </>
+    );
 
   return (
     <div className="space-y-4">
@@ -473,20 +538,7 @@ function CheckinEditor({ date, view, tz }: { date: string; view: DayView; tz: st
         </p>
       </Card>
 
-      {conflict && (
-        <ConflictDialog
-          open
-          mine={patchView(conflict.body as Record<string, unknown>)}
-          theirs={serverAsPatch(conflict.current as Schemas["CheckinFull"])}
-          labels={CONFLICT_LABELS}
-          onClose={() => undefined}
-          onResolve={(r) => {
-            void queue.resolve(conflict.id, r).then(() => {
-              if (r.choice === "theirs") void qc.invalidateQueries({ queryKey: ["day", date] });
-            });
-          }}
-        />
-      )}
+      {conflictDialog}
     </div>
   );
 }

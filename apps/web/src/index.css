@@ -22,22 +22,38 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-telegram]) {
-    --c-bg: #0b1220;
-    --c-surface: #111a2e;
-    --c-surface-2: #172238;
-    --c-text: #e2e8f0;
-    --c-muted: #a3b1c6;
-    --c-border: #2d3a52;
-    --c-accent: #2dd4bf;
-    --c-accent-text: #042f2e;
-    --c-link: #5eead4;
-    --c-danger: #f87171;
-    --c-ok: #4ade80;
-    --c-warn: #facc15;
-    color-scheme: dark;
-  }
+/* Tema "Ámbar" (rediseño premium elegido por el usuario a partir de una referencia de dashboard): negro cálido con
+   acentos ámbar. La web/PWA siempre usa esta paleta (no depende de prefers-color-scheme) porque es la identidad visual,
+   no un modo nocturno. La Mini App NO la usa ([data-telegram]): ahí manda el tema de Telegram para verse nativa.
+   Contrastes AA medidos (texto normal): text/surface 16.0, muted/surface 6.4, muted/surface-2 6.0,
+   link/surface 9.2, accent-text/accent 7.0, sidebar-muted/sidebar 5.3. */
+:root:not([data-telegram]) {
+  --c-bg: #0a0908;
+  --c-surface: #131110;
+  --c-surface-2: #1b1816;
+  --c-text: #f1ece6;
+  --c-muted: #a0958c;
+  --c-border: #2a2522;
+  --c-accent: #f07a2e;
+  --c-accent-2: #f6a35a;
+  --c-accent-soft: #2a1a10;
+  --c-accent-text: #140b05;
+  /* Más claro que --c-accent: el naranja base como texto pequeño cansa y los enlaces abundan. */
+  --c-link: #f6a35a;
+  --c-danger: #f87171;
+  --c-ok: #6fd39b;
+  --c-warn: #fbbf24;
+  --c-shadow: 0 1px 2px rgb(0 0 0 / 0.45), 0 18px 50px rgb(0 0 0 / 0.45);
+  /* Resplandor del borde de la imagen principal (como el banner de la referencia). */
+  --c-glow: 0 0 0 1px rgb(240 122 46 / 0.18), 0 0 48px rgb(240 122 46 / 0.22);
+  --c-sb-bg: #100e0d;
+  --c-sb-text: #d8d0c8;
+  --c-sb-muted: #8f857d;
+  --c-sb-hover: #1b1816;
+  --c-sb-active: #2a1a10;
+  --c-sb-active-text: #f6a35a;
+  --c-sb-border: #221e1b;
+  color-scheme: dark;
 }
 :root[data-telegram][data-theme="dark"] {
   --c-border: #3b4a63;
@@ -59,6 +75,20 @@
   --color-danger: var(--c-danger);
   --color-ok: var(--c-ok);
   --color-warn: var(--c-warn);
+  /* Tokens nuevos del tema Medianoche. Los fallbacks mantienen la Mini App (que no los define) igual que antes. */
+  --color-accent-2: var(--c-accent-2, var(--c-accent));
+  --color-accent-soft: var(--c-accent-soft, var(--c-surface-2));
+  --color-sb: var(--c-sb-bg, var(--c-surface));
+  --color-sb-fg: var(--c-sb-text, var(--c-text));
+  --color-sb-muted: var(--c-sb-muted, var(--c-muted));
+  --color-sb-hover: var(--c-sb-hover, var(--c-surface-2));
+  --color-sb-active: var(--c-sb-active, var(--c-surface-2));
+  --color-sb-active-fg: var(--c-sb-active-text, var(--c-text));
+  --color-sb-line: var(--c-sb-border, var(--c-border));
+  --shadow-float: var(--c-shadow, 0 1px 2px rgb(0 0 0 / 0.06));
+  --shadow-glow: var(--c-glow, 0 0 0 1px var(--c-border));
+  /* Serif solo para saludos y preguntas grandes: da el tono "editorial" de la referencia sin cargar fuentes web. */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
 }
 
 html,
@@ -82,8 +112,12 @@ body {
   border-radius: 6px;
 }
 
-a {
-  color: var(--c-link);
+/* En @layer base para que las utilidades de Tailwind (text-fg, text-accent-fg…) puedan sobrescribirlo: una regla sin
+   capa gana siempre a las utilidades de v4 y pintaba de violeta los enlaces de la barra lateral y el botón de captura. */
+@layer base {
+  a {
+    color: var(--c-link);
+  }
 }
 
 dialog::backdrop {

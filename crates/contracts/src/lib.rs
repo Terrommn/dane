@@ -107,6 +107,7 @@ pub fn path_ack(id: Uuid) -> String {
 /// Fuente única para `setMyCommands` (bot) y `/help` (server).
 pub const COMMANDS: &[(&str, &str, &str)] = &[
     ("start", "Conectar el bot y abrir la app", ""),
+    ("menu", "Menú rápido: check-in, mi día, gasto", ""),
     ("daily", "Check-in de hoy (o dicta tu día)", "daily"),
     ("checkin", "Abrir el check-in (opcional: ayer o AAAA-MM-DD)", ""),
     ("objetivos", "Objetivos del mes y la semana", "objetivos"),
@@ -115,7 +116,7 @@ pub const COMMANDS: &[(&str, &str, &str)] = &[
     ("ingreso", "Registrar ingresos", "ingreso"),
     ("weekly_review", "Revisión semanal", "weekly-review"),
     ("log_session", "Registrar una sesión de código", "log-session"),
-    ("dashboard", "Ver tu dashboard", ""),
+    ("dashboard", "Abrir tu día en Dane", ""),
     ("settings", "Ajustes y recordatorios", ""),
     ("help", "Ayuda y comandos", ""),
     ("pause", "Pausar recordatorios (opcional: días)", ""),

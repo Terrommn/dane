@@ -17420,6 +17420,27 @@
               "null"
             ]
           },
+          "morning_enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "morning_time": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "07:00"
+          },
+          "event_reminder_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "0–240 minutos; 0 desactiva los avisos de eventos."
+          },
           "daily_enabled": {
             "type": [
               "boolean",
@@ -18983,7 +19004,7 @@
         "properties": {
           "kind": {
             "type": "string",
-            "description": "`daily | weekly | monthly`"
+            "description": "`morning | daily | weekly | monthly`"
           },
           "occurrence_key": {
             "type": "string"
@@ -19076,6 +19097,9 @@
           "habit_warn_month",
           "habit_warn_total",
           "track_family_loans",
+          "morning_enabled",
+          "morning_time",
+          "event_reminder_minutes",
           "daily_enabled",
           "daily_time",
           "weekly_enabled",
@@ -19145,6 +19169,19 @@
           },
           "track_family_loans": {
             "type": "boolean"
+          },
+          "morning_enabled": {
+            "type": "boolean",
+            "description": "Mensaje de la mañana (check-in guiado); `daily_*` es el cierre de la noche."
+          },
+          "morning_time": {
+            "type": "string",
+            "example": "07:00:00"
+          },
+          "event_reminder_minutes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Minutos de anticipación para avisar de un evento con hora (0 = sin avisos)."
           },
           "daily_enabled": {
             "type": "boolean"

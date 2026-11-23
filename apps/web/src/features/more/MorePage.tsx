@@ -9,7 +9,7 @@ export function MorePage() {
   const groups = [...new Set(items.map((i) => i.group))];
   return (
     <div>
-      <PageHeader title="Más" subtitle="Todos los módulos" />
+      <PageHeader title="Menú" subtitle="Todo lo que hay en Dane" />
       <div className="space-y-5">
         {groups.map((g) => (
           <section key={g} aria-labelledby={`g-${g}`}>

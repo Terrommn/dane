@@ -41,7 +41,7 @@ export function OnboardingPage() {
     try {
       await save({ onboarding_completed: true });
       toast.show("¡Listo! Puedes cambiar todo en Ajustes.", { tone: "ok" });
-      navigate("/hoy");
+      navigate("/");
     } catch (e) {
       toast.show(errorMessage(e), { tone: "error" });
     }
@@ -53,7 +53,7 @@ export function OnboardingPage() {
         title="Configura tu app"
         subtitle={`Paso ${step + 1} de ${STEPS.length}: ${STEPS[step]}`}
         actions={
-          <Button variant="ghost" onClick={() => navigate("/hoy")}>
+          <Button variant="ghost" onClick={() => navigate("/")}>
             Saltar por ahora
           </Button>
         }

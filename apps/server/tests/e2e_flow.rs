@@ -83,7 +83,7 @@ async fn goal_reminder_checkin_dashboard_round_trip(pool: PgPool) {
     assert_eq!(jobs[0]["kind"], "reminder_daily");
     assert_eq!(
         jobs[0]["message"]["buttons"][0][0]["url"],
-        "http://localhost:5173/hoy?date=2026-11-12"
+        "http://localhost:5173/hoy?date=2026-11-12&guiado=noche"
     );
 
     // 4. Abre el check-in de esa fecha (aunque ya sea otro día en UTC) y guarda; el reintento offline no duplica.
