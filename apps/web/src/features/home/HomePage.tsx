@@ -84,8 +84,9 @@ export function dayBrief(opts: {
 }
 
 /** Brillo ámbar al pasar el mouse (el usuario lo pidió para todas las tarjetas de Inicio). */
+// Entra casi al instante (75 ms) y sale despacio (500 ms): así un paso rápido del mouse sí deja ver el brillo.
 const HOVER =
-  "transition duration-300 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_0_0_1px_rgb(240_122_46/0.15),0_0_40px_rgb(240_122_46/0.18)]";
+  "transition duration-500 hover:duration-75 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_0_0_1px_rgb(240_122_46/0.15),0_0_40px_rgb(240_122_46/0.18)]";
 const CARD = `rounded-[20px] border border-line bg-surface/80 p-4 backdrop-blur-md ${HOVER}`;
 
 export function HomePage() {
@@ -192,6 +193,11 @@ function Body({ d, view, today }: { d: Dashboard; view: DayView; today: string }
       <div className="max-w-[760px] md:order-none">
         <TodayGoals habits={habits} today={today} />
       </div>
+      <Link to="/dashboard" className="inline-block text-sm text-muted md:hidden">
+        Ver estadísticas completas →
+      </Link>
+      {/* Aire al final: la página siempre se puede desplazar y el fondo de planos se luce al bajar. */}
+      <div aria-hidden className="hidden h-[45vh] md:block" />
     </div>
   );
 }
@@ -208,7 +214,7 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className={`${CARD} ${desktop ? "hidden md:block" : ""}`}>
+    <section data-card className={`${CARD} ${desktop ? "hidden md:block" : ""}`}>
       <h2 className="text-[13px] font-medium">{title}</h2>
       {sub && <p className="mt-0.5 truncate text-[11px] text-muted">{sub}</p>}
       {children}
@@ -391,6 +397,7 @@ function TodayGoals({ habits, today }: { habits: HabitDay[]; today: string }) {
         </div>
       ) : (
         <ul
+          data-card
           className={`divide-y divide-line rounded-[20px] border border-line bg-surface/80 backdrop-blur-md ${HOVER}`}
         >
           {habits.map((h) => {
