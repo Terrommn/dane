@@ -49,6 +49,11 @@ pub struct SettingsPatch {
     pub habit_warn_month: Option<i32>,
     pub habit_warn_total: Option<i32>,
     pub track_family_loans: Option<bool>,
+    pub morning_enabled: Option<bool>,
+    #[schema(value_type = Option<String>, example = "07:00")]
+    pub morning_time: Option<NaiveTime>,
+    /// 0–240 minutos; 0 desactiva los avisos de eventos.
+    pub event_reminder_minutes: Option<i16>,
     pub daily_enabled: Option<bool>,
     #[schema(value_type = Option<String>, example = "21:00")]
     pub daily_time: Option<NaiveTime>,
@@ -140,6 +145,18 @@ pub fn apply_patch(cur: &mut UserSettings, p: SettingsPatch, now: DateTime<Utc>)
     }
     if let Some(v) = p.track_family_loans {
         cur.track_family_loans = v;
+    }
+    if let Some(v) = p.morning_enabled {
+        cur.morning_enabled = v;
+    }
+    if let Some(v) = p.morning_time {
+        cur.morning_time = v;
+    }
+    if let Some(v) = p.event_reminder_minutes {
+        if !(0..=240).contains(&v) {
+            return Err(ApiError::validation("event_reminder_minutes", "0 a 240 minutos"));
+        }
+        cur.event_reminder_minutes = v;
     }
     if let Some(v) = p.daily_enabled {
         cur.daily_enabled = v;

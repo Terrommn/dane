@@ -24,10 +24,10 @@ describe("cierre de sesión", () => {
 describe("redirecciones y URLs seguras", () => {
   it("solo rutas internas tras el login", () => {
     expect(safeRedirect("/hoy?date=2026-11-11")).toBe("/hoy?date=2026-11-11");
-    expect(safeRedirect("//evil.com")).toBe("/hoy");
-    expect(safeRedirect("https://evil.com")).toBe("/hoy");
-    expect(safeRedirect("/\\evil.com")).toBe("/hoy");
-    expect(safeRedirect(null)).toBe("/hoy");
+    expect(safeRedirect("//evil.com")).toBe("/");
+    expect(safeRedirect("https://evil.com")).toBe("/");
+    expect(safeRedirect("/\\evil.com")).toBe("/");
+    expect(safeRedirect(null)).toBe("/");
   });
 
   it("enlaces de proyecto solo http(s)", () => {

@@ -1,9 +1,19 @@
-// Iconos de línea para la barra lateral de escritorio. Se usan en lugar de los emojis de nav.ts porque los emojis
+// Iconos de línea para la navegación (barra superior, menús y barra inferior). Se usan en lugar de los emojis de nav.ts porque los emojis
 // cambian de aspecto según el sistema operativo y no toman el color del tema (el activo debe verse violeta).
 // Los emojis se conservan en nav.ts para la barra inferior móvil y la pantalla "Más", que no cambian.
 import type { ReactNode } from "react";
 
 const PATHS: Record<string, ReactNode> = {
+  "/": <path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z" />,
+  "/objetivos/planificar": (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M15.5 8.5l-2 5-5 2 2-5z" />
+    </>
+  ),
+  "/mas": <path d="M4 6h16M4 12h16M4 18h16" />,
+  bell: <path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10.3 21a1.94 1.94 0 003.4 0" />,
+  logout: <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />,
   "/hoy": (
     <>
       <circle cx="12" cy="12" r="4" />

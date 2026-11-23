@@ -72,6 +72,57 @@ pub fn parse_day(arg: &str, today: NaiveDate) -> Option<NaiveDate> {
     }
 }
 
+/// Saludos y pedidos de menú ("hola", "buenos días", "menu"…). Por qué no un LLM: son pocas frases y una regla
+/// determinista no se equivoca ni cuesta; todo lo demás sigue yendo al Inbox como captura rápida.
+pub fn is_greeting(text: &str) -> bool {
+    let t = domain::text::fold(text.trim());
+    let t = t.trim_matches(|c: char| !c.is_alphanumeric() && c != ' ');
+    const EXACT: [&str; 14] = [
+        "hola",
+        "holi",
+        "hey",
+        "buenas",
+        "buenos dias",
+        "buenas tardes",
+        "buenas noches",
+        "menu",
+        "inicio",
+        "que onda",
+        "hi",
+        "hello",
+        "ayuda",
+        "opciones",
+    ];
+    EXACT.contains(&t) || (t.starts_with("hola ") && t.split_whitespace().count() <= 3)
+}
+
+/// Menú principal con botones: lo que se manda al saludar o con /start.
+fn main_menu(state: &AppState, chat: i64, name: Option<&str>, today: NaiveDate) -> OutboundMessage {
+    let hello = name
+        .map(|n| format!("¡Hola, {n}!"))
+        .unwrap_or_else(|| "¡Hola!".into());
+    message(
+        chat,
+        format!("{hello} ¿Qué quieres hacer?"),
+        vec![
+            vec![app_button(
+                state,
+                "☀️ Check-in de la mañana",
+                &format!("/hoy?date={today}&guiado=manana"),
+            )],
+            vec![app_button(
+                state,
+                "🌙 Cerrar el día",
+                &format!("/hoy?date={today}&guiado=noche"),
+            )],
+            vec![
+                app_button(state, "🎯 Mi día", "/"),
+                app_button(state, "💸 Registrar gasto", "/finanzas/movimientos?nuevo=gasto"),
+            ],
+        ],
+    )
+}
+
 const CAPTURE_INTENTS: [(&str, &str); 7] = [
     ("daily", "tu día"),
     ("dump", "tus pendientes"),
@@ -133,6 +184,7 @@ pub async fn handle_update(
     let reply = match command {
         Some((name, args)) => command_reply(state, tx, user_id, &m, &name, &args, today, now).await?,
         None => match m.text.as_deref().map(str::trim).filter(|t| !t.is_empty()) {
+            Some(text) if is_greeting(text) => main_menu(state, m.chat_id, m.first_name.as_deref(), today),
             Some(text) => {
                 // Texto libre = captura rápida al Inbox (se procesa en la revisión).
                 sqlx::query(
@@ -227,24 +279,16 @@ async fn command_reply(
     };
     let has_text = !args.trim().is_empty();
     Ok(match name {
-        "start" => message(
-            chat,
-            format!(
-                "¡Hola{}! Aquí recibirás tus recordatorios. Los detalles se editan en la app.",
-                m.first_name
-                    .as_deref()
-                    .map(|n| format!(", {n}"))
-                    .unwrap_or_default()
-            ),
-            vec![
-                vec![app_button(
-                    state,
-                    "Abrir check-in de hoy",
-                    &format!("/hoy?date={today}"),
-                )],
-                vec![app_button(state, "Dashboard", "/dashboard")],
-            ],
-        ),
+        // /start conserva el aviso de recordatorios y añade el mismo menú que un saludo.
+        "start" => {
+            let mut msg = main_menu(state, chat, m.first_name.as_deref(), today);
+            msg.text = msg.text.replace(
+                "¿Qué quieres hacer?",
+                "Cada mañana te escribo para tu check-in y te aviso de tus eventos. ¿Qué quieres hacer?",
+            );
+            msg
+        }
+        "menu" => main_menu(state, chat, m.first_name.as_deref(), today),
         "checkin" => match parse_day(args, today) {
             Some(d) => checkin(d),
             None => message(
@@ -257,8 +301,8 @@ async fn command_reply(
         "daily" if parse_day(args, today).is_some() => checkin(parse_day(args, today).unwrap_or(today)),
         "dashboard" => message(
             chat,
-            "📊 Tu dashboard:",
-            vec![vec![app_button(state, "Abrir dashboard", "/dashboard")]],
+            "📊 Tu día en Dane:",
+            vec![vec![app_button(state, "Abrir Dane", "/")]],
         ),
         "objetivos" if !has_text => message(
             chat,
@@ -269,18 +313,42 @@ async fn command_reply(
             ]],
         ),
         "settings" => {
-            let (paused, until, daily_on, daily_time): (bool, Option<DateTime<Utc>>, bool, chrono::NaiveTime) = sqlx::query_as(
-                "SELECT reminders_paused, paused_until, daily_enabled, daily_time FROM user_settings WHERE user_id = $1",
+            #[allow(clippy::type_complexity)]
+            let (paused, until, morning_on, morning_time, daily_on, daily_time, ev_min): (
+                bool,
+                Option<DateTime<Utc>>,
+                bool,
+                chrono::NaiveTime,
+                bool,
+                chrono::NaiveTime,
+                i16,
+            ) = sqlx::query_as(
+                "SELECT reminders_paused, paused_until, morning_enabled, morning_time, daily_enabled, daily_time,
+                        event_reminder_minutes FROM user_settings WHERE user_id = $1",
             )
             .bind(user_id)
             .fetch_one(&mut **tx)
             .await?;
             let estado = if paused || until.is_some_and(|u| u > now) {
                 "pausados".to_string()
-            } else if daily_on {
-                format!("activos, diario a las {}", daily_time.format("%H:%M"))
             } else {
-                "diario desactivado".to_string()
+                let on = |b: bool, t: chrono::NaiveTime| {
+                    if b {
+                        t.format("%H:%M").to_string()
+                    } else {
+                        "apagado".into()
+                    }
+                };
+                let ev = if ev_min > 0 {
+                    format!("{ev_min} min antes")
+                } else {
+                    "apagados".into()
+                };
+                format!(
+                    "mañana {} · cierre {} · eventos {ev}",
+                    on(morning_on, morning_time),
+                    on(daily_on, daily_time)
+                )
             };
             message(
                 chat,
@@ -416,6 +484,20 @@ mod tests {
         );
         assert_eq!(parse_command("hola"), None);
         assert_eq!(parse_command("/"), None);
+    }
+
+    #[test]
+    fn greetings_open_the_menu_but_notes_go_to_inbox() {
+        for g in ["hola", "Hola!", "  Buenos días ", "MENÚ", "hey", "hola dane"] {
+            assert!(is_greeting(g), "{g}");
+        }
+        for n in [
+            "hola, mañana pagar la renta",
+            "comprar leche",
+            "buenos días con energía 4 y dormí mal",
+        ] {
+            assert!(!is_greeting(n), "{n}");
+        }
     }
 
     #[test]

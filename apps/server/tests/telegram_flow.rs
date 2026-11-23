@@ -143,7 +143,7 @@ async fn start_links_private_chat_and_replies_with_checkin_button(pool: PgPool) 
     assert_eq!(msg["buttons"][0][0]["type"], "url");
     assert_eq!(
         msg["buttons"][0][0]["url"],
-        "http://localhost:5173/hoy?date=2026-11-12"
+        "http://localhost:5173/hoy?date=2026-11-12&guiado=manana"
     );
     // Mismo usuario que la Mini App: dev-login con el mismo ID ve el chat conectado.
     let a = t.login(111).await;
@@ -450,7 +450,7 @@ async fn daily_reminder_is_scheduled_once_at_local_time(pool: PgPool) {
     assert_eq!(jobs[0]["kind"], "reminder_daily");
     assert_eq!(
         jobs[0]["message"]["buttons"][0][0]["url"],
-        "http://localhost:5173/hoy?date=2026-11-12"
+        "http://localhost:5173/hoy?date=2026-11-12&guiado=noche"
     );
 }
 
@@ -561,4 +561,121 @@ async fn pause_via_bot_and_api_cancels_and_resume_reschedules(pool: PgPool) {
     assert!(s["paused_until"].is_string());
     let (st, _) = a.post("/reminders/pause", json!({"days": 0})).await;
     assert_eq!(st, StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+// ---------- Asistente diario: saludo, mañana y avisos de eventos ----------
+
+#[sqlx::test(migrator = "persistence::MIGRATOR")]
+async fn greeting_opens_menu_instead_of_inbox(pool: PgPool) {
+    let t = TestApp::new(pool.clone());
+    user_with_chat(&t).await;
+    ingest(&t, upd(2, 111, "private", "Hola!")).await;
+    processor::drain(&t.state).await.unwrap();
+    let jobs = claim(&t, 5).await;
+    assert_eq!(jobs.len(), 1);
+    let msg = &jobs[0]["message"];
+    assert!(msg["text"].as_str().unwrap().starts_with("¡Hola, Neil!"));
+    assert_eq!(
+        msg["buttons"][0][0]["url"],
+        "http://localhost:5173/hoy?date=2026-11-12&guiado=manana"
+    );
+    assert_eq!(
+        count(&pool, "SELECT count(*) FROM inbox_items").await,
+        0,
+        "un saludo no es una captura"
+    );
+}
+
+#[sqlx::test(migrator = "persistence::MIGRATOR")]
+async fn morning_message_summarizes_tasks_and_agenda(pool: PgPool) {
+    let t = TestApp::new(pool.clone());
+    // 05:00 en Monterrey: la mañana (07:00) aún no llega.
+    t.clock.set(Utc.with_ymd_and_hms(2026, 11, 12, 11, 0, 0).unwrap());
+    user_with_chat(&t).await;
+    sqlx::query("INSERT INTO tasks (user_id, title, planned_on) SELECT user_id, 'Pagar renta', '2026-11-12' FROM telegram_chats")
+        .execute(&pool)
+        .await
+        .unwrap();
+    sqlx::query(
+        "INSERT INTO calendar_events (user_id, on_date, starts_at, ends_at, title)
+         SELECT user_id, '2026-11-12', '2026-11-12T15:00:00Z', '2026-11-12T16:00:00Z', 'Junta con cliente' FROM telegram_chats",
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+    scheduler::run_once(&t.state).await.unwrap();
+    let run_at: chrono::DateTime<Utc> =
+        sqlx::query_scalar("SELECT run_at FROM jobs WHERE kind = 'reminder_morning'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(
+        run_at,
+        Utc.with_ymd_and_hms(2026, 11, 12, 13, 0, 0).unwrap(),
+        "07:00 en Monterrey"
+    );
+    t.clock.set(Utc.with_ymd_and_hms(2026, 11, 12, 13, 1, 0).unwrap());
+    let jobs = claim(&t, 5).await;
+    let m = jobs
+        .iter()
+        .find(|j| j["kind"] == "reminder_morning")
+        .expect("mensaje de la mañana");
+    let text = m["message"]["text"].as_str().unwrap();
+    assert!(text.contains("Tienes 1 tarea pendiente."), "{text}");
+    assert!(text.contains("• 09:00 Junta con cliente"), "{text}");
+    assert_eq!(
+        m["message"]["buttons"][0][0]["url"],
+        "http://localhost:5173/hoy?date=2026-11-12&guiado=manana"
+    );
+}
+
+#[sqlx::test(migrator = "persistence::MIGRATOR")]
+async fn morning_is_skipped_when_morning_checkin_done(pool: PgPool) {
+    let t = TestApp::new(pool.clone());
+    t.clock.set(Utc.with_ymd_and_hms(2026, 11, 12, 11, 0, 0).unwrap());
+    user_with_chat(&t).await;
+    scheduler::run_once(&t.state).await.unwrap();
+    sqlx::query("INSERT INTO daily_checkins (user_id, on_date, morning_done_at) SELECT user_id, '2026-11-12', now() FROM telegram_chats")
+        .execute(&pool)
+        .await
+        .unwrap();
+    t.clock.set(Utc.with_ymd_and_hms(2026, 11, 12, 13, 1, 0).unwrap());
+    assert!(claim(&t, 5).await.iter().all(|j| j["kind"] != "reminder_morning"));
+}
+
+#[sqlx::test(migrator = "persistence::MIGRATOR")]
+async fn event_reminder_fires_before_the_event_once(pool: PgPool) {
+    let t = TestApp::new(pool.clone());
+    user_with_chat(&t).await;
+    sqlx::query(
+        "INSERT INTO calendar_events (user_id, on_date, starts_at, ends_at, title, location)
+         SELECT user_id, '2026-11-12', '2026-11-12T19:00:00Z', '2026-11-12T20:00:00Z', 'Dentista', 'Av. Juárez 10' FROM telegram_chats",
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+    // 18:00 UTC: faltan 60 min, fuera de la ventana (15 min + 5).
+    scheduler::run_once(&t.state).await.unwrap();
+    assert_eq!(
+        count(&pool, "SELECT count(*) FROM jobs WHERE kind = 'reminder_event'").await,
+        0
+    );
+    t.clock
+        .set(Utc.with_ymd_and_hms(2026, 11, 12, 18, 41, 0).unwrap());
+    scheduler::run_once(&t.state).await.unwrap();
+    scheduler::run_once(&t.state).await.unwrap();
+    assert_eq!(
+        count(&pool, "SELECT count(*) FROM jobs WHERE kind = 'reminder_event'").await,
+        1,
+        "sin duplicados"
+    );
+    t.clock
+        .set(Utc.with_ymd_and_hms(2026, 11, 12, 18, 46, 0).unwrap());
+    let jobs = claim(&t, 5).await;
+    let e = jobs
+        .iter()
+        .find(|j| j["kind"] == "reminder_event")
+        .expect("aviso del evento");
+    let text = e["message"]["text"].as_str().unwrap();
+    assert_eq!(text, "⏰ A las 13:00: Dentista\n📍 Av. Juárez 10");
 }

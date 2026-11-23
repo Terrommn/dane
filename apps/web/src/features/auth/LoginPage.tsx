@@ -26,7 +26,7 @@ const ERRORS: Record<string, string> = {
 
 /** Ruta interna segura para volver tras iniciar sesión. */
 export function safeRedirect(p: string | null): string {
-  return p?.startsWith("/") && !p.startsWith("//") && !p.includes("\\") ? p : "/hoy";
+  return p?.startsWith("/") && !p.startsWith("//") && !p.includes("\\") ? p : "/";
 }
 
 const devSchema = z.object({

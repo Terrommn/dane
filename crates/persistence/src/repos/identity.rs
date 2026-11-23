@@ -47,6 +47,12 @@ pub struct UserSettings {
     pub habit_warn_month: i32,
     pub habit_warn_total: i32,
     pub track_family_loans: bool,
+    /// Mensaje de la mañana (check-in guiado); `daily_*` es el cierre de la noche.
+    pub morning_enabled: bool,
+    #[schema(value_type = String, example = "07:00:00")]
+    pub morning_time: NaiveTime,
+    /// Minutos de anticipación para avisar de un evento con hora (0 = sin avisos).
+    pub event_reminder_minutes: i16,
     pub daily_enabled: bool,
     #[schema(value_type = String, example = "21:00:00")]
     pub daily_time: NaiveTime,
@@ -361,7 +367,8 @@ pub async fn get_settings(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<
     sqlx::query_as::<_, UserSettings>(
         "SELECT user_id, locale, timezone, currency::text AS currency, week_start, modules, devotional_mode,
                 devotional_template, max_devotional_failures, weight_goal_kg, weight_direction, habit_warn_month,
-                habit_warn_total, track_family_loans, daily_enabled, daily_time, weekly_enabled, weekly_weekday,
+                habit_warn_total, track_family_loans, morning_enabled, morning_time, event_reminder_minutes,
+                daily_enabled, daily_time, weekly_enabled, weekly_weekday,
                 weekly_time, monthly_enabled, monthly_time, reminders_paused, paused_until, onboarding_completed_at,
                 version
          FROM user_settings WHERE user_id = $1",
@@ -379,7 +386,8 @@ pub async fn save_settings(pool: &PgPool, s: &UserSettings) -> RepoResult<UserSe
             weight_direction = $12, habit_warn_month = $13, habit_warn_total = $14, track_family_loans = $15,
             daily_enabled = $16, daily_time = $17, weekly_enabled = $18, weekly_weekday = $19, weekly_time = $20,
             monthly_enabled = $21, monthly_time = $22, reminders_paused = $23, paused_until = $24,
-            onboarding_completed_at = $25, version = version + 1
+            onboarding_completed_at = $25, morning_enabled = $26, morning_time = $27,
+            event_reminder_minutes = $28, version = version + 1
          WHERE user_id = $1 AND version = $2",
     )
     .bind(s.user_id)
@@ -407,6 +415,9 @@ pub async fn save_settings(pool: &PgPool, s: &UserSettings) -> RepoResult<UserSe
     .bind(s.reminders_paused)
     .bind(s.paused_until)
     .bind(s.onboarding_completed_at)
+    .bind(s.morning_enabled)
+    .bind(s.morning_time)
+    .bind(s.event_reminder_minutes)
     .execute(pool)
     .await?
     .rows_affected();

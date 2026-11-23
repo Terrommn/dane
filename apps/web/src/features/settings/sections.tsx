@@ -150,6 +150,9 @@ export function ModulesSection({ settings, save, saving, submitLabel = "Guardar"
 
 export function RemindersSection({ settings, save, saving, submitLabel = "Guardar", onSaved }: SectionProps) {
   const [s, setS] = useState({
+    morning_enabled: settings.morning_enabled,
+    morning_time: toTimeInput(settings.morning_time),
+    event_reminder_minutes: settings.event_reminder_minutes,
     daily_enabled: settings.daily_enabled,
     daily_time: toTimeInput(settings.daily_time),
     weekly_enabled: settings.weekly_enabled,
@@ -169,6 +172,9 @@ export function RemindersSection({ settings, save, saving, submitLabel = "Guarda
         onSubmit={(e) => {
           e.preventDefault();
           void submit({
+            morning_enabled: s.morning_enabled,
+            morning_time: fromTimeInput(s.morning_time),
+            event_reminder_minutes: s.event_reminder_minutes,
             daily_enabled: s.daily_enabled,
             daily_time: fromTimeInput(s.daily_time),
             weekly_enabled: s.weekly_enabled,
@@ -184,19 +190,56 @@ export function RemindersSection({ settings, save, saving, submitLabel = "Guarda
           });
         }}
       >
+        <p className="text-sm text-muted">
+          El bot te escribe a estas horas. Si ya hiciste esa parte del check-in, no te molesta.
+        </p>
         <div className="grid gap-3 sm:grid-cols-[auto_1fr] sm:items-end">
           <CheckboxField
-            label="Check-in diario"
+            label="Mensaje de la mañana"
+            checked={s.morning_enabled}
+            onChange={(e) => set("morning_enabled", e.target.checked)}
+          />
+          <TextField
+            label="Hora de la mañana"
+            type="time"
+            value={s.morning_time}
+            disabled={!s.morning_enabled}
+            onChange={(e) => set("morning_time", e.target.value)}
+            hint="Resumen del día (tareas y agenda) y el check-in de la mañana."
+          />
+          <CheckboxField
+            label="Cierre del día"
             checked={s.daily_enabled}
             onChange={(e) => set("daily_enabled", e.target.checked)}
           />
           <TextField
-            label="Hora del recordatorio diario"
+            label="Hora del cierre"
             type="time"
             value={s.daily_time}
             disabled={!s.daily_enabled}
             onChange={(e) => set("daily_time", e.target.value)}
+            hint="Preguntas cortas para cerrar el día."
           />
+          <CheckboxField
+            label="Avisos de eventos"
+            checked={s.event_reminder_minutes > 0}
+            onChange={(e) => set("event_reminder_minutes", e.target.checked ? 15 : 0)}
+          />
+          <SelectField
+            label="Avisarme antes de cada evento"
+            value={s.event_reminder_minutes}
+            disabled={s.event_reminder_minutes === 0}
+            onChange={(e) => set("event_reminder_minutes", Number(e.target.value))}
+            hint="Eventos con hora de tu agenda (y de Google Calendar si lo conectaste)."
+          >
+            {/* El 0 solo aparece mientras está apagado, para que el select siempre tenga un valor válido. */}
+            {s.event_reminder_minutes === 0 && <option value={0}>Apagado</option>}
+            {[5, 10, 15, 30, 60].map((m) => (
+              <option key={m} value={m}>
+                {m} minutos
+              </option>
+            ))}
+          </SelectField>
           <CheckboxField
             label="Revisión semanal"
             checked={s.weekly_enabled}

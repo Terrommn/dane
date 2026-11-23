@@ -24,7 +24,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 
 #[derive(Serialize, ToSchema)]
 pub struct UpcomingReminder {
-    /// `daily | weekly | monthly`
+    /// `morning | daily | weekly | monthly`
     pub kind: String,
     pub occurrence_key: String,
     pub local_date: NaiveDate,
@@ -49,6 +49,8 @@ pub struct ReminderStatus {
 #[derive(sqlx::FromRow)]
 struct PrefsRow {
     timezone: String,
+    morning_enabled: bool,
+    morning_time: chrono::NaiveTime,
     daily_enabled: bool,
     daily_time: chrono::NaiveTime,
     weekly_enabled: bool,
@@ -62,7 +64,7 @@ struct PrefsRow {
 
 async fn build_status(s: &AppState, auth: &AuthUser) -> ApiResult<ReminderStatus> {
     let p = sqlx::query_as::<_, PrefsRow>(
-        "SELECT timezone, daily_enabled, daily_time, weekly_enabled, weekly_weekday, weekly_time, monthly_enabled,
+        "SELECT timezone, morning_enabled, morning_time, daily_enabled, daily_time, weekly_enabled, weekly_weekday, weekly_time, monthly_enabled,
                 monthly_time, reminders_paused, paused_until FROM user_settings WHERE user_id = $1",
     )
     .bind(auth.user_id)
@@ -74,6 +76,8 @@ async fn build_status(s: &AppState, auth: &AuthUser) -> ApiResult<ReminderStatus
             .fetch_optional(&s.pool)
             .await?;
     let prefs = ReminderPrefs {
+        morning_enabled: p.morning_enabled,
+        morning_time: p.morning_time,
         daily_enabled: p.daily_enabled,
         daily_time: p.daily_time,
         weekly_enabled: p.weekly_enabled,
@@ -87,6 +91,7 @@ async fn build_status(s: &AppState, auth: &AuthUser) -> ApiResult<ReminderStatus
     let now = s.now();
     let tz = domain::time::parse_tz(&p.timezone)?;
     let kind = |k: domain::reminders::ReminderKind| match k {
+        domain::reminders::ReminderKind::Morning => "morning",
         domain::reminders::ReminderKind::Daily => "daily",
         domain::reminders::ReminderKind::Weekly => "weekly",
         domain::reminders::ReminderKind::Monthly => "monthly",
