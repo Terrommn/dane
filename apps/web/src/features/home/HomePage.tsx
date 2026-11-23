@@ -87,7 +87,9 @@ export function dayBrief(opts: {
 // Entra casi al instante (75 ms) y sale despacio (500 ms): así un paso rápido del mouse sí deja ver el brillo.
 const HOVER =
   "transition duration-500 hover:duration-75 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_0_0_1px_rgb(240_122_46/0.15),0_0_40px_rgb(240_122_46/0.18)]";
-const CARD = `rounded-[20px] border border-line bg-surface/80 p-4 backdrop-blur-md ${HOVER}`;
+// Sin backdrop-blur a propósito: desenfocar el fondo animado en cada cuadro trababa el dashboard. Un fondo casi opaco
+// se ve igual de premium y no cuesta nada.
+const CARD = `rounded-[20px] border border-line bg-surface/90 p-4 ${HOVER}`;
 
 export function HomePage() {
   const { me } = useAuth();
@@ -391,14 +393,14 @@ function TodayGoals({ habits, today }: { habits: HabitDay[]; today: string }) {
         </Link>
       </div>
       {habits.length === 0 ? (
-        <div className="rounded-[20px] border border-dashed border-line bg-surface/60 p-5 text-sm text-muted backdrop-blur-md">
+        <div className="rounded-[20px] border border-dashed border-line bg-surface/80 p-5 text-sm text-muted">
           Aún no tienes hábitos para hoy. <Link to="/objetivos/planificar">Planifica tus objetivos</Link> y
           aquí aparecerán con un interruptor para marcarlos.
         </div>
       ) : (
         <ul
           data-card
-          className={`divide-y divide-line rounded-[20px] border border-line bg-surface/80 backdrop-blur-md ${HOVER}`}
+          className={`divide-y divide-line rounded-[20px] border border-line bg-surface/90 ${HOVER}`}
         >
           {habits.map((h) => {
             const t = asToday(h.progress);

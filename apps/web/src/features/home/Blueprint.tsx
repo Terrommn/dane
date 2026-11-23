@@ -4,8 +4,9 @@
 //
 // Ciclo en bucle (pedido por el usuario):
 //   1. se dibuja piso por piso → 2. pausa → 3. se abre por pisos (vista "explotada") → 4. pausa →
-//   5. cada línea sale disparada hacia donde "apunta" su pared (la pared norte al norte, la este al este…), estirándose a
-//      lo largo de su propio eje hasta cruzar la pantalla, y desaparece → 6. vuelve a empezar.
+//   5. cada línea sale hacia donde "apunta" su pared (la norte al norte, la este al este…) estirándose sobre su eje →
+//   6. en el punto más abierto regresa por el mismo camino → 7. los pisos bajan y el edificio queda armado → repetir.
+// Se dibuja una sola vez: el ciclo es reversible y continuo para que no haya tirones.
 // Además: un clic en el fondo (no en tarjetas ni controles) lanza una onda y la cuadrícula "se abre" y regresa despacio.
 // Cada arista es un <path> independiente: así cada pared puede salir en su propia dirección.
 import { useEffect, useMemo, useRef } from "react";
@@ -25,8 +26,8 @@ const D = 220;
 const H = 120;
 /** Separación entre pisos al "abrirse" (unidades del viewBox). */
 const GAP = 40;
-/** Distancia que recorre cada línea al salir: suficiente para abandonar la pantalla desde cualquier punto. */
-const FLY = 1500;
+/** Distancia máxima que recorre cada línea al salir antes de regresar (unidades del viewBox). */
+const FLY = 420;
 
 export interface Seg {
   a: Pt;
@@ -161,60 +162,72 @@ export function Blueprint() {
     }
     let alive = true;
     const run = async () => {
+      g.style.opacity = "1";
+      // 1) Dibujar una sola vez al entrar: cada línea con un pequeño retraso, piso por piso de abajo hacia arriba.
+      // Por qué solo una vez: borrar y redibujar en cada vuelta se sentía como un "tirón" en todo el dashboard.
+      const draws = paths.map((p, i) =>
+        p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], {
+          duration: 1200,
+          delay: i * 18,
+          easing: EASE,
+          fill: "forwards",
+        }),
+      );
+      await Promise.all(draws.map((a) => a.finished)).catch(() => {});
+      // Ciclo continuo y reversible: nada desaparece de golpe, todo vuelve por el mismo camino.
       while (alive) {
-        g.style.opacity = "1";
-        // 1) Dibujar: cada línea con un pequeño retraso, piso por piso de abajo hacia arriba.
-        const draws = paths.map((p, i) =>
-          p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], {
-            duration: 1200,
-            delay: i * 18,
-            easing: EASE,
-            fill: "forwards",
-          }),
-        );
-        await Promise.all(draws.map((a) => a.finished)).catch(() => {});
-        if (!alive) return;
         await sleep(2000);
+        if (!alive) return;
         // 2) Abrir: cada piso sube en proporción a su altura (vista explotada).
-        const open = groups.map((fl, i) =>
-          fl.animate([{ transform: "translate(0,0)" }, { transform: `translate(0,${-i * GAP}px)` }], {
-            duration: 1800,
-            easing: "cubic-bezier(.45,0,.2,1)",
-            fill: "forwards",
+        const lift = (i: number) => `translate(0,${-i * GAP}px)`;
+        await Promise.all(
+          groups.map(
+            (fl, i) =>
+              fl.animate([{ transform: "translate(0,0)" }, { transform: lift(i) }], {
+                duration: 1800,
+                easing: "cubic-bezier(.45,0,.2,1)",
+                fill: "forwards",
+              }).finished,
+          ),
+        ).catch(() => {});
+        if (!alive) return;
+        await sleep(1600);
+        // 3) Dispersar y regresar en UNA sola animación por línea: sale en su dirección estirándose sobre su eje,
+        //    se detiene suavemente en el punto más abierto y vuelve por el mismo camino a su lugar.
+        await Promise.all(
+          paths.map((p) => {
+            const out = (p.dataset.out ?? "0,0").split(",").map(Number) as Pt;
+            const ang = Number(p.dataset.ang ?? 0);
+            const t = (k: number, sx: number) =>
+              `translate(${(out[0] * FLY * k).toFixed(1)}px,${(out[1] * FLY * k).toFixed(1)}px) rotate(${ang}deg) scaleX(${sx}) rotate(${-ang}deg)`;
+            return p.animate(
+              [
+                // Misma lista de funciones en todos los fotogramas para que se interpole cada una (sin giros raros).
+                { transform: t(0, 1), opacity: 1, easing: "cubic-bezier(.3,0,.2,1)" },
+                { transform: t(1, 2.6), opacity: 0.45, offset: 0.45, easing: "linear" },
+                { transform: t(1, 2.6), opacity: 0.45, offset: 0.55, easing: "cubic-bezier(.6,0,.3,1)" },
+                { transform: t(0, 1), opacity: 1 },
+              ],
+              { duration: 4200 },
+            ).finished;
           }),
-        );
-        await Promise.all(open.map((a) => a.finished)).catch(() => {});
+        ).catch(() => {});
         if (!alive) return;
-        await sleep(2200);
-        // 3) Dispersar: cada arista sale en su dirección y se estira sobre su eje hasta cruzar la pantalla.
-        const fly = paths.map((p) => {
-          const out = (p.dataset.out ?? "0,0").split(",").map(Number) as Pt;
-          const ang = Number(p.dataset.ang ?? 0);
-          const tx = out[0] * FLY;
-          const ty = out[1] * FLY;
-          return p.animate(
-            [
-              // Misma lista de funciones en todos los fotogramas para que el navegador interpole cada una (sin giros raros).
-              { transform: `translate(0px,0px) rotate(${ang}deg) scaleX(1) rotate(${-ang}deg)`, opacity: 1 },
-              {
-                transform: `translate(${tx * 0.35}px,${ty * 0.35}px) rotate(${ang}deg) scaleX(4) rotate(${-ang}deg)`,
-                opacity: 1,
-                offset: 0.45,
-              },
-              {
-                transform: `translate(${tx}px,${ty}px) rotate(${ang}deg) scaleX(9) rotate(${-ang}deg)`,
-                opacity: 0,
-              },
-            ],
-            { duration: 1900, easing: "cubic-bezier(.55,0,.8,.3)", fill: "forwards" },
-          );
-        });
-        await Promise.all(fly.map((a) => a.finished)).catch(() => {});
-        if (!alive) return;
-        // 4) Reinicio limpio para el siguiente ciclo.
-        g.style.opacity = "0";
-        for (const a of [...draws, ...open, ...fly]) a.cancel();
-        await sleep(700);
+        await sleep(600);
+        // 4) Bajar: los pisos regresan a su lugar y el edificio queda armado como al inicio.
+        await Promise.all(
+          groups.map(
+            (fl, i) =>
+              fl.animate([{ transform: lift(i) }, { transform: "translate(0,0)" }], {
+                duration: 1800,
+                easing: "cubic-bezier(.45,0,.2,1)",
+                fill: "forwards",
+              }).finished,
+          ),
+        ).catch(() => {});
+        // Limpia animaciones terminadas de los pisos para que no se acumulen vuelta tras vuelta.
+        for (const fl of groups)
+          for (const a of fl.getAnimations()) if (a.playState === "finished") a.cancel();
       }
     };
     void run();
@@ -268,11 +281,12 @@ export function Blueprint() {
     return () => window.removeEventListener("pointerdown", onDown);
   }, []);
 
+  // contain + will-change: la capa animada se pinta aparte y no obliga a repintar el resto de la página en cada cuadro.
   return (
     <div
       ref={layer}
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-0 hidden overflow-hidden md:block"
+      className="pointer-events-none fixed inset-0 z-0 hidden overflow-hidden [contain:strict] md:block"
     >
       {/* Cuadrícula de papel de plano, más visible hacia el edificio. */}
       <div
@@ -283,7 +297,7 @@ export function Blueprint() {
         aria-hidden="true"
         viewBox="0 0 1440 900"
         preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-0 size-full [mask-image:linear-gradient(90deg,transparent_0%,#000_40%)]"
+        className="absolute inset-0 size-full [mask-image:linear-gradient(90deg,transparent_0%,#000_40%)] [will-change:transform]"
       >
         <g ref={root}>
           {floors.map((segs, i) => (
