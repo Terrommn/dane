@@ -120,7 +120,6 @@ export function parseResult(
 export const ENTITY_LABEL: Record<string, string> = {
   checkin: "Dailies",
   daily: "Dailies",
-  devotional: "Devocionales",
   goal: "Objetivos",
   weekly_review: "Revisiones semanales",
   person: "Personas",

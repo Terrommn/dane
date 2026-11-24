@@ -34,12 +34,6 @@ pub struct SettingsPatch {
     pub week_start: Option<i16>,
     #[schema(value_type = Option<Object>)]
     pub modules: Option<serde_json::Value>,
-    pub devotional_mode: Option<String>,
-    #[schema(value_type = Option<Vec<Object>>)]
-    pub devotional_template: Option<serde_json::Value>,
-    #[serde(default, with = "double_option")]
-    #[schema(value_type = Option<i32>)]
-    pub max_devotional_failures: Option<Option<i32>>,
     #[serde(default, with = "double_option")]
     #[schema(value_type = Option<String>)]
     pub weight_goal_kg: Option<Option<Decimal>>,
@@ -104,24 +98,6 @@ pub fn apply_patch(cur: &mut UserSettings, p: SettingsPatch, now: DateTime<Utc>)
             return Err(ApiError::validation("modules", "debe ser un objeto"));
         }
         cur.modules = m;
-    }
-    if let Some(m) = p.devotional_mode {
-        if !["devotional", "meditation"].contains(&m.as_str()) {
-            return Err(ApiError::validation("devotional_mode", "devotional o meditation"));
-        }
-        cur.devotional_mode = m;
-    }
-    if let Some(t) = p.devotional_template {
-        if !t.is_array() {
-            return Err(ApiError::validation(
-                "devotional_template",
-                "debe ser una lista de secciones",
-            ));
-        }
-        cur.devotional_template = t;
-    }
-    if let Some(v) = p.max_devotional_failures {
-        cur.max_devotional_failures = v;
     }
     if let Some(v) = p.weight_goal_kg {
         cur.weight_goal_kg = v;

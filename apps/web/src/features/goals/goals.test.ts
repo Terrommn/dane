@@ -171,7 +171,7 @@ describe("hábitos", () => {
     expect(streakText({ current: 3, longest: 5, unit: "weeks" })).toBe("Racha 3 sem · máx. 5");
   });
   it("hábitos fijos: ejemplos desmarcados; solo se envían los marcados", () => {
-    const rows = defaultFixedRows("devotional");
+    const rows = defaultFixedRows();
     expect(Object.values(rows).every((r) => !r.enabled)).toBe(true);
     expect(rows.exercise.freq).toEqual({ frequency: "times_per_week", times_per_week: 4 });
     expect(fixedBody(rows)).toEqual({ starts_on: null });
@@ -187,7 +187,7 @@ describe("hábitos", () => {
         name: "Ejercicio",
       },
     });
-    expect(defaultFixedRows("meditation").devotional.name).toBe("Meditación");
+    expect(Object.keys(rows)).toEqual(["exercise", "reading"]);
   });
 });
 

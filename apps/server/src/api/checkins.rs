@@ -15,7 +15,6 @@ use persistence::RepoError;
 use persistence::hooks::{self, HabitTrigger};
 use persistence::repos::checkins::{self as repo, Checkin, LogEntry, Reflection};
 use persistence::repos::dashboard::{self as dash, AgendaItem, DevlogBrief, InteractionBrief, TaskBrief};
-use persistence::repos::devotionals::Devotional;
 use persistence::repos::goals::{Goal, GoalFilter};
 use persistence::repos::habits as habit_repo;
 use persistence::repos::habits::{Habit, HabitEntry};
@@ -334,7 +333,7 @@ pub struct HabitDay {
 
 #[derive(Serialize, ToSchema)]
 pub struct HabitGroups {
-    /// Devocional/meditación, ejercicio, lectura.
+    /// Hábitos fijos: ejercicio, lectura.
     pub fixed: Vec<HabitDay>,
     pub month: Vec<HabitDay>,
     pub week: Vec<HabitDay>,
@@ -383,10 +382,6 @@ pub struct DayView {
     pub habits: HabitGroups,
     pub month_goals: Vec<GoalBrief>,
     pub week_goals: Vec<GoalBrief>,
-    /// Módulo devocional activo y modo (`devotional | meditation`).
-    pub devotional_enabled: bool,
-    pub devotional_mode: String,
-    pub devotional: Option<Devotional>,
     /// Agenda del día (propuesta: un evento no prueba asistencia).
     pub agenda: Vec<AgendaItem>,
     pub tasks_by_area: Vec<CheckinAreaTasks>,
@@ -476,12 +471,6 @@ async fn day_view(
             _ => groups.other.push(day),
         }
     }
-    let devotional_enabled = st
-        .modules
-        .get("devotional")
-        .and_then(|v| v.as_bool())
-        .unwrap_or(true);
-    let devotional = persistence::repos::devotionals::get(&s.pool, auth.user_id, date).await?;
     let agenda = dash::agenda(&s.pool, auth.user_id, date).await?;
     let tasks = dash::tasks_for_day(&s.pool, auth.user_id, &st.timezone, date).await?;
     let mut by_area: Vec<CheckinAreaTasks> = Vec::new();
@@ -530,9 +519,6 @@ async fn day_view(
         habits: groups,
         month_goals: goals.iter().filter(|g| g.kind == "month").map(brief).collect(),
         week_goals: goals.iter().filter(|g| g.kind == "week").map(brief).collect(),
-        devotional_enabled,
-        devotional_mode: st.devotional_mode.clone(),
-        devotional,
         agenda,
         tasks_by_area: by_area,
         people: dash::interactions_between(&s.pool, auth.user_id, date, date).await?,

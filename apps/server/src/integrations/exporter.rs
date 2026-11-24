@@ -40,6 +40,7 @@ pub const TABLES: &[(&str, &str)] = &[
     ("entity_links", ""),
     ("favorites", ""),
     ("drawings", ""),
+    // Se sigue exportando: Dane ya no muestra devocionales, pero los datos viejos siguen en la base (D-039).
     ("devotionals", ""),
     ("readings", ""),
     ("content_pieces", ""),
@@ -284,11 +285,7 @@ pub async fn export_zip(state: &AppState, user_id: Uuid) -> anyhow::Result<Vec<u
         .fetch_all(pool)
         .await?;
         let mut md = format!("---\nfecha: {date}\ncategories:\n  - \"[[Daily]]\"\n");
-        for (key, es) in [
-            ("devotional", "devocional"),
-            ("exercise", "ejercicio"),
-            ("reading", "lectura"),
-        ] {
+        for (key, es) in [("exercise", "ejercicio"), ("reading", "lectura")] {
             if let Some((_, st)) = fixed.iter().find(|f| f.0 == key)
                 && st == "done"
             {

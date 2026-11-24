@@ -22,7 +22,6 @@ export type EntityType =
   | "task"
   | "inbox"
   | "weekly_review"
-  | "devotional"
   | "reading"
   | "content"
   | "swipe"
@@ -44,7 +43,6 @@ export const ENTITY_LABEL: Record<string, string> = {
   task: "Tarea",
   inbox: "Inbox",
   weekly_review: "Revisión semanal",
-  devotional: "Devocional",
   reading: "Lectura",
   content: "Contenido",
   swipe: "Swipe",
@@ -78,8 +76,6 @@ export function entityHref(type: string, id: string, onDate?: string | null, tit
       return "/inbox";
     case "weekly_review":
       return title && /^\d{4}-W\d{2}$/.test(title) ? `/semanal?week=${title}` : "/semanal";
-    case "devotional":
-      return onDate ? `/devocionales?date=${onDate}` : "/devocionales";
     case "reading":
       return "/lecturas";
     case "content":

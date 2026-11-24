@@ -16,7 +16,7 @@ pub struct Habit {
     pub name: String,
     /// `fixed | goal | custom`
     pub kind: String,
-    /// `devotional | exercise | reading` para hábitos fijos.
+    /// `exercise | reading` para hábitos fijos.
     pub fixed_key: Option<String>,
     pub goal_id: Option<Uuid>,
     pub area_id: Option<Uuid>,
@@ -69,7 +69,7 @@ pub struct HabitEntry {
 
 #[derive(Debug, Clone, FromRow, Serialize, ToSchema)]
 pub struct HabitLink {
-    /// `weight_logged | expense_logged | positive_reflection | devotional_content`
+    /// `weight_logged | expense_logged | positive_reflection`
     pub trigger: String,
     pub habit_id: Uuid,
     pub habit_name: String,
@@ -388,7 +388,7 @@ pub async fn delete_entry(
 pub async fn links(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<Vec<HabitLink>> {
     Ok(sqlx::query_as::<_, HabitLink>(
         "SELECT l.trigger, l.habit_id, h.name AS habit_name FROM habit_links l JOIN habits h ON h.id = l.habit_id
-         WHERE l.user_id = $1 ORDER BY l.trigger",
+         WHERE l.user_id = $1 AND l.trigger <> 'devotional_content' ORDER BY l.trigger",
     )
     .bind(user_id)
     .fetch_all(db)

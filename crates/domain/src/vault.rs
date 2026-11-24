@@ -441,7 +441,6 @@ pub fn first_url(s: &str) -> Option<String> {
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum FileKind {
     Daily { date: NaiveDate },
-    Devotional { date: NaiveDate },
     GoalMonth { period: String },
     GoalWeek { period: String },
     Weekly { week: String },
@@ -560,13 +559,8 @@ pub fn classify(path: &str) -> FileKind {
         ["Dev", "snippets", ..] => FileKind::Note {
             note_kind: "snippet".into(),
         },
-        ["Proyectos", "personal", "Devocionales", _] => stem
-            .strip_prefix("Devocional ")
-            .and_then(parse_date)
-            .map(|date| FileKind::Devotional { date })
-            .unwrap_or(FileKind::Note {
-                note_kind: "note".into(),
-            }),
+        // Dane ya no tiene devocionales: esas notas se omiten en vez de importarse como notas sueltas.
+        ["Proyectos", "personal", "Devocionales", ..] => unsupported("los devocionales ya no se importan"),
         ["Proyectos", "personal", "Objetivos", _] => {
             if let Some(m) = stem.strip_prefix("Mes ") {
                 FileKind::GoalMonth {
@@ -651,11 +645,7 @@ pub struct DailyImport {
 pub fn daily(note: &Note, date: NaiveDate) -> DailyImport {
     let mut fixed_done = Vec::new();
     let mut fixed_false_ignored = 0;
-    for (key, habit) in [
-        ("devocional", "devotional"),
-        ("ejercicio", "exercise"),
-        ("lectura", "reading"),
-    ] {
+    for (key, habit) in [("ejercicio", "exercise"), ("lectura", "reading")] {
         match note.fm_bool(key) {
             Some(true) => fixed_done.push(habit.to_string()),
             Some(false) => fixed_false_ignored += 1,
@@ -745,57 +735,6 @@ pub fn agenda_line(s: &str) -> Option<(String, Option<String>, String)> {
 /// Hábito de la daily: `Texto del hábito · objetivo corto` → texto del hábito.
 pub fn habit_name(checkbox_text: &str) -> String {
     plain(checkbox_text.split(" · ").next().unwrap_or(checkbox_text))
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct DevotionalImport {
-    pub date: NaiveDate,
-    pub passage: String,
-    pub verse_actions: Vec<(String, String)>,
-    pub learned: String,
-    pub teaching: String,
-    pub prayer: String,
-    pub song: String,
-}
-
-impl DevotionalImport {
-    pub fn has_content(&self) -> bool {
-        !(self.passage.is_empty()
-            && self.verse_actions.is_empty()
-            && self.learned.is_empty()
-            && self.teaching.is_empty()
-            && self.prayer.is_empty()
-            && self.song.is_empty())
-    }
-}
-
-pub fn devotional(note: &Note, date: NaiveDate) -> DevotionalImport {
-    let sec = |p: &str| note.section(p).map(prose).unwrap_or_default();
-    let verse_actions = note
-        .section("¿Cómo puedo agradar")
-        .map(tables)
-        .unwrap_or_default()
-        .into_iter()
-        .flat_map(|t| {
-            t.rows.into_iter().map(|r| {
-                (
-                    unescape_cell(r.first().map(String::as_str).unwrap_or("")),
-                    unescape_cell(r.get(1).map(String::as_str).unwrap_or("")),
-                )
-            })
-        })
-        .filter(|(v, a)| !v.is_empty() || !a.is_empty())
-        .collect();
-    let passage = note.fm_str("pasaje").unwrap_or_else(|| sec("Pasaje"));
-    DevotionalImport {
-        date,
-        passage,
-        verse_actions,
-        learned: sec("¿Qué aprendí"),
-        teaching: sec("¿Qué enseñanza"),
-        prayer: sec("Oración"),
-        song: sec("Canción"),
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -1937,7 +1876,8 @@ mod tests {
         let (n, w) = parse_note("Daily/2026-11-02.md", raw);
         assert!(w.is_empty());
         let x = daily(&n, d("2026-11-02"));
-        assert_eq!(x.fixed_done, vec!["devotional"]);
+        // `devocional: true` se ignora: Dane ya no tiene devocionales.
+        assert!(x.fixed_done.is_empty());
         assert_eq!(x.fixed_false_ignored, 2);
         assert_eq!(x.energy, Some(4));
         assert_eq!(x.weight_kg, Some(72.5));

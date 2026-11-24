@@ -1,4 +1,4 @@
-// Alta de hábito personalizado o de objetivo. Los fijos (devocional, ejercicio, lectura) se configuran en onboarding.
+// Alta de hábito personalizado o de objetivo. Los fijos (ejercicio, lectura) se configuran en onboarding.
 import { useState } from "react";
 import { Button } from "../../components/ui/Button";
 import { Dialog } from "../../components/ui/Dialog";

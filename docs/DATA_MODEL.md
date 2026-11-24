@@ -30,7 +30,7 @@ Fuente de verdad: `crates/persistence/migrations/*.sql` (PostgreSQL 17). Este do
 | Inbox | `inbox_items` | `proposal` revisable; `client_id` único para capturas offline idempotentes |
 | Semana | `weekly_reviews` | `UNIQUE(user, iso_week)`; `peace` 1–5; ≤ 3 prioridades |
 | Conocimiento | `notes`, `entity_links`, `favorites`, `search_index`, `drawings` | `search_index` por triggers con `unaccent` + trigramas |
-| Módulos | `devotionals`, `readings`, `content_pieces`, `swipe_refs`, `subjects`, `class_notes`, `devlogs`, `devlog_sessions`, `devlog_session_projects`, `adrs` | ADR `UNIQUE(user, project, number)`; `superseded` exige `superseded_by_id`; hooks ≤ 10 |
+| Módulos | `devotionals` (sin uso desde D-039: se conserva con sus datos, la app ya no la lee ni escribe), `readings`, `content_pieces`, `swipe_refs`, `subjects`, `class_notes`, `devlogs`, `devlog_sessions`, `devlog_session_projects`, `adrs` | ADR `UNIQUE(user, project, number)`; `superseded` exige `superseded_by_id`; hooks ≤ 10 |
 | Finanzas | `fin_categories`, `fin_accounts`, `balance_snapshots`, `debts`, `fin_recurring_rules`, `budget_months`, `budget_lines`, `budget_items`, `transactions`, `credit_plans` | ver abajo |
 | Operación | `jobs`, `telegram_updates`, `integration_connections`, `capture_proposals`, `import_runs`, `import_records` | ver abajo |
 

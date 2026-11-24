@@ -27,7 +27,7 @@ const TEXT_FIELDS: { key: keyof Body & keyof Review; label: string; rows?: numbe
   { key: "what_happened", label: "Qué pasó" },
   { key: "what_didnt", label: "Qué no pasó (y por qué)" },
   { key: "content_md", label: "Contenido publicado / métricas", rows: 3 },
-  { key: "habits_md", label: "Hábitos y devocional", rows: 3 },
+  { key: "habits_md", label: "Hábitos", rows: 3 },
   { key: "goals_md", label: "Objetivos y adherencia", rows: 3 },
   { key: "went_badly", label: "Patrones: lo que salió mal", rows: 3 },
   { key: "went_well", label: "Patrones: lo que salió bien", rows: 3 },
@@ -432,15 +432,6 @@ function Sources({ s, currency }: { s: Schemas["WeeklySummary"]; currency: strin
             text: d.repo || "sesión",
             sub: formatShortDate(d.on_date),
             to: `/dev?date=${d.on_date}`,
-          }))}
-        />
-        <List
-          title="Devocionales"
-          items={s.devotionals.map((d) => ({
-            k: d.date,
-            text: d.passage || "(sin pasaje)",
-            sub: d.actions.join("; "),
-            to: `/devocionales/${d.date}`,
           }))}
         />
       </div>

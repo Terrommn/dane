@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Display";
-import { CheckboxField, RadioGroup, SelectField, TextField } from "../../components/ui/Field";
+import { CheckboxField, SelectField, TextField } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Toast";
 import { errorMessage } from "../../lib/errors";
 import { fromTimeInput, toTimeInput } from "../../lib/format";
@@ -93,14 +93,9 @@ export function RegionSection({ settings, save, saving, submitLabel = "Guardar",
   );
 }
 
-type DevotionalChoice = "devotional" | "meditation" | "off";
-
 export function ModulesSection({ settings, save, saving, submitLabel = "Guardar", onSaved }: SectionProps) {
   const initial = (settings.modules ?? {}) as Record<string, boolean>;
   const [mods, setMods] = useState<Record<string, boolean>>(initial);
-  const [dev, setDev] = useState<DevotionalChoice>(
-    initial.devotional === false ? "off" : (settings.devotional_mode as DevotionalChoice),
-  );
   const submit = useSubmit(save, onSaved);
   return (
     <Card title="Módulos">
@@ -108,10 +103,7 @@ export function ModulesSection({ settings, save, saving, submitLabel = "Guardar"
         className="space-y-4"
         onSubmit={(e) => {
           e.preventDefault();
-          void submit({
-            modules: { ...mods, devotional: dev !== "off" } as never,
-            devotional_mode: dev === "off" ? settings.devotional_mode : dev,
-          });
+          void submit({ modules: mods as never });
         }}
       >
         <div className="grid gap-3 sm:grid-cols-2">
@@ -125,21 +117,6 @@ export function ModulesSection({ settings, save, saving, submitLabel = "Guardar"
             />
           ))}
         </div>
-        <RadioGroup<DevotionalChoice>
-          legend="Reflexión diaria"
-          name="devotional"
-          value={dev}
-          onChange={setDev}
-          options={[
-            {
-              value: "devotional",
-              label: "Devocional",
-              hint: "Pasaje, versículo/acción, aprendizaje, oración y canción",
-            },
-            { value: "meditation", label: "Meditación", hint: "Misma sección con enfoque de meditación" },
-            { value: "off", label: "Desactivado", hint: "Oculta la sección y su hábito" },
-          ]}
-        />
         <Button type="submit" loading={saving}>
           {submitLabel}
         </Button>
@@ -319,8 +296,6 @@ export function GoalsSection({
   const [useWeight, setUseWeight] = useState(!asExamples && settings.weight_goal_kg != null);
   const [weight, setWeight] = useState(settings.weight_goal_kg ?? (asExamples ? "70" : ""));
   const [direction, setDirection] = useState(settings.weight_direction ?? "decrease");
-  const [useFailures, setUseFailures] = useState(!asExamples && settings.max_devotional_failures != null);
-  const [failures, setFailures] = useState(String(settings.max_devotional_failures ?? (asExamples ? 5 : "")));
   const [err, setErr] = useState<string | null>(null);
   const submit = useSubmit(save, onSaved);
   return (
@@ -334,14 +309,10 @@ export function GoalsSection({
           e.preventDefault();
           setErr(null);
           const w = Number(weight);
-          const f = Number(failures);
           if (useWeight && !(w > 0 && w < 500)) return setErr("El peso meta debe estar entre 0 y 500 kg");
-          if (useFailures && !(Number.isInteger(f) && f >= 0))
-            return setErr("Las fallas permitidas deben ser un entero ≥ 0");
           void submit({
             weight_goal_kg: useWeight ? String(w) : null,
             weight_direction: useWeight ? direction : null,
-            max_devotional_failures: useFailures ? f : null,
           });
         }}
       >
@@ -365,22 +336,6 @@ export function GoalsSection({
                 <option value="maintain">Mantener</option>
               </SelectField>
             </div>
-          )}
-        </div>
-        <div className="rounded-xl border border-line p-3">
-          <CheckboxField
-            label="Máximo de fallas devocionales al mes"
-            checked={useFailures}
-            onChange={(e) => setUseFailures(e.target.checked)}
-          />
-          {useFailures && (
-            <TextField
-              className="mt-2"
-              label="Fallas permitidas por mes"
-              inputMode="numeric"
-              value={failures}
-              onChange={(e) => setFailures(e.target.value)}
-            />
           )}
         </div>
         <p className="text-sm text-muted">

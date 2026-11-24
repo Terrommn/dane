@@ -76,7 +76,7 @@ const AgendaPage = lazy(() =>
 );
 const ViewsPage = lazy(() => import("../features/views/ViewsPage").then((m) => ({ default: m.ViewsPage })));
 
-// Núcleo (fase 2): objetivos, hábitos, dashboard, semanal, devocionales y lecturas.
+// Núcleo (fase 2): objetivos, hábitos, dashboard, semanal y lecturas.
 const GoalsPage = lazy(() => import("../features/goals/GoalsPage").then((m) => ({ default: m.GoalsPage })));
 const GoalDetailPage = lazy(() =>
   import("../features/goals/GoalDetailPage").then((m) => ({ default: m.GoalDetailPage })),
@@ -95,12 +95,6 @@ const DashboardPage = lazy(() =>
 );
 const WeeklyPage = lazy(() =>
   import("../features/weekly/WeeklyPage").then((m) => ({ default: m.WeeklyPage })),
-);
-const DevotionalsPage = lazy(() =>
-  import("../features/devotionals/DevotionalsPage").then((m) => ({ default: m.DevotionalsPage })),
-);
-const DevotionalEditorPage = lazy(() =>
-  import("../features/devotionals/DevotionalsPage").then((m) => ({ default: m.DevotionalEditorPage })),
 );
 const ReadingsPage = lazy(() =>
   import("../features/readings/ReadingsPage").then((m) => ({ default: m.ReadingsPage })),
@@ -193,8 +187,6 @@ export function App() {
                 <Route path="/habitos/:id" element={<HabitDetailPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/semanal" element={<WeeklyPage />} />
-                <Route path="/devocionales" element={<DevotionalsPage />} />
-                <Route path="/devocionales/:date" element={<DevotionalEditorPage />} />
                 <Route path="/lecturas" element={<ReadingsPage />} />
                 <Route path="/lecturas/:id" element={<ReadingEditorPage />} />
                 <Route path="/mas" element={<MorePage />} />

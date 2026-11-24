@@ -1,4 +1,4 @@
-//! T23 Dashboard general: objetivos vs avance/ritmo, hábitos fijos/mensuales/semanales, fallas devocionales vs máximo,
+//! T23 Dashboard general: objetivos vs avance/ritmo, hábitos fijos/mensuales/semanales,
 //! 30 días + heatmap + rachas, peso sin interpolar, energía, paz semanal, finanzas y comparación con el mismo tramo
 //! anterior (o periodos completos, etiquetado). Cada bloque incluye rutas a sus fuentes. Propietario: agente A-core.
 
@@ -59,23 +59,6 @@ pub struct HabitBlock {
     pub month: Vec<HabitStat>,
     pub week: Vec<HabitStat>,
     pub other: Vec<HabitStat>,
-}
-
-#[derive(Serialize, ToSchema)]
-pub struct DevotionalFailures {
-    pub habit_id: uuid::Uuid,
-    /// Días cerrados del mes con `not_done` explícito.
-    pub explicit_failures: u32,
-    /// Días cerrados del mes sin registro (cuentan como falla, se muestran aparte).
-    pub unrecorded: u32,
-    pub failures_total: u32,
-    pub closed_days: u32,
-    /// Máximo configurado (ajustes). `None` si el usuario no lo definió.
-    pub max_allowed: Option<i32>,
-    pub over_limit: Option<bool>,
-    /// Aviso: el mes sigue abierto; hoy y los días futuros no cuentan.
-    pub note: String,
-    pub route: String,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -166,7 +149,6 @@ pub struct Dashboard {
     pub month_goals: Vec<GoalView>,
     pub week_goals: Vec<GoalView>,
     pub habits: HabitBlock,
-    pub devotional: Option<DevotionalFailures>,
     pub last_30_days: Vec<HeatDay>,
     pub weight: WeightBlock,
     pub energy: Vec<EnergyPoint>,
@@ -301,7 +283,6 @@ async fn comparison(
     for (key, cur_v) in &a.fixed_done {
         let prev_v = b.fixed_done.iter().find(|(k, _)| k == key).map(|x| x.1);
         let label = match key.as_str() {
-            "devotional" => "Devocional (días)",
             "exercise" => "Ejercicio (sesiones)",
             "reading" => "Lectura (días)",
             _ => "Hábito fijo",
@@ -481,22 +462,6 @@ async fn dashboard(
         }
     }
 
-    let devotional = habits.iter().find(|h| h.habit.fixed_key.as_deref() == Some("devotional") && h.habit.archived_at.is_none()).map(|h| {
-        let c = metrics::compliance(&h.spec, &h.entries, month, ref_today);
-        let failures = c.missed + c.unrecorded;
-        DevotionalFailures {
-            habit_id: h.habit.id,
-            explicit_failures: c.missed,
-            unrecorded: c.unrecorded,
-            failures_total: failures,
-            closed_days: c.required + c.excluded_not_applicable,
-            max_allowed: st.max_devotional_failures,
-            over_limit: st.max_devotional_failures.map(|m| failures as i32 > m),
-            note: "Solo cuentan días cerrados; hoy y los días futuros no son falla. Los días sin registro se cuentan aparte.".into(),
-            route: "/devocionales".into(),
-        }
-    });
-
     let checkins =
         persistence::repos::checkins::list(&s.pool, auth.user_id, date - Duration::days(120), date).await?;
     let energy_by_day: std::collections::HashMap<NaiveDate, i16> = checkins
@@ -633,7 +598,6 @@ async fn dashboard(
         month_goals,
         week_goals,
         habits: block,
-        devotional,
         last_30_days: heat,
         weight,
         energy,

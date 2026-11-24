@@ -33,7 +33,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 #[derive(Serialize, ToSchema)]
 pub struct FixedHabitWeek {
     pub habit_id: Uuid,
-    /// `devotional | exercise | reading`
+    /// `exercise | reading`
     pub key: String,
     pub name: String,
     /// Días con `done` en la semana (hasta hoy).
@@ -56,14 +56,6 @@ pub struct AreaActivity {
     pub area_name: String,
     pub done: u32,
     pub open: u32,
-}
-
-#[derive(Serialize, ToSchema)]
-pub struct DevotionalNote {
-    pub date: NaiveDate,
-    pub passage: String,
-    pub actions: Vec<String>,
-    pub learned: String,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -95,7 +87,6 @@ pub struct WeeklySummary {
     pub people: Vec<InteractionBrief>,
     pub content_published: Vec<ContentBrief>,
     pub devlog: Vec<DevlogBrief>,
-    pub devotionals: Vec<DevotionalNote>,
     pub expenses_total_cents: i64,
     pub expenses_count: i64,
     pub inbox_pending: i64,
@@ -197,39 +188,6 @@ pub async fn compute_summary(s: &AppState, user_id: Uuid, iso_week: &str) -> Api
         });
     }
     let devlog = dash::devlog_between(&s.pool, user_id, week.start, week.end).await?;
-    let devs: Vec<(NaiveDate, String, serde_json::Value, String)> = sqlx::query_as(
-        "SELECT on_date, passage, verse_actions, learned FROM devotionals WHERE user_id = $1 AND on_date BETWEEN $2 AND $3 ORDER BY on_date",
-    )
-    .bind(user_id)
-    .bind(week.start)
-    .bind(week.end)
-    .fetch_all(&s.pool)
-    .await?;
-    let devotionals: Vec<DevotionalNote> = devs
-        .into_iter()
-        .map(|(date, passage, va, learned)| DevotionalNote {
-            date,
-            passage,
-            actions: va
-                .as_array()
-                .map(|a| {
-                    a.iter()
-                        .filter_map(|x| x.get("action")?.as_str().map(str::to_string))
-                        .filter(|x| !x.is_empty())
-                        .collect()
-                })
-                .unwrap_or_default(),
-            learned,
-        })
-        .collect();
-    for d in &devotionals {
-        evidence.push(Evidence {
-            entity_type: "devotional".into(),
-            entity_id: None,
-            label: format!("Devocional {}", d.date),
-            route: format!("/devocionales?date={}", d.date),
-        });
-    }
     let (total, count) = dash::expenses_between(&s.pool, user_id, &st.currency, week.start, week.end).await?;
     evidence.push(Evidence {
         entity_type: "transaction".into(),
@@ -270,7 +228,6 @@ pub async fn compute_summary(s: &AppState, user_id: Uuid, iso_week: &str) -> Api
         people: dash::interactions_between(&s.pool, user_id, week.start, week.end).await?,
         content_published: content,
         devlog,
-        devotionals,
         expenses_total_cents: total,
         expenses_count: count,
         inbox_pending: dash::inbox_pending_count(&s.pool, user_id).await?,

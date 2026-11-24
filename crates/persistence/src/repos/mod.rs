@@ -9,7 +9,6 @@ pub mod checkins;
 pub mod content;
 pub mod dashboard;
 pub mod dev;
-pub mod devotionals;
 pub mod drawings;
 pub mod finance;
 pub mod goals;

@@ -131,15 +131,11 @@ export function OnboardingPage() {
             )}
             {step === 5 && (
               <>
-                <FixedHabitsSetup
-                  devotionalMode={s.devotional_mode}
-                  devotionalEnabled={(s.modules as Record<string, unknown>).devotional !== false}
-                  onDone={next}
-                />
+                <FixedHabitsSetup onDone={next} />
                 <p className="text-sm text-muted">
                   Los hábitos de tus objetivos se proponen al{" "}
-                  <Link to="/objetivos/planificar">planificar</Link>; los vínculos automáticos (peso, gastos,
-                  algo bueno, devocional) se configuran en <Link to="/habitos">Hábitos</Link>.
+                  <Link to="/objetivos/planificar">planificar</Link>; los vínculos automáticos (peso, gastos y
+                  algo bueno) se configuran en <Link to="/habitos">Hábitos</Link>.
                 </p>
               </>
             )}

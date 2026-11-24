@@ -26,8 +26,8 @@ Comando: `pnpm verify` → tabla de pasos con código de salida (logs en `.data/
 | `auth_isolation` | 9 | Mini App válida/vencida/firma ajena/fuera de allowlist; sesión revocada; CSRF; **acceso cruzado entre dos usuarios rechazado**; renombrar conserva ID; 409 por versión; Idempotency-Key |
 | `auth_oidc` | 5 | OIDC con IdP simulado RS256/JWKS/PKCE: flujo válido, **misma identidad que la Mini App** (`sub`≠`id`), nonce/aud/iss/exp/firma/claim inválidos, state de un uso, allowlist, open redirect, rate limit |
 | `core_goals_habits` | 9 | acción enlazada a dos objetivos aporta una vez a cada uno; libros vs minutos sin mezclar unidades; denominadores; 4/semana; pausas; aislamiento |
-| `core_checkins` | 6 | guardado parcial; 409 entre dispositivos; **check-in repetido con Idempotency-Key sin duplicar**; vínculos explícitos peso/reflexión; devocional |
-| `core_dashboard_weekly` | 3 | fallas devocionales vs máximo, peso sin interpolar, comparaciones mismo tramo/completo, resumen semanal |
+| `core_checkins` | 6 | guardado parcial; 409 entre dispositivos; **check-in repetido con Idempotency-Key sin duplicar**; vínculos explícitos peso/reflexión; devocionales quitados (sin API ni vínculo) |
+| `core_dashboard_weekly` | 3 | peso sin interpolar, heatmap, comparaciones mismo tramo/completo, resumen semanal |
 | `finance_flows` | 12 | dinero exacto; lote idempotente por elemento; **compra con tarjeta + pago + transferencia sin doble conteo**; conciliación del mismo día y retroactivos; semántica legacy; FX; préstamo familiar; deuda saldada → hito; recurrentes 29–31 concurrentes; confirmar sin duplicar; sugerencia de tarjeta; presupuestos/rubros |
 | `modules_tasks` | 6 | arrastre conserva ID; recurrentes feb bisiesto/no bisiesto, catch-up y concurrencia; ClickUp no se modifica |
 | `modules_people_inbox` | 3 | alias sin acentos, cumpleaños 29-feb, sugerencias no crean personas; Inbox no mueve sin confirmar |

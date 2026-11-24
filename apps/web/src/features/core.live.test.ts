@@ -33,7 +33,7 @@ live("contrato en vivo de la UI núcleo", () => {
   };
   const today = todayIso("America/Monterrey");
 
-  it("flujo completo: hábitos fijos → check-in → objetivo → lectura → dashboard → semanal → devocional", async () => {
+  it("flujo completo: hábitos fijos → check-in → objetivo → lectura → dashboard → semanal", async () => {
     const login = await fetch(`${BASE}/api/v1/auth/dev-login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,12 +42,12 @@ live("contrato en vivo de la UI núcleo", () => {
     token = (await login.json()).token;
     expect(token).toBeTruthy();
 
-    // Onboarding: solo los marcados (ejercicio 4/semana y devocional diario).
-    const rows = defaultFixedRows("devotional");
+    // Onboarding: solo los marcados (ejercicio 4/semana y lectura diaria).
+    const rows = defaultFixedRows();
     const fixed = fixedBody({
       ...rows,
       exercise: { ...rows.exercise, enabled: true },
-      devotional: { ...rows.devotional, enabled: true },
+      reading: { ...rows.reading, enabled: true },
     });
     const created = await call("POST", "/habits/fixed", fixed);
     expect(created.status).toBe(200);
@@ -161,19 +161,6 @@ live("contrato en vivo de la UI núcleo", () => {
     expect(saved.status).toBe(200);
     expect((await call("GET", `/weekly-reviews/${week}/summary`)).status).toBe(200);
 
-    // Devocional con contenido.
-    const dev = await call("PUT", `/devotionals/${today}`, {
-      mode: "devotional",
-      passage: "Juan 15:1-8",
-      verse_actions: [{ verse: "15:5", action: "Orar antes de trabajar" }],
-      learned: "Permanecer",
-      teaching: "",
-      prayer: "",
-      song: "",
-      extra: {},
-      version: 0,
-    });
-    expect(dev.status).toBe(200);
     const history = await call("GET", `/habits/history?from=${today}&to=${today}`);
     expect(history.status).toBe(200);
   });

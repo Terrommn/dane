@@ -20,7 +20,6 @@ export const SEARCH_TYPES = [
   "project",
   "area",
   "inbox",
-  "devotional",
   "reading",
   "content",
   "swipe",

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // Espacio demo opt-in: usuario aislado con datos [DEMO] en todos los módulos, consultados por la UI real.
 const MODULES: [string, RegExp][] = [
   ["/objetivos", /\[DEMO\] Bajar a 70 kg/],
-  ["/habitos", /Devocional/],
+  ["/habitos", /Ejercicio/],
   ["/tareas", /\[DEMO\]/],
   ["/inbox", /\[DEMO\] Idea/],
   ["/personas", /\[DEMO\] Ana López/],

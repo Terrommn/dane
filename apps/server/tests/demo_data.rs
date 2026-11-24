@@ -30,7 +30,8 @@ async fn demo_space_is_isolated_and_populated(pool: PgPool) {
     assert_eq!(me["user"]["is_demo"], true);
     let (st, dash) = demo.get("/dashboard?date=2026-11-12").await;
     assert_eq!(st, StatusCode::OK, "{dash}");
-    assert!(dash["habits"]["fixed"].as_array().unwrap().len() >= 3);
+    // Ejercicio y lectura (el demo ya no crea "Devocional", D-039).
+    assert_eq!(dash["habits"]["fixed"].as_array().unwrap().len(), 2);
     assert!(dash["finance"]["month"]["consumption_cents"].as_i64().unwrap() > 0);
     // El usuario real no recibe nada de la demo.
     let (_, goals) = real.get("/goals").await;

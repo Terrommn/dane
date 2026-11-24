@@ -8,7 +8,7 @@ Código e identificadores en inglés; textos visibles, mensajes de error y docum
 | Agente | Tareas | Archivos propios |
 |---|---|---|
 | lead | integración, auth, base | `apps/server/src/{lib,main,config,error,crypto,state,workers}.rs`, `auth/`, `http/`, `api/{mod,areas,settings}.rs`, `persistence/{lib,hooks}.rs`, `repos/{identity,areas}.rs`, migraciones `0001–0006`, `domain/{time,money,text}.rs`, `tests/common/`, `docs/*` (salvo lo indicado) |
-| A-core | T17–T20, T22, T23 (API), T26, T28, T29 | `api/{goals,habits,checkins,dashboard,weekly,devotionals,readings}.rs`, `repos/{goals,habits,checkins,devotionals,readings,weekly,dashboard}.rs`, `domain/{habits,goals,metrics,checkin}.rs`, `tests/core_*.rs`, migraciones `01xx_*.sql` |
+| A-core | T17–T20, T22, T23 (API), T26, T28, T29 | `api/{goals,habits,checkins,dashboard,weekly,readings}.rs`, `repos/{goals,habits,checkins,readings,weekly,dashboard}.rs`, `domain/{habits,goals,metrics,checkin}.rs`, `tests/core_*.rs`, migraciones `01xx_*.sql` |
 | B-modules | T24, T25, T27, T30–T34, T35 (API) | `api/{tasks,inbox,people,content,school,dev,notes,drawings,agenda,search}.rs`, `repos/{tasks,inbox,people,content,school,dev,notes,drawings,agenda}.rs`, `domain/tasks.rs`, `tests/modules_*.rs`, migraciones `02xx_*.sql` |
 | C-finance | T36–T43 | `api/finance.rs` (puede volverse `api/finance/`), `repos/finance.rs` (o `repos/finance/`), `domain/finance.rs` (o `domain/finance/`), `tests/finance_*.rs`, migraciones `03xx_*.sql` |
 | D-telegram | T44–T48 | `apps/telegram-bot/**`, `crates/contracts/**`, `apps/server/src/telegram/**`, `apps/server/src/internal.rs`, `api/reminders.rs`, `repos/{jobs,telegram}.rs`, `domain/reminders.rs`, `tests/telegram_*.rs`, migraciones `04xx_*.sql` |
@@ -64,8 +64,8 @@ PostgreSQL local ya corre en el puerto 5433 (`scripts/dev-db.sh start` si no).
 ## Contratos entre módulos
 
 1. **Vínculos acción → hábito** (`persistence::hooks::mark_linked_habit(tx, user, HabitTrigger::X, fecha)`):
-   peso registrado (A), gasto registrado (C), reflexión positiva (A), devocional con contenido (A; usar
-   `unmark_linked_habit` si se vacía). Configurables en `habit_links` (A expone CRUD).
+   peso registrado (A), gasto registrado (C), reflexión positiva (A); usar `unmark_linked_habit` si la fuente se
+   borra. Configurables en `habit_links` (A expone CRUD).
 2. **Progreso de objetivos** (`hooks::record_goal_progress` / `remove_goal_progress` / `contributing_goals`): una
    entidad aporta a los objetivos a los que el usuario la enlazó con `entity_links(src_type, src_id, 'goal', goal_id, 'contributes_to')`.
    Lectura terminada → `Amount(1)` (A); deuda saldada → `Completed` con `source_type='debt'` (C); abono parcial no completa.
@@ -78,10 +78,10 @@ PostgreSQL local ya corre en el puerto 5433 (`scripts/dev-db.sh start` si no).
 5. **Recordatorios**: D cancela/omite el recordatorio diario si `daily_checkins.evening_done_at` de esa fecha no es nulo.
    A fija `evening_done_at` cuando el usuario marca el check-in nocturno como terminado.
 6. **Tipos de entidad** (enlaces, favoritos, búsqueda, export): `area, project, goal, habit, checkin, person, task, inbox,
-   weekly_review, devotional, reading, content, swipe, subject, class_note, devlog_session, adr, note, drawing, transaction`.
+   weekly_review, reading, content, swipe, subject, class_note, devlog_session, adr, note, drawing, transaction`.
 7. **Rutas de la web** (para enlaces del bot y del dashboard): `/hoy?date=YYYY-MM-DD`, `/objetivos`, `/objetivos/planificar`,
    `/habitos`, `/dashboard`, `/tareas`, `/inbox`, `/semanal?week=GGGG-Www`, `/finanzas`, `/finanzas/movimientos`,
-   `/personas`, `/devocionales`, `/lecturas`, `/contenido`, `/swipe`, `/escuela`, `/dev`, `/notas`, `/dibujos`,
+   `/personas`, `/lecturas`, `/contenido`, `/swipe`, `/escuela`, `/dev`, `/notas`, `/dibujos`,
    `/buscar`, `/captura/{id}`, `/ajustes`, `/onboarding`, `/importar`.
 8. **Tareas y recurrencias**: B materializa pendientes recurrentes y C ocurrencias financieras en sus `workers()`
    (registrados en `workers.rs`), de forma idempotente (UNIQUE por regla+periodo) y con catch-up tras reinicios.

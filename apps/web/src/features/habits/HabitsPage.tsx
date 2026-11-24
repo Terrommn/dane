@@ -89,8 +89,7 @@ export function HabitsPage() {
               </div>
             }
           >
-            Los fijos (devocional, ejercicio, lectura) se proponen en la configuración; los de objetivos, al
-            planificar.
+            Los fijos (ejercicio, lectura) se proponen en la configuración; los de objetivos, al planificar.
           </EmptyState>
         }
       >

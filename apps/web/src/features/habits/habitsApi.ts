@@ -204,11 +204,6 @@ export const LINK_TRIGGERS: { trigger: string; label: string; hint: string }[] =
     label: "Escribir algo en «Lo que hice bien»",
     hint: "Al anotar algo bueno del día se marca este hábito",
   },
-  {
-    trigger: "devotional_content",
-    label: "Devocional con contenido",
-    hint: "Un devocional escrito (no vacío) marca este hábito",
-  },
 ];
 
 /** Estados de una celda de historial (`HistoryCell.state`). Sin registro y "no" se distinguen siempre. */
