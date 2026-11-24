@@ -1,5 +1,5 @@
-// Mapa de navegación. En escritorio: barra superior con Inicio y menús por tema (Objetivos, Organizar, Finanzas, Vida,
-// Conocimiento); "Sistema" vive en el menú del perfil. En móvil: barra inferior (Hoy, Capturar, Menú) y todo lo demás
+// Mapa de navegación. En escritorio: barra lateral con Inicio y secciones colapsables por tema (Objetivos, Organizar,
+// Finanzas, Vida, Conocimiento, Sistema). En móvil: barra inferior (Hoy, Capturar, Menú) y todo lo demás
 // en "Menú" (/mas). `module` liga la entrada al interruptor de módulos de las preferencias.
 
 export type NavGroup =
@@ -84,8 +84,15 @@ export const GROUP_LABEL: Record<NavGroup, string> = {
   sistema: "Sistema",
 };
 
-/** Menús de la barra superior, en orden. "Sistema" no aparece: va en el menú del perfil para no saturar la barra. */
-export const TOP_GROUPS: NavGroup[] = ["objetivos", "organizar", "finanzas", "vida", "conocimiento"];
+/** Secciones de la barra lateral de escritorio, en orden. */
+export const SIDEBAR_GROUPS: NavGroup[] = [
+  "objetivos",
+  "organizar",
+  "finanzas",
+  "vida",
+  "conocimiento",
+  "sistema",
+];
 
 /** Filtra módulos desactivados en las preferencias (`modules`). Ausente = activo. */
 export function visibleItems(

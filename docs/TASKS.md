@@ -85,6 +85,7 @@ Resumen: 65 completadas · 0 en curso · 0 pendientes · 1 bloqueadas externamen
 | Rediseño Ámbar: barra superior, Inicio nuevo, vista móvil mínima | ✅ completed | `AppShell.tsx`, `HomePage.tsx`, `home.test.ts` |
 | Check-in guiado mañana/noche | ✅ completed | `GuidedCheckin.tsx`; verificado en producción |
 | Asistente diario en Telegram sin IA (mañana, cierre, avisos de eventos, menú) | ✅ completed | migración `0502_morning_assistant.sql`, `telegram_flow.rs` (4 pruebas nuevas) |
+| Navegación de escritorio en barra lateral con secciones colapsables y modo riel | ✅ completed | `AppShell.tsx`, `nav.ts`, D-038 |
 | Fondo de planos animado en Inicio | ✅ completed | `Blueprint.tsx`, D-037 |
 | Llaves de prueba OIDC generadas (CI fallaba al compilar `auth_oidc`) | ✅ completed | `scripts/gen-test-keys.mjs`, paso en `verify.sh` |
 | Escaneo de secretos en CI (gitleaks) | ✅ completed | job `secrets` en `.github/workflows/ci.yml`, `.gitleaks.toml` |

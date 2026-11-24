@@ -1,10 +1,10 @@
-// Shell mobile-first. Escritorio: barra superior con Inicio y menús por tema (rediseño premium "Ámbar"); el menú del
-// perfil agrupa lo de Sistema. Móvil: barra inferior mínima (Hoy, Capturar, Menú).
+// Shell mobile-first. Escritorio: barra lateral con Inicio y una sección colapsable por tema (se puede reducir a un
+// riel de iconos) y un encabezado con acciones rápidas. Móvil: barra inferior mínima (Hoy, Capturar, Menú).
 // En Telegram usa el BackButton nativo (si la versión lo soporta) y respeta las safe areas.
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useId, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
-import { GROUP_LABEL, MORE_NAV, type NavGroup, type NavItem, TOP_GROUPS, visibleItems } from "../app/nav";
+import { GROUP_LABEL, MORE_NAV, type NavGroup, type NavItem, SIDEBAR_GROUPS, visibleItems } from "../app/nav";
 import { LoadingState } from "../components/ui/States";
 import { useToast } from "../components/ui/Toast";
 import { useAuth } from "../features/auth/AuthProvider";
@@ -103,8 +103,6 @@ function useDisclosure() {
 
 const popover =
   "absolute top-[calc(100%+8px)] z-40 min-w-60 rounded-2xl border border-line bg-surface p-1.5 shadow-float";
-const tab =
-  "flex h-10 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm no-underline transition-colors";
 
 function ItemIcon({ item }: { item: NavItem }) {
   return hasNavIcon(item.to) ? (
@@ -116,47 +114,184 @@ function ItemIcon({ item }: { item: NavItem }) {
   );
 }
 
-function GroupMenu({ group, items }: { group: NavGroup; items: NavItem[] }) {
-  const { open, setOpen, ref } = useDisclosure();
+// Preferencias de la barra lateral: solo comodidad de este navegador. Si localStorage falla (modo privado, bloqueado)
+// se usan los valores por defecto y la barra funciona igual.
+const SB_RAIL_KEY = "dane.sidebar.rail";
+const SB_CLOSED_KEY = "dane.sidebar.closed";
+/** Por defecto "Sistema" arranca cerrado: son pantallas de configuración que se visitan poco. */
+const DEFAULT_CLOSED: NavGroup[] = ["sistema"];
+
+function readPref<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw === null ? fallback : (JSON.parse(raw) as T);
+  } catch {
+    return fallback;
+  }
+}
+
+function writePref(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Sin almacenamiento: la preferencia dura solo esta visita.
+  }
+}
+
+function sidebarLink(rail: boolean) {
+  return ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-3 rounded-xl text-sm no-underline transition-colors ${rail ? "size-11 justify-center" : "px-3 py-2"} ${isActive ? "bg-sb-active font-medium text-sb-active-fg" : "text-sb-fg hover:bg-sb-hover"}`;
+}
+
+/**
+ * Sección colapsable de la barra lateral (patrón "disclosure": botón con aria-expanded que muestra u oculta la lista).
+ * En modo riel no hay encabezados: los iconos de cada grupo se separan con una línea y el nombre sale en el tooltip.
+ */
+function SidebarGroup({
+  group,
+  items,
+  open,
+  rail,
+  onToggle,
+}: {
+  group: NavGroup;
+  items: NavItem[];
+  open: boolean;
+  rail: boolean;
+  onToggle: () => void;
+}) {
   const loc = useLocation();
   const id = useId();
   const active = items.some((i) => matches(loc.pathname, i.to, items));
+  const link = sidebarLink(rail);
+  const list = (
+    <ul id={id} className={rail ? "flex flex-col items-center gap-1" : "mt-0.5 space-y-0.5"}>
+      {items.map((i) => (
+        <li key={i.to}>
+          <NavLink
+            to={i.to}
+            end
+            className={link}
+            title={rail ? `${GROUP_LABEL[group]} · ${i.label}` : i.hint}
+            aria-label={rail ? i.label : undefined}
+          >
+            <span className="shrink-0 text-sb-muted">
+              <ItemIcon item={i} />
+            </span>
+            {!rail && <span className="truncate">{i.label}</span>}
+          </NavLink>
+        </li>
+      ))}
+    </ul>
+  );
+  if (rail) return <li className="border-t border-sb-line pt-2">{list}</li>;
   return (
-    <div ref={ref} className="relative">
+    <li>
       <button
         type="button"
         aria-expanded={open}
         aria-controls={id}
-        onClick={() => setOpen((o) => !o)}
-        className={`${tab} ${active ? "border-line bg-surface-2 text-fg" : "border-transparent text-muted hover:text-fg"}`}
+        onClick={onToggle}
+        className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider hover:text-sb-fg ${active ? "text-sb-active-fg" : "text-sb-muted"}`}
       >
         {GROUP_LABEL[group]}
         <NavIcon name="chevron" className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && (
-        <ul id={id} className={`${popover} left-0`}>
-          {items.map((i) => (
-            <li key={i.to}>
-              <NavLink
-                to={i.to}
-                end
-                className={({ isActive }) =>
-                  `flex items-start gap-3 rounded-xl px-3 py-2.5 no-underline ${isActive ? "bg-accent-soft text-link" : "text-fg hover:bg-surface-2"}`
-                }
-              >
-                <span className="mt-0.5 text-muted">
-                  <ItemIcon item={i} />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium">{i.label}</span>
-                  {i.hint && <span className="block text-xs text-muted">{i.hint}</span>}
-                </span>
-              </NavLink>
-            </li>
+      {open && list}
+    </li>
+  );
+}
+
+/**
+ * Barra lateral de escritorio: Inicio y una sección colapsable por tema. Se puede reducir a un riel de iconos para
+ * ganar espacio en pantallas medianas; las dos preferencias se recuerdan en este navegador.
+ */
+function Sidebar({
+  items,
+  rail,
+  onRail,
+}: {
+  items: NavItem[];
+  rail: boolean;
+  onRail: (rail: boolean) => void;
+}) {
+  const loc = useLocation();
+  const [closed, setClosed] = useState<NavGroup[]>(() => readPref(SB_CLOSED_KEY, DEFAULT_CLOSED));
+  const groups = SIDEBAR_GROUPS.map((g) => ({ group: g, list: items.filter((i) => i.group === g) })).filter(
+    (g) => g.list.length > 0,
+  );
+  const activeGroup = groups.find((g) => g.list.some((i) => matches(loc.pathname, i.to, g.list)))?.group;
+
+  // Si llegas a una pantalla de un grupo cerrado (enlace, búsqueda…), se abre para que veas dónde estás.
+  useEffect(() => {
+    if (activeGroup && closed.includes(activeGroup)) {
+      const next = closed.filter((g) => g !== activeGroup);
+      setClosed(next);
+      writePref(SB_CLOSED_KEY, next);
+    }
+  }, [activeGroup, closed]);
+
+  const toggle = (g: NavGroup) => {
+    const next = closed.includes(g) ? closed.filter((x) => x !== g) : [...closed, g];
+    setClosed(next);
+    writePref(SB_CLOSED_KEY, next);
+  };
+
+  return (
+    <aside
+      className={`fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-sb-line bg-sb transition-[width] duration-200 md:flex ${rail ? "w-[72px]" : "w-64"}`}
+      style={{ paddingTop: "var(--safe-top)", paddingLeft: "var(--safe-left)" }}
+    >
+      <div
+        className={`flex h-[68px] shrink-0 items-center ${rail ? "justify-center" : "justify-between px-5"}`}
+      >
+        {!rail && (
+          <Link to="/" className="text-[22px] font-semibold tracking-tight text-fg no-underline">
+            Dane<span className="text-accent">.</span>
+          </Link>
+        )}
+        <button
+          type="button"
+          onClick={() => onRail(!rail)}
+          aria-label={rail ? "Expandir barra lateral" : "Contraer barra lateral"}
+          title={rail ? "Expandir barra lateral" : "Contraer barra lateral"}
+          className="grid size-9 cursor-pointer place-items-center rounded-lg text-sb-muted hover:bg-sb-hover hover:text-sb-fg"
+        >
+          <NavIcon name="panel" className="size-[18px]" />
+        </button>
+      </div>
+      <nav
+        aria-label="Navegación principal"
+        className={`flex-1 overflow-y-auto pb-6 ${rail ? "px-2" : "px-3"}`}
+      >
+        <ul className={rail ? "flex flex-col items-center gap-2" : "space-y-3"}>
+          <li className={rail ? "" : "pb-1"}>
+            <NavLink
+              to="/"
+              end
+              className={sidebarLink(rail)}
+              title={rail ? "Inicio" : undefined}
+              aria-label={rail ? "Inicio" : undefined}
+            >
+              <span className="shrink-0 text-sb-muted">
+                <NavIcon name="/" className="size-[17px]" />
+              </span>
+              {!rail && "Inicio"}
+            </NavLink>
+          </li>
+          {groups.map(({ group, list }) => (
+            <SidebarGroup
+              key={group}
+              group={group}
+              items={list}
+              rail={rail}
+              open={!closed.includes(group)}
+              onToggle={() => toggle(group)}
+            />
           ))}
         </ul>
-      )}
-    </div>
+      </nav>
+    </aside>
   );
 }
 
@@ -226,7 +361,7 @@ function Notifications() {
   );
 }
 
-function ProfileMenu({ system }: { system: NavItem[] }) {
+function ProfileMenu() {
   const { open, setOpen, ref } = useDisclosure();
   const { me, logout } = useAuth();
   const id = useId();
@@ -246,27 +381,17 @@ function ProfileMenu({ system }: { system: NavItem[] }) {
       {open && (
         <div id={id} className={`${popover} right-0`}>
           <p className="px-3 pb-2 pt-1.5 text-sm font-semibold">{name ?? "Tu cuenta"}</p>
-          <ul className="border-t border-line pt-1">
-            {system
-              .filter((i) => i.to !== "/buscar" && i.to !== "/captura/nueva")
-              .map((i) => (
-                <li key={i.to}>
-                  <Link
-                    to={i.to}
-                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-fg no-underline hover:bg-surface-2"
-                  >
-                    <span className="text-muted">
-                      <ItemIcon item={i} />
-                    </span>
-                    {i.label}
-                  </Link>
-                </li>
-              ))}
-          </ul>
+          <Link
+            to="/ajustes"
+            className="flex items-center gap-3 rounded-xl border-t border-line px-3 py-2 text-sm text-fg no-underline hover:bg-surface-2"
+          >
+            <NavIcon name="/ajustes" className="size-[17px]" />
+            Ajustes
+          </Link>
           <button
             type="button"
             onClick={() => void logout()}
-            className="mt-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-t border-line px-3 py-2 text-sm text-muted hover:bg-surface-2 hover:text-fg"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-sm text-muted hover:bg-surface-2 hover:text-fg"
           >
             <NavIcon name="logout" className="size-[17px]" />
             Cerrar sesión
@@ -277,47 +402,27 @@ function ProfileMenu({ system }: { system: NavItem[] }) {
   );
 }
 
-function TopBar({ items }: { items: NavItem[] }) {
+/** Encabezado de escritorio: solo acciones rápidas. La navegación vive en la barra lateral. */
+function TopBar() {
   const iconBtn =
     "grid size-10 place-items-center rounded-full border border-line text-muted no-underline hover:text-fg";
   return (
-    <header className="sticky top-0 z-30 hidden border-b border-line/60 bg-bg/80 backdrop-blur-md md:block">
-      <div className="mx-auto flex max-w-7xl items-center gap-5 px-6 py-3.5">
-        <Link to="/" className="text-[22px] font-semibold tracking-tight text-fg no-underline">
-          Dane<span className="text-accent">.</span>
+    <header className="sticky top-0 z-20 hidden border-b border-line/60 bg-bg/80 backdrop-blur-md md:block">
+      <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-end gap-2 px-6">
+        <SyncIndicator />
+        <Link to="/buscar" aria-label="Buscar" title="Buscar" className={iconBtn}>
+          <NavIcon name="/buscar" />
         </Link>
-        <nav aria-label="Navegación principal" className="flex flex-wrap items-center gap-1">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `${tab} ${isActive ? "border-line bg-surface-2 text-fg" : "border-transparent text-muted hover:text-fg"}`
-            }
-          >
-            <NavIcon name="/" className="size-4" />
-            Inicio
-          </NavLink>
-          {TOP_GROUPS.map((g) => {
-            const list = items.filter((i) => i.group === g);
-            return list.length ? <GroupMenu key={g} group={g} items={list} /> : null;
-          })}
-        </nav>
-        <div className="ml-auto flex items-center gap-2">
-          <SyncIndicator />
-          <Link to="/buscar" aria-label="Buscar" title="Buscar" className={iconBtn}>
-            <NavIcon name="/buscar" />
-          </Link>
-          <Link
-            to="/captura/nueva"
-            aria-label="Captura rápida"
-            title="Captura rápida: anota algo y Dane lo ordena"
-            className={iconBtn}
-          >
-            <NavIcon name="/captura/nueva" />
-          </Link>
-          <Notifications />
-          <ProfileMenu system={items.filter((i) => i.group === "sistema")} />
-        </div>
+        <Link
+          to="/captura/nueva"
+          aria-label="Captura rápida"
+          title="Captura rápida: anota algo y Dane lo ordena"
+          className={iconBtn}
+        >
+          <NavIcon name="/captura/nueva" />
+        </Link>
+        <Notifications />
+        <ProfileMenu />
       </div>
     </header>
   );
@@ -372,6 +477,11 @@ export function AppShell() {
   const name = me?.user.display_name?.trim() || undefined;
   const loc = useLocation();
   const guided = loc.pathname === "/hoy" && new URLSearchParams(loc.search).has("guiado");
+  const [rail, setRail] = useState(() => readPref(SB_RAIL_KEY, false));
+  const onRail = (next: boolean) => {
+    setRail(next);
+    writePref(SB_RAIL_KEY, next);
+  };
 
   useEffect(() => {
     if (notice) toast.show(notice, { sticky: true });
@@ -389,36 +499,42 @@ export function AppShell() {
       <a href="#contenido" className="sr-only-focusable fixed left-2 top-2 z-50 rounded bg-surface p-2">
         Saltar al contenido
       </a>
-      <DemoBanner />
-      <TopBar items={items} />
-      {/* Encabezado móvil: marca + perfil. Dentro de Telegram sobra (Telegram ya muestra el nombre del bot). */}
-      {!isTelegram && (
-        <header className="flex items-center justify-between gap-2 px-4 pt-4 md:hidden">
-          <Link to="/" className="text-xl font-semibold tracking-tight text-fg no-underline">
-            Dane<span className="text-accent">.</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <SyncIndicator />
-            <Link
-              to="/ajustes"
-              aria-label="Perfil y ajustes"
-              className="grid size-9 place-items-center rounded-full border border-line bg-linear-to-br from-[#5b4636] to-[#2a211c] text-xs font-semibold text-fg no-underline"
-            >
-              {name ? initials(name) : <NavIcon name="/personas" className="size-4" />}
+      <Sidebar items={items} rail={rail} onRail={onRail} />
+      {/* Columna de contenido: se desplaza a la derecha lo que mida la barra lateral (solo en escritorio). El aviso de
+          demo va aquí dentro para no tapar la parte superior de la barra lateral, que es fija. */}
+      <div className={`transition-[padding] duration-200 ${rail ? "md:pl-[72px]" : "md:pl-64"}`}>
+        <DemoBanner />
+        <TopBar />
+        {/* Encabezado móvil: marca + perfil. Dentro de Telegram sobra (Telegram ya muestra el nombre del bot). */}
+        {!isTelegram && (
+          <header className="flex items-center justify-between gap-2 px-4 pt-4 md:hidden">
+            <Link to="/" className="text-xl font-semibold tracking-tight text-fg no-underline">
+              Dane<span className="text-accent">.</span>
             </Link>
-          </div>
-        </header>
-      )}
-      <main id="contenido" className="mx-auto max-w-7xl px-4 pb-28 pt-4 md:px-6 md:pb-12 md:pt-6">
-        {offline && (
-          <p role="status" className="mb-3 rounded-xl border border-warn bg-surface p-3 text-sm">
-            Sin conexión: trabajas con los datos guardados en este dispositivo. Se sincronizará al reconectar.
-          </p>
+            <div className="flex items-center gap-2">
+              <SyncIndicator />
+              <Link
+                to="/ajustes"
+                aria-label="Perfil y ajustes"
+                className="grid size-9 place-items-center rounded-full border border-line bg-linear-to-br from-[#5b4636] to-[#2a211c] text-xs font-semibold text-fg no-underline"
+              >
+                {name ? initials(name) : <NavIcon name="/personas" className="size-4" />}
+              </Link>
+            </div>
+          </header>
         )}
-        <Suspense fallback={<LoadingState />}>
-          <Outlet />
-        </Suspense>
-      </main>
+        <main id="contenido" className="mx-auto max-w-7xl px-4 pb-28 pt-4 md:px-6 md:pb-12 md:pt-6">
+          {offline && (
+            <p role="status" className="mb-3 rounded-xl border border-warn bg-surface p-3 text-sm">
+              Sin conexión: trabajas con los datos guardados en este dispositivo. Se sincronizará al
+              reconectar.
+            </p>
+          )}
+          <Suspense fallback={<LoadingState />}>
+            <Outlet />
+          </Suspense>
+        </main>
+      </div>
       {/* Durante el check-in guiado se oculta: sus botones Atrás/Siguiente van fijos abajo y competirían con ella. */}
       {!guided && <BottomNav />}
       <UpdatePrompt />
