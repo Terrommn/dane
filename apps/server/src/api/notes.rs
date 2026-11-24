@@ -415,7 +415,7 @@ async fn restore_entity(
 
 #[derive(Serialize, ToSchema)]
 pub struct ProjectsView {
-    /// "Dev reciente" (excluye devocionales, clases, objetivos y finanzas).
+    /// "Dev reciente" (excluye clases, objetivos y finanzas).
     pub recent: Vec<ActivityItem>,
     pub adrs: Vec<Adr>,
 }

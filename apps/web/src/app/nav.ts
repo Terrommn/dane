@@ -16,7 +16,7 @@ export interface NavItem {
   label: string;
   icon: string;
   group: NavGroup;
-  module?: "devotional" | "finance" | "content" | "school" | "dev" | "readings" | "people";
+  module?: "finance" | "content" | "school" | "dev" | "readings" | "people";
   /** Texto corto bajo la etiqueta en los menús desplegables: explica para qué sirve la pantalla. */
   hint?: string;
 }
@@ -56,7 +56,6 @@ export const MORE_NAV: NavItem[] = [
   { to: "/finanzas", label: "Resumen", icon: "💰", group: "finanzas", module: "finance" },
   { to: "/finanzas/movimientos", label: "Movimientos", icon: "🧾", group: "finanzas", module: "finance" },
   { to: "/personas", label: "Personas", icon: "👥", group: "vida", module: "people" },
-  { to: "/devocionales", label: "Devocionales", icon: "🙏", group: "vida", module: "devotional" },
   { to: "/lecturas", label: "Lecturas", icon: "📚", group: "vida", module: "readings" },
   { to: "/contenido", label: "Contenido", icon: "🎬", group: "conocimiento", module: "content" },
   { to: "/swipe", label: "Swipe", icon: "🔖", group: "conocimiento", module: "content" },

@@ -37,10 +37,6 @@ pub struct UserSettings {
     pub week_start: i16,
     #[schema(value_type = Object)]
     pub modules: serde_json::Value,
-    pub devotional_mode: String,
-    #[schema(value_type = Vec<Object>)]
-    pub devotional_template: serde_json::Value,
-    pub max_devotional_failures: Option<i32>,
     #[schema(value_type = Option<String>)]
     pub weight_goal_kg: Option<rust_decimal::Decimal>,
     pub weight_direction: Option<String>,
@@ -365,8 +361,7 @@ pub async fn revoke_all_sessions(db: impl PgExecutor<'_>, user_id: Uuid) -> Repo
 
 pub async fn get_settings(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<UserSettings> {
     sqlx::query_as::<_, UserSettings>(
-        "SELECT user_id, locale, timezone, currency::text AS currency, week_start, modules, devotional_mode,
-                devotional_template, max_devotional_failures, weight_goal_kg, weight_direction, habit_warn_month,
+        "SELECT user_id, locale, timezone, currency::text AS currency, week_start, modules, weight_goal_kg, weight_direction, habit_warn_month,
                 habit_warn_total, track_family_loans, morning_enabled, morning_time, event_reminder_minutes,
                 daily_enabled, daily_time, weekly_enabled, weekly_weekday,
                 weekly_time, monthly_enabled, monthly_time, reminders_paused, paused_until, onboarding_completed_at,
@@ -382,12 +377,11 @@ pub async fn get_settings(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<
 pub async fn save_settings(pool: &PgPool, s: &UserSettings) -> RepoResult<UserSettings> {
     let n = sqlx::query(
         "UPDATE user_settings SET locale = $3, timezone = $4, currency = $5, week_start = $6, modules = $7,
-            devotional_mode = $8, devotional_template = $9, max_devotional_failures = $10, weight_goal_kg = $11,
-            weight_direction = $12, habit_warn_month = $13, habit_warn_total = $14, track_family_loans = $15,
-            daily_enabled = $16, daily_time = $17, weekly_enabled = $18, weekly_weekday = $19, weekly_time = $20,
-            monthly_enabled = $21, monthly_time = $22, reminders_paused = $23, paused_until = $24,
-            onboarding_completed_at = $25, morning_enabled = $26, morning_time = $27,
-            event_reminder_minutes = $28, version = version + 1
+            weight_goal_kg = $8, weight_direction = $9, habit_warn_month = $10, habit_warn_total = $11,
+            track_family_loans = $12, daily_enabled = $13, daily_time = $14, weekly_enabled = $15,
+            weekly_weekday = $16, weekly_time = $17, monthly_enabled = $18, monthly_time = $19,
+            reminders_paused = $20, paused_until = $21, onboarding_completed_at = $22, morning_enabled = $23,
+            morning_time = $24, event_reminder_minutes = $25, version = version + 1
          WHERE user_id = $1 AND version = $2",
     )
     .bind(s.user_id)
@@ -397,9 +391,6 @@ pub async fn save_settings(pool: &PgPool, s: &UserSettings) -> RepoResult<UserSe
     .bind(&s.currency)
     .bind(s.week_start)
     .bind(&s.modules)
-    .bind(&s.devotional_mode)
-    .bind(&s.devotional_template)
-    .bind(s.max_devotional_failures)
     .bind(s.weight_goal_kg)
     .bind(&s.weight_direction)
     .bind(s.habit_warn_month)

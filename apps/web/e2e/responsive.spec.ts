@@ -4,7 +4,7 @@ import { devLogin, expectNoHorizontalOverflow } from "./helpers";
 // Revisión visual: cada pantalla carga sin error, sin "módulo en integración" y sin scroll horizontal.
 const ROUTES = [
   "/hoy", "/objetivos", "/objetivos/planificar", "/habitos", "/dashboard", "/semanal", "/tareas", "/inbox",
-  "/finanzas", "/finanzas/movimientos", "/personas", "/devocionales", "/lecturas", "/contenido", "/swipe",
+  "/finanzas", "/finanzas/movimientos", "/personas", "/lecturas", "/contenido", "/swipe",
   "/escuela", "/dev", "/notas", "/dibujos", "/buscar", "/agenda", "/vistas", "/proyectos", "/ajustes",
   "/onboarding", "/instalar", "/mas", "/importar", "/exportar",
 ];

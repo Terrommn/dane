@@ -710,60 +710,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/devotionals": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Historial (Devocionales.base: fecha desc con pasaje) con búsqueda sin acentos. */
-        get: operations["get_devotionals"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/devotionals/template": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Plantilla vigente: la personalizada en ajustes (`devotional_template`) o la del vault según el modo. */
-        get: operations["get_devotionals_template"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/devotionals/{date}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["get_devotionals_date"];
-        /**
-         * Crea/actualiza el devocional del día. Con contenido real marca el hábito vinculado (`devotional_content`) de esa
-         *     fecha; si queda vacío, retira la marca automática.
-         */
-        put: operations["put_devotionals_date"];
-        post?: never;
-        delete: operations["delete_devotionals_date"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/drawings": {
         parameters: {
             query?: never;
@@ -1424,7 +1370,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Confirma los hábitos fijos propuestos en onboarding (devocional, ejercicio, lectura). Nada se crea sin esta
+         * Confirma los hábitos fijos propuestos en onboarding (ejercicio, lectura). Nada se crea sin esta
          *     confirmación. Idempotente: si ya existe, actualiza su frecuencia desde `starts_on` o lo archiva si `enabled=false`.
          */
         post: operations["post_habits_fixed"];
@@ -2820,7 +2766,7 @@ export interface components {
              */
             oldest_snapshot_days?: number | null;
         };
-        /** @description Elemento de actividad reciente (vista "Dev reciente" de Proyectos.base, sin devocionales/clases/objetivos/finanzas). */
+        /** @description Elemento de actividad reciente (vista "Dev reciente" de Proyectos.base, sin clases/objetivos/finanzas). */
         ActivityItem: {
             entity_type: string;
             /** Format: uuid */
@@ -3534,7 +3480,6 @@ export interface components {
             month_goals: components["schemas"]["GoalView"][];
             week_goals: components["schemas"]["GoalView"][];
             habits: components["schemas"]["HabitBlock"];
-            devotional?: components["schemas"]["DevotionalFailures"] | null;
             last_30_days: components["schemas"]["HeatDay"][];
             weight: components["schemas"]["WeightBlock"];
             energy: components["schemas"]["EnergyPoint"][];
@@ -3577,10 +3522,6 @@ export interface components {
             habits: components["schemas"]["HabitGroups"];
             month_goals: components["schemas"]["GoalBrief"][];
             week_goals: components["schemas"]["GoalBrief"][];
-            /** @description Módulo devocional activo y modo (`devotional | meditation`). */
-            devotional_enabled: boolean;
-            devotional_mode: string;
-            devotional?: components["schemas"]["Devotional"] | null;
             /** @description Agenda del día (propuesta: un evento no prueba asistencia). */
             agenda: components["schemas"]["AgendaItem"][];
             tasks_by_area: components["schemas"]["CheckinAreaTasks"][];
@@ -3777,93 +3718,6 @@ export interface components {
             date: string;
             devlog?: components["schemas"]["Devlog"] | null;
             sessions: components["schemas"]["DevSession"][];
-        };
-        Devotional: {
-            /** Format: uuid */
-            id: string;
-            /** Format: date */
-            on_date: string;
-            /** @description `devotional | meditation` */
-            mode: string;
-            passage: string;
-            /** @description `[{verse, action}]` — "¿Cómo puedo agradar a Dios hoy?" */
-            verse_actions: Record<string, never>[];
-            learned: string;
-            teaching: string;
-            prayer: string;
-            song: string;
-            /** @description Secciones personalizadas de la plantilla del usuario: `{clave: texto}`. */
-            extra: Record<string, never>;
-            /** Format: int32 */
-            version: number;
-            /** Format: date-time */
-            updated_at: string;
-        };
-        DevotionalBody: {
-            /** @description `devotional | meditation` (por defecto, el modo de ajustes). */
-            mode?: string | null;
-            passage?: string;
-            verse_actions?: components["schemas"]["VerseActionBody"][];
-            learned?: string;
-            teaching?: string;
-            prayer?: string;
-            song?: string;
-            /** @description Secciones personalizadas `{clave: texto}`. */
-            extra?: Record<string, never>;
-            /**
-             * Format: int32
-             * @description 0 o ausente al crear.
-             */
-            version?: number | null;
-        };
-        DevotionalFailures: {
-            /** Format: uuid */
-            habit_id: string;
-            /**
-             * Format: int32
-             * @description Días cerrados del mes con `not_done` explícito.
-             */
-            explicit_failures: number;
-            /**
-             * Format: int32
-             * @description Días cerrados del mes sin registro (cuentan como falla, se muestran aparte).
-             */
-            unrecorded: number;
-            /** Format: int32 */
-            failures_total: number;
-            /** Format: int32 */
-            closed_days: number;
-            /**
-             * Format: int32
-             * @description Máximo configurado (ajustes). `None` si el usuario no lo definió.
-             */
-            max_allowed?: number | null;
-            over_limit?: boolean | null;
-            /** @description Aviso: el mes sigue abierto; hoy y los días futuros no cuentan. */
-            note: string;
-            route: string;
-        };
-        DevotionalNote: {
-            /** Format: date */
-            date: string;
-            passage: string;
-            actions: string[];
-            learned: string;
-        };
-        DevotionalPage: {
-            items: components["schemas"]["Devotional"][];
-            /** Format: int64 */
-            total: number;
-            /** Format: int64 */
-            limit: number;
-            /** Format: int64 */
-            offset: number;
-        };
-        DevotionalTemplate: {
-            /** @description `devotional | meditation` */
-            mode: string;
-            enabled: boolean;
-            sections: components["schemas"]["TemplateSection"][];
         };
         Drawing: {
             /** Format: uuid */
@@ -4118,13 +3972,13 @@ export interface components {
         };
         FixedHabitConfig: components["schemas"]["FrequencyBody"] & {
             enabled: boolean;
-            /** @description Nombre visible (ej. "Meditación" si sustituye al devocional). */
+            /** @description Nombre visible (por defecto "Ejercicio" o "Lectura"). */
             name?: string | null;
         };
         FixedHabitWeek: {
             /** Format: uuid */
             habit_id: string;
-            /** @description `devotional | exercise | reading` */
+            /** @description `exercise | reading` */
             key: string;
             name: string;
             /**
@@ -4140,7 +3994,6 @@ export interface components {
             compliance: Record<string, never>;
         };
         FixedHabitsBody: {
-            devotional?: components["schemas"]["FixedHabitConfig"] | null;
             exercise?: components["schemas"]["FixedHabitConfig"] | null;
             reading?: components["schemas"]["FixedHabitConfig"] | null;
             /**
@@ -4363,7 +4216,7 @@ export interface components {
             name: string;
             /** @description `fixed | goal | custom` */
             kind: string;
-            /** @description `devotional | exercise | reading` para hábitos fijos. */
+            /** @description `exercise | reading` para hábitos fijos. */
             fixed_key?: string | null;
             /** Format: uuid */
             goal_id?: string | null;
@@ -4433,7 +4286,7 @@ export interface components {
             reason?: string | null;
         };
         HabitGroups: {
-            /** @description Devocional/meditación, ejercicio, lectura. */
+            /** @description Hábitos fijos: ejercicio, lectura. */
             fixed: components["schemas"]["HabitDay"][];
             month: components["schemas"]["HabitDay"][];
             week: components["schemas"]["HabitDay"][];
@@ -4444,7 +4297,7 @@ export interface components {
             days: components["schemas"]["HistoryDay"][];
         };
         HabitLink: {
-            /** @description `weight_logged | expense_logged | positive_reflection | devotional_content` */
+            /** @description `weight_logged | expense_logged | positive_reflection` */
             trigger: string;
             /** Format: uuid */
             habit_id: string;
@@ -5297,7 +5150,7 @@ export interface components {
             amount_cents: number;
         };
         ProjectsView: {
-            /** @description "Dev reciente" (excluye devocionales, clases, objetivos y finanzas). */
+            /** @description "Dev reciente" (excluye clases, objetivos y finanzas). */
             recent: components["schemas"]["ActivityItem"][];
             adrs: components["schemas"]["Adr"][];
         };
@@ -5519,10 +5372,6 @@ export interface components {
             /** Format: int32 */
             week_start?: number | null;
             modules?: Record<string, never> | null;
-            devotional_mode?: string | null;
-            devotional_template?: Record<string, never>[] | null;
-            /** Format: int32 */
-            max_devotional_failures?: number | null;
             weight_goal_kg?: string | null;
             weight_direction?: string | null;
             /** Format: int32 */
@@ -5860,12 +5709,6 @@ export interface components {
             bot_username?: string | null;
             last_error?: string | null;
         };
-        TemplateSection: {
-            key: string;
-            label: string;
-            /** @description `text | verse_actions` */
-            kind: string;
-        };
         Transaction: {
             /** Format: uuid */
             id: string;
@@ -6055,10 +5898,6 @@ export interface components {
             /** Format: int32 */
             week_start: number;
             modules: Record<string, never>;
-            devotional_mode: string;
-            devotional_template: Record<string, never>[];
-            /** Format: int32 */
-            max_devotional_failures?: number | null;
             weight_goal_kg?: string | null;
             weight_direction?: string | null;
             /** Format: int32 */
@@ -6091,10 +5930,6 @@ export interface components {
             onboarding_completed_at?: string | null;
             /** Format: int32 */
             version: number;
-        };
-        VerseActionBody: {
-            verse?: string;
-            action?: string;
         };
         WeeklyBody: {
             /**
@@ -6181,7 +6016,6 @@ export interface components {
             people: components["schemas"]["InteractionBrief"][];
             content_published: components["schemas"]["ContentBrief"][];
             devlog: components["schemas"]["DevlogBrief"][];
-            devotionals: components["schemas"]["DevotionalNote"][];
             /** Format: int64 */
             expenses_total_cents: number;
             /** Format: int64 */
@@ -7604,132 +7438,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["DevSession"];
                 };
-            };
-        };
-    };
-    get_devotionals: {
-        parameters: {
-            query?: {
-                limit?: number | null;
-                offset?: number | null;
-                /** @description Búsqueda de texto (tolerante a acentos donde aplique). */
-                q?: string | null;
-                /** @description Incluir archivados. */
-                archived?: boolean | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DevotionalPage"];
-                };
-            };
-        };
-    };
-    get_devotionals_template: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DevotionalTemplate"];
-                };
-            };
-        };
-    };
-    get_devotionals_date: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                date: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Devotional"];
-                };
-            };
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-        };
-    };
-    put_devotionals_date: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                date: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DevotionalBody"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Devotional"];
-                };
-            };
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-        };
-    };
-    delete_devotionals_date: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                date: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };

@@ -1,4 +1,4 @@
-// Hábitos fijos (devocional/meditación, ejercicio, lectura). Se PROPONEN como ejemplos del vault, desmarcados; solo se
+// Hábitos fijos (ejercicio, lectura). Se PROPONEN como ejemplos del vault, desmarcados; solo se
 // crean los que el usuario marque y confirme (POST /habits/fixed). Ejercicio es N/semana: no es obligatorio cada día.
 import { useState } from "react";
 import { Button } from "../../components/ui/Button";
@@ -10,20 +10,17 @@ import { errorMessage } from "../../lib/errors";
 import { cleanFrequency, FrequencyFields, validateFrequency } from "./FrequencyFields";
 import { type FrequencyBody, useHabitMutations } from "./habitsApi";
 
-type Key = "devotional" | "exercise" | "reading";
+type Key = "exercise" | "reading";
+const KEYS: Key[] = ["exercise", "reading"];
+
 interface Row {
   enabled: boolean;
   name: string;
   freq: FrequencyBody;
 }
 
-export function defaultFixedRows(devotionalMode: string): Record<Key, Row> {
+export function defaultFixedRows(): Record<Key, Row> {
   return {
-    devotional: {
-      enabled: false,
-      name: devotionalMode === "meditation" ? "Meditación" : "Devocional",
-      freq: { frequency: "daily" },
-    },
     exercise: { enabled: false, name: "Ejercicio", freq: { frequency: "times_per_week", times_per_week: 4 } },
     reading: { enabled: false, name: "Lectura", freq: { frequency: "daily" } },
   };
@@ -32,7 +29,7 @@ export function defaultFixedRows(devotionalMode: string): Record<Key, Row> {
 /** Cuerpo para el servidor: solo los marcados (los no marcados se omiten para no archivar existentes). */
 export function fixedBody(rows: Record<Key, Row>, startsOn?: string): Schemas["FixedHabitsBody"] | string {
   const body: Schemas["FixedHabitsBody"] = { starts_on: startsOn ?? null };
-  for (const k of ["devotional", "exercise", "reading"] as const) {
+  for (const k of KEYS) {
     const r = rows[k];
     if (!r.enabled) continue;
     const err = validateFrequency(r.freq);
@@ -42,20 +39,12 @@ export function fixedBody(rows: Record<Key, Row>, startsOn?: string): Schemas["F
   return body;
 }
 
-export function FixedHabitsSetup({
-  devotionalMode,
-  devotionalEnabled,
-  onDone,
-}: {
-  devotionalMode: string;
-  devotionalEnabled: boolean;
-  onDone?: () => void;
-}) {
-  const [rows, setRows] = useState(() => defaultFixedRows(devotionalMode));
+export function FixedHabitsSetup({ onDone }: { onDone?: () => void }) {
+  const [rows, setRows] = useState(defaultFixedRows);
   const [err, setErr] = useState<string | null>(null);
   const { setupFixed } = useHabitMutations();
   const toast = useToast();
-  const keys: Key[] = devotionalEnabled ? ["devotional", "exercise", "reading"] : ["exercise", "reading"];
+  const keys = KEYS;
   const any = keys.some((k) => rows[k].enabled);
   const set = (k: Key, r: Partial<Row>) => setRows((x) => ({ ...x, [k]: { ...x[k], ...r } }));
 

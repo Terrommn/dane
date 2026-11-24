@@ -2079,203 +2079,6 @@
         }
       }
     },
-    "/devotionals": {
-      "get": {
-        "tags": [
-          "devotionals"
-        ],
-        "summary": "Historial (Devocionales.base: fecha desc con pasaje) con búsqueda sin acentos.",
-        "operationId": "get_devotionals",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
-              "format": "int64"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
-              "format": "int64"
-            }
-          },
-          {
-            "name": "q",
-            "in": "query",
-            "description": "Búsqueda de texto (tolerante a acentos donde aplique).",
-            "required": false,
-            "schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          {
-            "name": "archived",
-            "in": "query",
-            "description": "Incluir archivados.",
-            "required": false,
-            "schema": {
-              "type": [
-                "boolean",
-                "null"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DevotionalPage"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/devotionals/template": {
-      "get": {
-        "tags": [
-          "devotionals"
-        ],
-        "summary": "Plantilla vigente: la personalizada en ajustes (`devotional_template`) o la del vault según el modo.",
-        "operationId": "get_devotionals_template",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DevotionalTemplate"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/devotionals/{date}": {
-      "get": {
-        "tags": [
-          "devotionals"
-        ],
-        "operationId": "get_devotionals_date",
-        "parameters": [
-          {
-            "name": "date",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Devotional"
-                }
-              }
-            }
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "devotionals"
-        ],
-        "summary": "Crea/actualiza el devocional del día. Con contenido real marca el hábito vinculado (`devotional_content`) de esa\nfecha; si queda vacío, retira la marca automática.",
-        "operationId": "put_devotionals_date",
-        "parameters": [
-          {
-            "name": "date",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DevotionalBody"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Devotional"
-                }
-              }
-            }
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "devotionals"
-        ],
-        "operationId": "delete_devotionals_date",
-        "parameters": [
-          {
-            "name": "date",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          }
-        ],
-        "responses": {
-          "204": {}
-        }
-      }
-    },
     "/drawings": {
       "get": {
         "tags": [
@@ -4488,7 +4291,7 @@
         "tags": [
           "habits"
         ],
-        "summary": "Confirma los hábitos fijos propuestos en onboarding (devocional, ejercicio, lectura). Nada se crea sin esta\nconfirmación. Idempotente: si ya existe, actualiza su frecuencia desde `starts_on` o lo archiva si `enabled=false`.",
+        "summary": "Confirma los hábitos fijos propuestos en onboarding (ejercicio, lectura). Nada se crea sin esta\nconfirmación. Idempotente: si ya existe, actualiza su frecuencia desde `starts_on` o lo archiva si `enabled=false`.",
         "operationId": "post_habits_fixed",
         "requestBody": {
           "content": {
@@ -8544,7 +8347,7 @@
       },
       "ActivityItem": {
         "type": "object",
-        "description": "Elemento de actividad reciente (vista \"Dev reciente\" de Proyectos.base, sin devocionales/clases/objetivos/finanzas).",
+        "description": "Elemento de actividad reciente (vista \"Dev reciente\" de Proyectos.base, sin clases/objetivos/finanzas).",
         "required": [
           "entity_type",
           "entity_id",
@@ -10896,16 +10699,6 @@
           "habits": {
             "$ref": "#/components/schemas/HabitBlock"
           },
-          "devotional": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DevotionalFailures"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
           "last_30_days": {
             "type": "array",
             "items": {
@@ -11013,8 +10806,6 @@
               "habits",
               "month_goals",
               "week_goals",
-              "devotional_enabled",
-              "devotional_mode",
               "agenda",
               "tasks_by_area",
               "people",
@@ -11059,23 +10850,6 @@
                 "items": {
                   "$ref": "#/components/schemas/GoalBrief"
                 }
-              },
-              "devotional_enabled": {
-                "type": "boolean",
-                "description": "Módulo devocional activo y modo (`devotional | meditation`)."
-              },
-              "devotional_mode": {
-                "type": "string"
-              },
-              "devotional": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Devotional"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
               },
               "agenda": {
                 "type": "array",
@@ -11676,256 +11450,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DevSession"
-            }
-          }
-        }
-      },
-      "Devotional": {
-        "type": "object",
-        "required": [
-          "id",
-          "on_date",
-          "mode",
-          "passage",
-          "verse_actions",
-          "learned",
-          "teaching",
-          "prayer",
-          "song",
-          "extra",
-          "version",
-          "updated_at"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "on_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "mode": {
-            "type": "string",
-            "description": "`devotional | meditation`"
-          },
-          "passage": {
-            "type": "string"
-          },
-          "verse_actions": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            },
-            "description": "`[{verse, action}]` — \"¿Cómo puedo agradar a Dios hoy?\""
-          },
-          "learned": {
-            "type": "string"
-          },
-          "teaching": {
-            "type": "string"
-          },
-          "prayer": {
-            "type": "string"
-          },
-          "song": {
-            "type": "string"
-          },
-          "extra": {
-            "type": "object",
-            "description": "Secciones personalizadas de la plantilla del usuario: `{clave: texto}`."
-          },
-          "version": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "DevotionalBody": {
-        "type": "object",
-        "properties": {
-          "mode": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "`devotional | meditation` (por defecto, el modo de ajustes)."
-          },
-          "passage": {
-            "type": "string"
-          },
-          "verse_actions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VerseActionBody"
-            }
-          },
-          "learned": {
-            "type": "string"
-          },
-          "teaching": {
-            "type": "string"
-          },
-          "prayer": {
-            "type": "string"
-          },
-          "song": {
-            "type": "string"
-          },
-          "extra": {
-            "type": "object",
-            "description": "Secciones personalizadas `{clave: texto}`."
-          },
-          "version": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "description": "0 o ausente al crear."
-          }
-        }
-      },
-      "DevotionalFailures": {
-        "type": "object",
-        "required": [
-          "habit_id",
-          "explicit_failures",
-          "unrecorded",
-          "failures_total",
-          "closed_days",
-          "note",
-          "route"
-        ],
-        "properties": {
-          "habit_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "explicit_failures": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Días cerrados del mes con `not_done` explícito.",
-            "minimum": 0
-          },
-          "unrecorded": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Días cerrados del mes sin registro (cuentan como falla, se muestran aparte).",
-            "minimum": 0
-          },
-          "failures_total": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "closed_days": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "max_allowed": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "description": "Máximo configurado (ajustes). `None` si el usuario no lo definió."
-          },
-          "over_limit": {
-            "type": [
-              "boolean",
-              "null"
-            ]
-          },
-          "note": {
-            "type": "string",
-            "description": "Aviso: el mes sigue abierto; hoy y los días futuros no cuentan."
-          },
-          "route": {
-            "type": "string"
-          }
-        }
-      },
-      "DevotionalNote": {
-        "type": "object",
-        "required": [
-          "date",
-          "passage",
-          "actions",
-          "learned"
-        ],
-        "properties": {
-          "date": {
-            "type": "string",
-            "format": "date"
-          },
-          "passage": {
-            "type": "string"
-          },
-          "actions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "learned": {
-            "type": "string"
-          }
-        }
-      },
-      "DevotionalPage": {
-        "type": "object",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset"
-        ],
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Devotional"
-            }
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "limit": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "offset": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "DevotionalTemplate": {
-        "type": "object",
-        "required": [
-          "mode",
-          "enabled",
-          "sections"
-        ],
-        "properties": {
-          "mode": {
-            "type": "string",
-            "description": "`devotional | meditation`"
-          },
-          "enabled": {
-            "type": "boolean"
-          },
-          "sections": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TemplateSection"
             }
           }
         }
@@ -12680,7 +12204,7 @@
                   "string",
                   "null"
                 ],
-                "description": "Nombre visible (ej. \"Meditación\" si sustituye al devocional)."
+                "description": "Nombre visible (por defecto \"Ejercicio\" o \"Lectura\")."
               }
             }
           }
@@ -12703,7 +12227,7 @@
           },
           "key": {
             "type": "string",
-            "description": "`devotional | exercise | reading`"
+            "description": "`exercise | reading`"
           },
           "name": {
             "type": "string"
@@ -12728,16 +12252,6 @@
       "FixedHabitsBody": {
         "type": "object",
         "properties": {
-          "devotional": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/FixedHabitConfig"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
           "exercise": {
             "oneOf": [
               {
@@ -13402,7 +12916,7 @@
               "string",
               "null"
             ],
-            "description": "`devotional | exercise | reading` para hábitos fijos."
+            "description": "`exercise | reading` para hábitos fijos."
           },
           "goal_id": {
             "type": [
@@ -13685,7 +13199,7 @@
             "items": {
               "$ref": "#/components/schemas/HabitDay"
             },
-            "description": "Devocional/meditación, ejercicio, lectura."
+            "description": "Hábitos fijos: ejercicio, lectura."
           },
           "month": {
             "type": "array",
@@ -13738,7 +13252,7 @@
         "properties": {
           "trigger": {
             "type": "string",
-            "description": "`weight_logged | expense_logged | positive_reflection | devotional_content`"
+            "description": "`weight_logged | expense_logged | positive_reflection`"
           },
           "habit_id": {
             "type": "string",
@@ -16620,7 +16134,7 @@
             "items": {
               "$ref": "#/components/schemas/ActivityItem"
             },
-            "description": "\"Dev reciente\" (excluye devocionales, clases, objetivos y finanzas)."
+            "description": "\"Dev reciente\" (excluye clases, objetivos y finanzas)."
           },
           "adrs": {
             "type": "array",
@@ -17365,28 +16879,6 @@
               "object",
               "null"
             ]
-          },
-          "devotional_mode": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "devotional_template": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": "object"
-            }
-          },
-          "max_devotional_failures": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
           },
           "weight_goal_kg": {
             "type": [
@@ -18531,26 +18023,6 @@
           }
         }
       },
-      "TemplateSection": {
-        "type": "object",
-        "required": [
-          "key",
-          "label",
-          "kind"
-        ],
-        "properties": {
-          "key": {
-            "type": "string"
-          },
-          "label": {
-            "type": "string"
-          },
-          "kind": {
-            "type": "string",
-            "description": "`text | verse_actions`"
-          }
-        }
-      },
       "Transaction": {
         "type": "object",
         "required": [
@@ -19092,8 +18564,6 @@
           "currency",
           "week_start",
           "modules",
-          "devotional_mode",
-          "devotional_template",
           "habit_warn_month",
           "habit_warn_total",
           "track_family_loans",
@@ -19130,22 +18600,6 @@
           },
           "modules": {
             "type": "object"
-          },
-          "devotional_mode": {
-            "type": "string"
-          },
-          "devotional_template": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            }
-          },
-          "max_devotional_failures": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
           },
           "weight_goal_kg": {
             "type": [
@@ -19226,17 +18680,6 @@
           "version": {
             "type": "integer",
             "format": "int32"
-          }
-        }
-      },
-      "VerseActionBody": {
-        "type": "object",
-        "properties": {
-          "verse": {
-            "type": "string"
-          },
-          "action": {
-            "type": "string"
           }
         }
       },
@@ -19452,7 +18895,6 @@
           "people",
           "content_published",
           "devlog",
-          "devotionals",
           "expenses_total_cents",
           "expenses_count",
           "inbox_pending",
@@ -19534,12 +18976,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DevlogBrief"
-            }
-          },
-          "devotionals": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DevotionalNote"
             }
           },
           "expenses_total_cents": {

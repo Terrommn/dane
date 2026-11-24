@@ -22,7 +22,6 @@ pub fn table_of(entity_type: &str) -> Option<&'static str> {
         "task" => "tasks",
         "inbox" => "inbox_items",
         "weekly_review" => "weekly_reviews",
-        "devotional" => "devotionals",
         "reading" => "readings",
         "content" => "content_pieces",
         "swipe" => "swipe_refs",
@@ -219,6 +218,7 @@ pub struct TagCount {
 pub async fn tags(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<Vec<TagCount>> {
     Ok(sqlx::query_as::<_, TagCount>(
         "SELECT t AS tag, count(*) AS count FROM search_index, unnest(tags) t WHERE user_id = $1 AND NOT archived
+           AND entity_type <> 'devotional'
          GROUP BY t ORDER BY count DESC, t",
     )
     .bind(user_id)
@@ -364,7 +364,7 @@ pub async fn set_favorite(pool: &PgPool, user_id: Uuid, t: &str, id: Uuid, on: b
 pub async fn archived(db: impl PgExecutor<'_>, user_id: Uuid) -> RepoResult<Vec<EntityRef>> {
     Ok(sqlx::query_as::<_, EntityRef>(
         "SELECT entity_type, entity_id, title, on_date, status, updated_at AS at FROM search_index
-         WHERE user_id = $1 AND archived ORDER BY updated_at DESC LIMIT 500",
+         WHERE user_id = $1 AND archived AND entity_type <> 'devotional' ORDER BY updated_at DESC LIMIT 500",
     )
     .bind(user_id)
     .fetch_all(db)
@@ -430,7 +430,8 @@ pub async fn search(db: impl PgExecutor<'_>, user_id: Uuid, f: &SearchFilter) ->
         "SELECT entity_type, entity_id, title, left(body, 240) AS snippet, tags, area_id, on_date, status, archived,
                 (ts_rank(doc, q) + similarity(immutable_unaccent(lower(title)), immutable_unaccent(lower($3))))::real AS rank
          FROM search_index, to_tsquery('simple', $2) q
-         WHERE user_id = $1
+         -- Los devocionales viejos siguen en la base (D-039) pero Dane ya no los muestra.
+         WHERE user_id = $1 AND entity_type <> 'devotional'
            AND (doc @@ q OR immutable_unaccent(lower(title)) % immutable_unaccent(lower($3))
                 OR $3 = ANY(tags))
            AND (cardinality($4::text[]) = 0 OR entity_type = ANY($4))

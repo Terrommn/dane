@@ -13,9 +13,8 @@ import { ENTITY_LABEL, entityHref } from "../notes/common";
 import { usePeopleByArea } from "../people/peopleApi";
 
 const OTHER_BASES = [
-  { to: "/habitos", label: "Hábitos", hint: "Últimos 30 días de devocional, ejercicio, lectura y energía" },
+  { to: "/habitos", label: "Hábitos", hint: "Últimos 30 días de ejercicio, lectura y energía" },
   { to: "/objetivos", label: "Objetivos", hint: "Por tipo y periodo" },
-  { to: "/devocionales", label: "Devocionales", hint: "Por fecha con pasaje" },
   { to: "/lecturas", label: "Lecturas", hint: "Tarjetas por estado y tabla por rating" },
 ];
 

@@ -717,7 +717,7 @@ async fn habit_history(
 #[derive(Deserialize, ToSchema)]
 pub struct FixedHabitConfig {
     pub enabled: bool,
-    /// Nombre visible (ej. "Meditación" si sustituye al devocional).
+    /// Nombre visible (por defecto "Ejercicio" o "Lectura").
     pub name: Option<String>,
     #[serde(flatten)]
     pub frequency: FrequencyBody,
@@ -725,14 +725,13 @@ pub struct FixedHabitConfig {
 
 #[derive(Deserialize, ToSchema)]
 pub struct FixedHabitsBody {
-    pub devotional: Option<FixedHabitConfig>,
     pub exercise: Option<FixedHabitConfig>,
     pub reading: Option<FixedHabitConfig>,
     /// Desde cuándo rigen (por defecto hoy).
     pub starts_on: Option<NaiveDate>,
 }
 
-/// Confirma los hábitos fijos propuestos en onboarding (devocional, ejercicio, lectura). Nada se crea sin esta
+/// Confirma los hábitos fijos propuestos en onboarding (ejercicio, lectura). Nada se crea sin esta
 /// confirmación. Idempotente: si ya existe, actualiza su frecuencia desde `starts_on` o lo archiva si `enabled=false`.
 #[utoipa::path(post, path = "/habits/fixed", tag = "habits", request_body = FixedHabitsBody, responses((status = 200, body = Vec<Habit>)))]
 async fn setup_fixed_habits(
@@ -740,20 +739,11 @@ async fn setup_fixed_habits(
     auth: AuthUser,
     Json(b): Json<FixedHabitsBody>,
 ) -> ApiResult<Json<Vec<Habit>>> {
-    let (tz, settings) = user_ctx(&s.pool, auth.user_id).await?;
+    let (tz, _) = user_ctx(&s.pool, auth.user_id).await?;
     let start = b.starts_on.unwrap_or_else(|| today(&s, tz));
     let mut tx = s.pool.begin().await?;
     let mut out = Vec::new();
     for (key, default_name, cfg) in [
-        (
-            "devotional",
-            if settings.devotional_mode == "meditation" {
-                "Meditación"
-            } else {
-                "Devocional"
-            },
-            &b.devotional,
-        ),
         ("exercise", "Ejercicio", &b.exercise),
         ("reading", "Lectura", &b.reading),
     ] {
@@ -823,12 +813,7 @@ async fn setup_fixed_habits(
 
 // ---------- Vínculos explícitos ----------
 
-const TRIGGERS: [&str; 4] = [
-    "weight_logged",
-    "expense_logged",
-    "positive_reflection",
-    "devotional_content",
-];
+const TRIGGERS: [&str; 3] = ["weight_logged", "expense_logged", "positive_reflection"];
 
 /// Vínculos configurados (registrar peso → "Pesarme", gasto → "Registrar gastos", etc.).
 #[utoipa::path(get, path = "/habit-links", tag = "habits", responses((status = 200, body = Vec<HabitLink>)))]

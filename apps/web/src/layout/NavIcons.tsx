@@ -61,7 +61,6 @@ const PATHS: Record<string, ReactNode> = {
       <path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14a6 6 0 013.5 6" />
     </>
   ),
-  "/devocionales": <path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z" />,
   "/lecturas": <path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 21V5M19 19v2H6" />,
   "/contenido": (
     <>

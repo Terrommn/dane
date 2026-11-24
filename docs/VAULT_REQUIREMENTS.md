@@ -1,6 +1,10 @@
 # Matriz de requisitos del vault → aplicación
 
 Fuente: `Vault-Obsidian-esqueleto.zip` (copia sin plugins en `fixtures/vault-skeleton/`).
+
+> **Devocionales quitados (D-039).** Las filas de devocional de esta matriz ya no aplican: la app no tiene pantalla,
+> API, ajuste ni hábito de devocional, y el importador omite `Proyectos/personal/Devocionales/` y la propiedad
+> `devocional` de las dailies. El esqueleto del vault se conserva tal cual como especificación original.
 Inventario leído (T01): `AGENTS.md`, `CLAUDE.md`, `LEEME - Cómo usar este vault.md`, `Home.md`, `Inbox.md`,
 5 notas de proyecto/finanzas, `Pendientes recurrentes.md`, **15 plantillas**, **7 Bases**, **7 comandos**, **8 scripts DataviewJS**,
 y `.obsidian/` (solo para el mapeo de plugins; no se ejecuta nada).

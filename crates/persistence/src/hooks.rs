@@ -18,7 +18,6 @@ pub enum HabitTrigger {
     WeightLogged,
     ExpenseLogged,
     PositiveReflection,
-    DevotionalContent,
 }
 
 impl HabitTrigger {
@@ -27,7 +26,6 @@ impl HabitTrigger {
             Self::WeightLogged => "weight_logged",
             Self::ExpenseLogged => "expense_logged",
             Self::PositiveReflection => "positive_reflection",
-            Self::DevotionalContent => "devotional_content",
         }
     }
     fn source(&self) -> &'static str {
@@ -35,7 +33,6 @@ impl HabitTrigger {
             Self::WeightLogged => "weight",
             Self::ExpenseLogged => "expense",
             Self::PositiveReflection => "reflection",
-            Self::DevotionalContent => "devotional",
         }
     }
 }
@@ -72,7 +69,7 @@ pub async fn mark_linked_habit(
     Ok(Some(habit_id))
 }
 
-/// Revierte la marca automática si ya no hay contenido que la justifique (p. ej. devocional vaciado).
+/// Revierte la marca automática si ya no hay contenido que la justifique (p. ej. reflexión borrada).
 /// Solo borra entradas creadas por ese disparador; una marca manual del usuario se respeta.
 pub async fn unmark_linked_habit(
     tx: &mut Tx<'_>,

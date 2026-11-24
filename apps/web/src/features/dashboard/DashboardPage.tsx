@@ -1,5 +1,5 @@
 // Dashboard general (equivalente a Home.md / home.js con las correcciones C1, C2, C12 y C13): objetivos vs avance,
-// hábitos separados, fallas devocionales, 30 días, peso sin interpolar, energía, paz, finanzas y comparaciones por
+// hábitos separados, 30 días, peso sin interpolar, energía, paz, finanzas y comparaciones por
 // el mismo tramo (u opcionalmente periodos completos, etiquetado). Cada métrica enlaza a su fuente.
 import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router";
@@ -107,10 +107,9 @@ function Body({
   onCompare: (c: "same_span" | "full") => void;
 }) {
   const w = d.weight;
-  const dev = d.devotional;
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         <KpiCard
           label="Peso (último)"
           value={w.last ? `${formatNumber(w.last.kg, 1)} kg` : "—"}
@@ -141,30 +140,6 @@ function Body({
               : "Se necesitan 2 mediciones reales"
           }
         />
-        {dev ? (
-          <KpiCard
-            label="Fallas devocionales del mes"
-            value={
-              dev.max_allowed !== null && dev.max_allowed !== undefined
-                ? `${dev.failures_total}/${dev.max_allowed}`
-                : dev.failures_total
-            }
-            tone={
-              dev.over_limit
-                ? "danger"
-                : dev.max_allowed !== null && dev.max_allowed !== undefined
-                  ? "ok"
-                  : undefined
-            }
-            sub={
-              <Link to={dev.route}>
-                {dev.explicit_failures} "no" + {dev.unrecorded} sin registro · {dev.closed_days} días cerrados
-              </Link>
-            }
-          />
-        ) : (
-          <KpiCard label="Devocional" value="—" sub="Sin hábito devocional" />
-        )}
         <KpiCard
           label="Consumo del mes"
           value={formatMoney(d.finance.month.consumption_cents, currency)}
@@ -175,7 +150,6 @@ function Body({
           }
         />
       </div>
-      {dev?.note && <p className="text-xs text-muted">{dev.note}</p>}
 
       <Card title="Objetivos del mes" actions={<Link to="/objetivos">Objetivos →</Link>}>
         {d.month_goals.length ? (

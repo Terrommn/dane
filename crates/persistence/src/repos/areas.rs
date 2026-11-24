@@ -215,7 +215,7 @@ pub async fn update_project(
     }
 }
 
-/// Elemento de actividad reciente (vista "Dev reciente" de Proyectos.base, sin devocionales/clases/objetivos/finanzas).
+/// Elemento de actividad reciente (vista "Dev reciente" de Proyectos.base, sin clases/objetivos/finanzas).
 #[derive(Debug, Clone, FromRow, Serialize, ToSchema)]
 pub struct ActivityItem {
     pub entity_type: String,

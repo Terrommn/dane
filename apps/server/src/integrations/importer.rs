@@ -168,7 +168,6 @@ pub enum Payload {
         closing: String,
         goal: vault::GoalImport,
     },
-    Devotional(vault::DevotionalImport),
     Daily(vault::DailyImport),
     Task(vault::TaskImport),
     Weekly(vault::WeeklyImport),
@@ -207,7 +206,6 @@ impl Payload {
                     6
                 }
             }
-            Payload::Devotional(_) => 7,
             Payload::Daily(_) => 8,
             Payload::Task(_) => 9,
             Payload::Weekly(_) => 10,
@@ -231,7 +229,6 @@ impl Payload {
             Payload::Devlog(_) => "devlog",
             Payload::Class(_) => "class_note",
             Payload::Goal { .. } => "goal",
-            Payload::Devotional(_) => "devotional",
             Payload::Daily(_) => "checkin",
             Payload::Task(_) => "task",
             Payload::Weekly(_) => "weekly_review",
@@ -257,6 +254,7 @@ fn table_of(entity_type: &str) -> Option<&'static str> {
         "devlog" => "devlogs",
         "class_note" => "class_notes",
         "goal" => "goals",
+        // Ya no se importan devocionales, pero deshacer una importación anterior todavía puede tocarlos.
         "devotional" => "devotionals",
         "checkin" => "daily_checkins",
         "task" => "tasks",
@@ -335,7 +333,6 @@ fn known_keys(kind: &FileKind) -> &'static [&'static str] {
             "energia",
             "peso",
         ],
-        FileKind::Devotional { .. } => &["fecha", "categories", "pasaje"],
         FileKind::GoalMonth { .. } | FileKind::GoalWeek { .. } => {
             &["categories", "tipo", "periodo", "inicio", "fin", "estado", "mes"]
         }
@@ -489,23 +486,6 @@ pub fn build_plan(files: &[VaultFile]) -> Plan {
         let p = f.path.as_str();
         match kind {
             FileKind::Daily { date } => dailies.push((p.to_string(), vault::daily(&note, date))),
-            FileKind::Devotional { date } => {
-                let d = vault::devotional(&note, date);
-                if d.has_content() {
-                    plan.items.push(item(
-                        p,
-                        "",
-                        format!("Devocional {date}"),
-                        Payload::Devotional(d),
-                        unk,
-                    ));
-                } else {
-                    plan.ignored.push(FileRef {
-                        path: p.into(),
-                        reason: "devocional vacío".into(),
-                    });
-                }
-            }
             FileKind::GoalMonth { period } | FileKind::GoalWeek { period } => {
                 let is_month = vault::classify(p)
                     == FileKind::GoalMonth {
@@ -839,10 +819,6 @@ pub async fn resolve_actions(state: &AppState, user_id: Uuid, plan: &mut Plan) -
         let (sql, arg): (Option<&str>, String) = match &it.payload {
             Payload::Daily(d) => (
                 Some("SELECT 1 FROM daily_checkins WHERE user_id = $1 AND on_date = $2::date"),
-                d.date.to_string(),
-            ),
-            Payload::Devotional(d) => (
-                Some("SELECT 1 FROM devotionals WHERE user_id = $1 AND on_date = $2::date"),
                 d.date.to_string(),
             ),
             Payload::Weekly(w) => (
@@ -1706,30 +1682,6 @@ async fn apply_item(
             }
             Ok(Some(id))
         }
-        Payload::Devotional(d) => {
-            let va: Vec<Value> = d
-                .verse_actions
-                .iter()
-                .map(|(v, a)| json!({ "verse": v, "action": a }))
-                .collect();
-            let id: Uuid = sqlx::query_scalar(
-                "INSERT INTO devotionals (user_id, on_date, passage, verse_actions, learned, teaching, prayer, song) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-            )
-            .bind(user_id)
-            .bind(d.date)
-            .bind(&d.passage)
-            .bind(Value::Array(va))
-            .bind(&d.learned)
-            .bind(&d.teaching)
-            .bind(&d.prayer)
-            .bind(&d.song)
-            .fetch_one(&mut **tx)
-            .await?;
-            hooks::mark_linked_habit(tx, user_id, HabitTrigger::DevotionalContent, d.date)
-                .await
-                .map_err(repo_to_sqlx)?;
-            Ok(Some(id))
-        }
         Payload::Daily(d) => {
             let weight = d
                 .weight_kg
@@ -2130,7 +2082,6 @@ async fn fixed_habit(tx: &mut Tx<'_>, ctx: &mut Ctx, user_id: Uuid, key: &str) -
         return Ok(id);
     }
     let (name, freq, per_week) = match key {
-        "devotional" => ("Devocional", "daily", None),
         "exercise" => ("Ejercicio", "times_per_week", Some(4i16)),
         _ => ("Lectura", "daily", None),
     };

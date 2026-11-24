@@ -1,4 +1,4 @@
-//! A-core: check-in diario (T20), devocionales (T28) y vínculos explícitos con hábitos.
+//! A-core: check-in diario (T20) y vínculos explícitos con hábitos (los devocionales se quitaron, D-039).
 //! Reloj de pruebas: 2026-11-12 12:00 America/Monterrey.
 
 mod common;
@@ -208,88 +208,27 @@ async fn explicit_links_mark_a_single_occurrence(pool: PgPool) {
 }
 
 #[sqlx::test(migrator = "persistence::MIGRATOR")]
-async fn devotional_with_real_content_completes_linked_habit(pool: PgPool) {
+async fn devotionals_are_gone(pool: PgPool) {
     let t = TestApp::new(pool.clone());
     let a = t.login(111).await;
+    // Ya no hay API de devocionales ni se puede vincular un hábito a "devocional con contenido".
+    assert_eq!(a.get("/devotionals").await.0, StatusCode::NOT_FOUND);
     let (_, fixed) = a
         .post(
             "/habits/fixed",
-            json!({ "devotional": { "enabled": true, "frequency": "daily" }, "starts_on": "2026-11-01" }),
+            json!({ "reading": { "enabled": true, "frequency": "daily" }, "starts_on": "2026-11-01" }),
         )
         .await;
-    let dev = fixed[0]["id"].as_str().unwrap().to_string();
-    a.put("/habit-links/devotional_content", json!({ "habit_id": dev }))
-        .await;
-    // Devocional vacío: no completa.
-    let (st, d) = a
-        .put(
-            "/devotionals/2026-11-12",
-            json!({ "passage": "  ", "verse_actions": [{ "verse": "", "action": "" }] }),
-        )
-        .await;
-    assert_eq!(st, StatusCode::OK, "{d}");
-    assert_eq!(d["verse_actions"].as_array().unwrap().len(), 0);
-    assert_eq!(entries_count(&pool, &dev).await, 0);
-    // Con contenido real: completa la ocurrencia de ese día.
-    let (st, d) = a
-        .put("/devotionals/2026-11-12", json!({ "version": d["version"], "passage": "Juan 15:1-8", "verse_actions": [{ "verse": "15:5", "action": "Orar antes de trabajar" }], "learned": "Permanecer" }))
-        .await;
-    assert_eq!(st, StatusCode::OK, "{d}");
-    assert_eq!(entries_count(&pool, &dev).await, 1);
-    // Versión vieja → 409.
+    let read = fixed[0]["id"].as_str().unwrap().to_string();
     assert_eq!(
-        a.put("/devotionals/2026-11-12", json!({ "version": 1, "passage": "x" }))
-            .await
-            .0,
-        StatusCode::CONFLICT
-    );
-    // Historial y búsqueda sin acentos.
-    a.put(
-        "/devotionals/2026-11-10",
-        json!({ "passage": "Salmo 23", "prayer": "Gracias por la canción" }),
-    )
-    .await;
-    let (_, page) = a.get("/devotionals?q=cancion").await;
-    assert_eq!(page["total"], 1);
-    assert_eq!(page["items"][0]["on_date"], "2026-11-10");
-    let (_, all) = a.get("/devotionals").await;
-    assert_eq!(all["items"][0]["on_date"], "2026-11-12", "orden por fecha desc");
-    // Plantilla por defecto del vault y modo meditación desde ajustes.
-    let (_, tpl) = a.get("/devotionals/template").await;
-    assert_eq!(tpl["sections"].as_array().unwrap().len(), 6);
-    let (_, s) = a.get("/settings").await;
-    a.put(
-        "/settings",
-        json!({ "version": s["version"], "devotional_mode": "meditation" }),
-    )
-    .await;
-    let (_, tpl) = a.get("/devotionals/template").await;
-    assert_eq!(tpl["mode"], "meditation");
-    // Borrar retira la marca automática.
-    assert_eq!(
-        a.delete("/devotionals/2026-11-12").await.0,
-        StatusCode::NO_CONTENT
-    );
-    let on_12: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM habit_entries WHERE habit_id = $1::uuid AND on_date = '2026-11-12'",
-    )
-    .bind(&dev)
-    .fetch_one(&pool)
-    .await
-    .unwrap();
-    assert_eq!(on_12, 0);
-    assert_eq!(
-        entries_count(&pool, &dev).await,
-        1,
-        "el devocional del día 10 conserva su ocurrencia"
-    );
-    // Futuro → 422.
-    assert_eq!(
-        a.put("/devotionals/2026-11-20", json!({ "passage": "x" }))
+        a.put("/habit-links/devotional_content", json!({ "habit_id": read }))
             .await
             .0,
         StatusCode::UNPROCESSABLE_ENTITY
     );
+    // El día ya no trae bloque devocional.
+    let (_, day) = a.get("/checkins/2026-11-12").await;
+    assert!(day.get("devotional").is_none() && day.get("devotional_enabled").is_none());
 }
 
 #[sqlx::test(migrator = "persistence::MIGRATOR")]

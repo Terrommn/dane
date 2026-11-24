@@ -185,8 +185,16 @@ async fn dry_run_then_apply_then_reimport_is_idempotent(pool: PgPool) {
     );
     assert_eq!(count(&pool, "SELECT count(*) FROM task_events e JOIN tasks t ON t.id = e.task_id WHERE t.user_id = $1 AND t.title = 'Pagar la luz' AND e.kind = 'carried_over'", user).await, 1);
     assert_eq!(count(&pool, "SELECT count(*) FROM tasks WHERE user_id = $1 AND external_source = 'clickup' AND external_id = '86abc'", user).await, 1);
-    // Hábitos: fijo devocional (true) registrado; ejercicio false omitido; hábito del objetivo hecho el 2 y no hecho el 3.
-    assert_eq!(count(&pool, "SELECT count(*) FROM habit_entries e JOIN habits h ON h.id = e.habit_id WHERE e.user_id = $1 AND h.fixed_key = 'devotional'", user).await, 1);
+    // Hábitos: `devocional: true` se ignora (D-039); ejercicio false omitido; hábito del objetivo hecho el 2 y no el 3.
+    assert_eq!(
+        count(
+            &pool,
+            "SELECT count(*) FROM habits WHERE user_id = $1 AND fixed_key = 'devotional'",
+            user
+        )
+        .await,
+        0
+    );
     assert_eq!(
         count(
             &pool,

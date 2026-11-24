@@ -360,17 +360,16 @@ async fn fixed_habits_are_created_only_on_confirmation_and_idempotent(pool: PgPo
         "no se siembran hábitos sin confirmación"
     );
     let body = json!({
-        "devotional": { "enabled": true, "frequency": "daily" },
         "exercise": { "enabled": true, "frequency": "times_per_week", "times_per_week": 4 },
         "reading": { "enabled": false, "frequency": "daily" }
     });
     let (st, r) = a.post("/habits/fixed", body.clone()).await;
     assert_eq!(st, StatusCode::OK, "{r}");
-    assert_eq!(r.as_array().unwrap().len(), 2);
+    assert_eq!(r.as_array().unwrap().len(), 1);
     let (_, r2) = a.post("/habits/fixed", body).await;
-    assert_eq!(r2.as_array().unwrap().len(), 2);
+    assert_eq!(r2.as_array().unwrap().len(), 1);
     let (_, list) = a.get("/habits").await;
-    assert_eq!(list.as_array().unwrap().len(), 2);
+    assert_eq!(list.as_array().unwrap().len(), 1);
     let ex = list
         .as_array()
         .unwrap()

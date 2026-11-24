@@ -391,8 +391,6 @@ function CheckinEditor({
         <HabitsSection title="Otros hábitos" items={habits.other} form={form} onChange={setHabit} />
       )}
 
-      {view.devotional_enabled && <DevotionalCard view={view} date={date} />}
-
       <Card title="Agenda">
         {view.agenda.length === 0 ? (
           <p className="text-sm text-muted">
@@ -601,32 +599,6 @@ function HabitsSection({
             );
           })}
         </div>
-      )}
-    </Card>
-  );
-}
-
-function DevotionalCard({ view, date }: { view: DayView; date: string }) {
-  const d = view.devotional;
-  const label = view.devotional_mode === "meditation" ? "Meditación" : "Devocional";
-  const hasContent =
-    !!d && [d.passage, d.learned, d.teaching, d.prayer, d.song].some((x) => x.trim().length > 0);
-  return (
-    <Card title={label} actions={<Link to={`/devocionales/${date}`}>{d ? "Abrir" : "Escribir"} →</Link>}>
-      {d ? (
-        <div className="text-sm">
-          {d.passage && (
-            <p>
-              <span className="text-muted">Pasaje:</span> {d.passage}
-            </p>
-          )}
-          {d.learned && <p className="mt-1 line-clamp-3">{d.learned}</p>}
-          {!hasContent && <p className="text-muted">Creado pero sin contenido: no marca el hábito.</p>}
-        </div>
-      ) : (
-        <p className="text-sm text-muted">
-          Sin escribir todavía. Un {label.toLowerCase()} con contenido real marca el hábito.
-        </p>
       )}
     </Card>
   );

@@ -12,7 +12,6 @@ async fn fixed(a: &Client) -> Value {
         .post(
             "/habits/fixed",
             json!({
-                "devotional": { "enabled": true, "frequency": "daily" },
                 "exercise": { "enabled": true, "frequency": "times_per_week", "times_per_week": 4 },
                 "reading": { "enabled": true, "frequency": "daily" },
                 "starts_on": "2026-11-01"
@@ -39,11 +38,14 @@ async fn weekly_summary_counts_sources_and_review_is_editable(pool: PgPool) {
     let t = TestApp::new(pool.clone());
     let a = t.login(111).await;
     let f = fixed(&a).await;
-    let dev = id_of(&f, "devotional");
+    let read = id_of(&f, "reading");
     let ex = id_of(&f, "exercise");
     for d in ["2026-11-09", "2026-11-10", "2026-11-11"] {
-        a.put(&format!("/habits/{dev}/entries/{d}"), json!({ "status": "done" }))
-            .await;
+        a.put(
+            &format!("/habits/{read}/entries/{d}"),
+            json!({ "status": "done" }),
+        )
+        .await;
     }
     for d in ["2026-11-09", "2026-11-11"] {
         a.put(&format!("/habits/{ex}/entries/{d}"), json!({ "status": "done" }))
@@ -83,8 +85,8 @@ async fn weekly_summary_counts_sources_and_review_is_editable(pool: PgPool) {
             .unwrap()
             .clone()
     };
-    assert_eq!(fh("devotional")["done"], 3);
-    assert_eq!(fh("devotional")["target"], 7);
+    assert_eq!(fh("reading")["done"], 3);
+    assert_eq!(fh("reading")["target"], 7);
     assert_eq!(fh("exercise")["done"], 2);
     assert_eq!(fh("exercise")["target"], 4, "Ejercicio: /4 (meta)");
     assert_eq!(s["went_badly"].as_array().unwrap().len(), 2);
@@ -144,11 +146,11 @@ async fn weekly_summary_counts_sources_and_review_is_editable(pool: PgPool) {
 }
 
 #[sqlx::test(migrator = "persistence::MIGRATOR")]
-async fn dashboard_devotional_failures_weight_and_comparisons(pool: PgPool) {
+async fn dashboard_weight_heatmap_and_comparisons(pool: PgPool) {
     let t = TestApp::new(pool.clone());
     let a = t.login(111).await;
     let f = fixed(&a).await;
-    let dev = id_of(&f, "devotional");
+    let dev = id_of(&f, "reading");
     // Del 1 al 11 (días cerrados): 7 hechos, 2 "no" explícitos, 2 sin registro. Hoy (12) abierto no cuenta.
     for d in 1..=7 {
         a.put(
@@ -165,7 +167,11 @@ async fn dashboard_devotional_failures_weight_and_comparisons(pool: PgPool) {
         .await;
     }
     let (_, s) = a.get("/settings").await;
-    a.put("/settings", json!({ "version": s["version"], "max_devotional_failures": 3, "weight_goal_kg": "75", "weight_direction": "decrease" })).await;
+    a.put(
+        "/settings",
+        json!({ "version": s["version"], "weight_goal_kg": "75", "weight_direction": "decrease" }),
+    )
+    .await;
     a.put("/checkins/2026-11-02", json!({ "weight_kg": "80", "energy": 3 }))
         .await;
     a.put(
@@ -177,13 +183,7 @@ async fn dashboard_devotional_failures_weight_and_comparisons(pool: PgPool) {
 
     let (st, d) = a.get("/dashboard").await;
     assert_eq!(st, StatusCode::OK, "{d}");
-    let dv = &d["devotional"];
-    assert_eq!(dv["explicit_failures"], 2);
-    assert_eq!(dv["unrecorded"], 2);
-    assert_eq!(dv["failures_total"], 4);
-    assert_eq!(dv["max_allowed"], 3);
-    assert_eq!(dv["over_limit"], true);
-    assert_eq!(dv["closed_days"], 11);
+    assert!(d.get("devotional").is_none(), "Dane ya no tiene devocionales");
     // Peso: último real y cambio del mes sin interpolar.
     assert_eq!(d["weight"]["last"]["kg"], 78.5);
     assert_eq!(d["weight"]["change_month"], -1.5);
@@ -201,7 +201,7 @@ async fn dashboard_devotional_failures_weight_and_comparisons(pool: PgPool) {
     assert!(day10["unrecorded"].as_u64().unwrap() >= 1);
     assert_eq!(day10["route"], "/hoy?date=2026-11-10");
     // Hábitos separados por tipo.
-    assert_eq!(d["habits"]["fixed"].as_array().unwrap().len(), 3);
+    assert_eq!(d["habits"]["fixed"].as_array().unwrap().len(), 2);
     // Comparación por mismo tramo (1–12 nov vs 1–12 oct) y bloque financiero.
     let mc = &d["month_comparison"];
     assert_eq!(mc["mode"], "same_span");
@@ -232,19 +232,10 @@ async fn dashboard_devotional_failures_weight_and_comparisons(pool: PgPool) {
 }
 
 #[sqlx::test(migrator = "persistence::MIGRATOR")]
-async fn dashboard_without_configured_max_and_without_data(pool: PgPool) {
+async fn dashboard_without_data(pool: PgPool) {
     let t = TestApp::new(pool);
     let a = t.login(111).await;
     let (st, d) = a.get("/dashboard").await;
     assert_eq!(st, StatusCode::OK, "{d}");
-    assert!(
-        d["devotional"].is_null(),
-        "sin hábito devocional no se inventa la métrica"
-    );
     assert!(d["weight"]["last"].is_null());
-    let f = fixed(&a).await;
-    let _ = f;
-    let (_, d) = a.get("/dashboard").await;
-    assert!(d["devotional"]["max_allowed"].is_null());
-    assert!(d["devotional"]["over_limit"].is_null());
 }
