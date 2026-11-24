@@ -15,8 +15,9 @@ y la misma web funciona en el navegador y como PWA instalable.
 * **Check-in guiado** (`/hoy?guiado=manana|noche`): paso a paso. Mañana: energía, peso, gasto y resumen del día.
   Noche: hábitos, bitácora, reflexión y cierre. Usa el mismo borrador, cola offline y control de conflictos que el
   formulario completo de `/hoy`.
-* **Navegación**: barra superior con menús Objetivos, Organizar, Finanzas, Vida y Conocimiento, búsqueda, captura
-  rápida, avisos y menú de perfil. Las estadísticas completas están en `/dashboard`.
+* **Navegación**: en escritorio, barra lateral con Inicio y secciones colapsables (Objetivos, Organizar, Finanzas,
+  Vida, Conocimiento, Sistema) que se puede reducir a un riel de iconos; arriba, búsqueda, captura rápida, avisos y
+  menú de perfil. Las estadísticas completas están en `/dashboard`.
 * **Asistente diario en Telegram (sin IA)**: mensaje de la mañana (07:00 por defecto) con tareas y agenda del día y
   botón al check-in guiado; cierre del día (21:00); aviso N minutos antes de cada evento; `hola`, `menú` o `/menu`
   responden con un menú de botones. Horarios y anticipación se configuran en **Ajustes → Recordatorios en Telegram**.

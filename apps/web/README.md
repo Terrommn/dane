@@ -22,7 +22,8 @@ de la PWA (Node puro, sin dependencias).
 ```
 src/
   app/          App (rutas), nav, queryClient
-  layout/       AppShell (barra superior con menús en escritorio; barra inferior Hoy · ＋ · Menú en móvil, oculta en el
+  layout/       AppShell (barra lateral con secciones colapsables y modo riel en escritorio, preferencias en
+                localStorage; barra inferior Hoy · ＋ · Menú en móvil, oculta en el
                 check-in guiado; BackButton de Telegram), NavIcons, aviso de actualización
   components/ui Button, Field (Text/TextArea/Select/Checkbox/Radio), Dialog/ConfirmDialog, States (vacío/carga/error/QueryState),
                 DataTable (filtro sin acentos, orden, paginación; tarjetas en móvil), Display (ProgressBar, KpiCard, Card,
